@@ -6,7 +6,10 @@
     <title>Register - Kájọpọ̀ Succeed Together</title>
     <!-- Theme System -->
     <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="css/notifications.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/mobile-nav.js"></script>
+    <script src="js/error-handler.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         /* Override Tailwind with theme variables */
@@ -62,10 +65,19 @@
                     <a href="contact.html" class="text-gray-600 hover:text-cyan-600 transition-colors font-medium">Contact</a>
                 </nav>
                 
-                <div class="flex space-x-4">
+                <div class="hidden md:flex space-x-4">
                     <a href="signin-form.html" class="text-cyan-600 hover:text-cyan-700 px-4 py-2 rounded-lg transition-colors">
                         Already have an account? Sign In
                     </a>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-gray-600 hover:text-gray-900 focus:outline-none focus:text-gray-900">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>
@@ -202,7 +214,7 @@
                     <h2 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Areas of Interest</h2>
                     <p class="text-sm text-gray-600">Select the impact areas you're most interested in (check all that apply):</p>
                     
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                         <label class="flex items-center space-x-2">
                             <input type="checkbox" name="interests" value="healthcare" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                             <span class="text-sm text-gray-700">Healthcare</span>
@@ -275,11 +287,11 @@
                 </div>
 
                 <!-- Submit Button -->
-                <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
-                    <button type="button" onclick="history.back()" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
+                <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4 pt-6 border-t border-gray-200">
+                    <button type="button" onclick="history.back()" class="w-full sm:w-auto px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
                         Cancel
                     </button>
-                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium">
+                    <button type="submit" class="w-full sm:w-auto px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium">
                         Create Account
                     </button>
                 </div>
@@ -295,7 +307,17 @@
         </div>
     </main>
 
+    <!-- JavaScript Modules -->
+    <script src="js/data-manager.js"></script>
+    <script src="js/form-validation.js"></script>
+    <script src="js/auth.js"></script>
+    
     <script>
+        // Initialize components
+        const dataManager = new DataManager();
+        const formValidator = new FormValidator();
+        const userAuth = new UserAuth();
+        
         document.addEventListener('DOMContentLoaded', function() {
             setupFormValidation();
             setupEventListeners();
@@ -303,25 +325,37 @@
 
         function setupFormValidation() {
             const form = document.getElementById('registrationForm');
-            const password = document.getElementById('password');
+            
+            // Setup enhanced form validation
+            formValidator.setupFormValidation(form, ValidationRules.registration);
+            
+            // Add real-time validation for all form fields
+            const fields = ['firstName', 'lastName', 'email', 'password', 'confirmPassword', 'location'];
+            fields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('blur', () => {
+                        formValidator.validateField(field, ValidationRules.registration[fieldId]);
+                    });
+                    
+                    field.addEventListener('input', () => {
+                        formValidator.clearFieldError(field);
+                    });
+                }
+            });
+            
+            // Special handling for password confirmation
             const confirmPassword = document.getElementById('confirmPassword');
-
-            // Password confirmation validation
-            confirmPassword.addEventListener('input', function() {
-                if (password.value !== confirmPassword.value) {
-                    confirmPassword.setCustomValidity('Passwords do not match');
-                } else {
-                    confirmPassword.setCustomValidity('');
-                }
-            });
-
-            password.addEventListener('input', function() {
-                if (confirmPassword.value && password.value !== confirmPassword.value) {
-                    confirmPassword.setCustomValidity('Passwords do not match');
-                } else {
-                    confirmPassword.setCustomValidity('');
-                }
-            });
+            if (confirmPassword) {
+                confirmPassword.addEventListener('input', () => {
+                    const password = document.getElementById('password');
+                    if (password && password.value !== confirmPassword.value) {
+                        formValidator.showFieldError(confirmPassword, 'Passwords do not match');
+                    } else {
+                        formValidator.clearFieldError(confirmPassword);
+                    }
+                });
+            }
         }
 
         function setupEventListeners() {
@@ -333,60 +367,59 @@
             });
         }
 
-        function handleRegistration() {
+        async function handleRegistration() {
             const form = document.getElementById('registrationForm');
+            const submitBtn = form.querySelector('button[type="submit"]');
             
-            // Validate form
-            if (!form.checkValidity()) {
-                form.reportValidity();
-                return;
-            }
-
-            // Collect form data
-            const formData = new FormData(form);
-            const userData = {};
-            
-            // Process regular form fields
-            for (let [key, value] of formData.entries()) {
-                if (key === 'interests') {
-                    if (!userData.interests) userData.interests = [];
-                    userData.interests.push(value);
-                } else {
-                    userData[key] = value;
+            try {
+                // Show loading state using error handler
+                errorHandler.showLoading(submitBtn, 'Creating Account...');
+                
+                // Validate form using enhanced validation
+                const isValid = formValidator.validateForm(form, ValidationRules.registration);
+                if (!isValid) {
+                    return;
                 }
-            }
-
-            // Add metadata
-            userData.id = generateUserId();
-            userData.registeredAt = new Date().toISOString();
-            userData.isVerified = false;
-            userData.profileComplete = false;
-            userData.status = 'Pending'; // Default status for admin approval
-
-            // In a real application, you would send this to your API
-            console.log('Registration data:', userData);
-            
-            // Simulate successful registration
-            // Store user data in localStorage for demo purposes
-            // Use unique key to support multiple user registrations
-            const userKey = `kajopo_user_${userData.id}`;
-            localStorage.setItem(userKey, JSON.stringify(userData));
-            
-            // Also keep the main user key for backward compatibility
-            localStorage.setItem('kajopo_user', JSON.stringify(userData));
-            
-            // Show success message
-            showSuccessMessage();
-            
-            // Redirect after a short delay
-            setTimeout(() => {
-                const returnUrl = new URLSearchParams(window.location.search).get('returnUrl');
-                if (returnUrl) {
-                    window.location.href = returnUrl;
-                } else {
-                    window.location.href = 'index.html';
+                
+                // Collect form data
+                const formData = new FormData(form);
+                const userData = {};
+                
+                // Process regular form fields
+                for (let [key, value] of formData.entries()) {
+                    if (key === 'interests') {
+                        if (!userData.interests) userData.interests = [];
+                        userData.interests.push(value);
+                    } else {
+                        userData[key] = value;
+                    }
                 }
-            }, 2000);
+                
+                // Use enhanced auth system for registration
+                const registrationResult = await userAuth.register(userData);
+                
+                if (registrationResult.success) {
+                    // Show success message
+                    formValidator.showSuccessMessage('Account created successfully! Welcome to Kájọpọ̀!');
+                    
+                    // Redirect after a short delay
+                    setTimeout(() => {
+                        const returnUrl = new URLSearchParams(window.location.search).get('returnUrl');
+                        if (returnUrl && returnUrl.startsWith('/')) {
+                            window.location.href = returnUrl;
+                        } else {
+                            window.location.href = 'dashboard.html';
+                        }
+                    }, 2000);
+                }
+                // Error handling is done in the auth.js file
+            } catch (error) {
+                console.error('Registration error:', error);
+                errorHandler.handleError(error, 'Registration');
+            } finally {
+                // Hide loading state
+                errorHandler.hideLoading(submitBtn);
+            }
         }
 
         function generateUserId() {

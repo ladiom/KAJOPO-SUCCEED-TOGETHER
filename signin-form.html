@@ -6,6 +6,7 @@
     <title>Sign In - Kájọpọ̀ Succeed Together</title>
     <!-- Theme System -->
     <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="css/notifications.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
@@ -62,14 +63,34 @@
                     <a href="contact.html" class="text-gray-600 hover:text-cyan-600 transition-colors font-medium">Contact</a>
                 </nav>
                 
-                <div class="flex space-x-4">
+                <div class="hidden md:flex space-x-4">
                     <a href="registration-form.html" class="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 transition-colors">
                         Create Account
                     </a>
                 </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-gray-600 hover:text-gray-900 focus:outline-none focus:text-gray-900">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
     </header>
+
+    <!-- Mobile Navigation Menu -->
+    <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-gray-200 shadow-sm">
+        <div class="px-4 py-2 space-y-1">
+            <a href="about-us.html" class="block px-3 py-2 text-gray-600 hover:text-cyan-600 transition-colors font-medium">About Us</a>
+            <a href="contact.html" class="block px-3 py-2 text-gray-600 hover:text-cyan-600 transition-colors font-medium">Contact</a>
+            <a href="registration-form.html" class="block px-3 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors text-center">
+                Create Account
+            </a>
+        </div>
+    </div>
 
     <!-- Main Content -->
     <main class="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -130,9 +151,17 @@
         </div>
     </main>
 
+    <!-- Include JavaScript modules -->
+    <script src="js/mobile-nav.js"></script>
+    <script src="js/error-handler.js"></script>
+    <script src="js/data-manager.js"></script>
+    <script src="js/form-validation.js"></script>
+    <script src="js/auth.js"></script>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             setupEventListeners();
+            setupFormValidation();
         });
 
         function setupEventListeners() {
@@ -153,97 +182,106 @@
                 loginDemoUser('provider');
             });
         }
-
-        function handleSignIn() {
+        
+        function setupFormValidation() {
             const form = document.getElementById('signinForm');
-            const email = document.getElementById('email').value;
+            formValidator.setupRealTimeValidation(form, ValidationRules.login);
+        }
+
+        async function handleSignIn() {
+            const form = document.getElementById('signinForm');
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('remember').checked;
             
-            // Validate form
-            if (!form.checkValidity()) {
-                form.reportValidity();
-                return;
-            }
-
-            // In a real application, you would authenticate with your API
-            // For demo purposes, we'll check all registered users in localStorage
-            const allKeys = Object.keys(localStorage);
-            const userKeys = allKeys.filter(key => key.startsWith('kajopo_user'));
+            const submitBtn = form.querySelector('button[type="submit"]');
             
-            // Check each user key for matching email
-            for (const key of userKeys) {
-                try {
-                    const userData = JSON.parse(localStorage.getItem(key));
-                    if (userData && userData.email === email) {
-                        // Successful login - set the main user key for compatibility
-                        localStorage.setItem('kajopo_user', JSON.stringify(userData));
-                        
-                        showSuccessMessage('Welcome back!');
-                        redirectAfterLogin();
-                        return;
-                    }
-                } catch (e) {
-                    console.warn('Error parsing user data from key:', key, e);
+            try {
+                // Show loading state
+                errorHandler.showLoading(submitBtn, 'Signing in...');
+                
+                // Basic validation
+                if (!email || !password) {
+                    errorHandler.showError('Please fill in all fields');
+                    return;
                 }
-            }
+                
+                // Validate form using our validation system
+                const validation = formValidator.validateForm(form, ValidationRules.login);
+                if (!validation.isValid) {
+                    // Errors are already shown by the validator
+                    return;
+                }
 
-            // If no matching user found, show error
-            showErrorMessage('Invalid email or password. Please try again or use a demo login.');
+                // Use our enhanced auth system
+                const loginResult = await userAuth.login(email, password, rememberMe);
+                
+                if (loginResult.success) {
+                    // Handle return URL if present
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const returnUrl = urlParams.get('returnUrl');
+                    
+                    // Small delay to show success message
+                    setTimeout(() => {
+                        if (returnUrl && returnUrl.startsWith('/')) {
+                            window.location.href = returnUrl;
+                        } else {
+                            window.location.href = 'dashboard.html';
+                        }
+                    }, 1000);
+                }
+                // Error handling is done in the auth.js file
+            } catch (error) {
+                console.error('Login error:', error);
+                errorHandler.handleError(error, 'Sign in');
+            } finally {
+                // Hide loading state
+                errorHandler.hideLoading(submitBtn);
+            }
         }
 
         function loginDemoUser(type) {
-            let demoUser;
+            // Show loading state
+            const demoBtn = document.getElementById(type === 'seeker' ? 'demoSeeker' : 'demoProvider');
+            const originalText = demoBtn.textContent;
+            demoBtn.textContent = 'Logging in...';
+            demoBtn.disabled = true;
             
-            if (type === 'seeker') {
-                demoUser = {
-                    id: 'demo_seeker_1',
-                    accountType: 'seeker',
-                    firstName: 'Sarah',
-                    lastName: 'Johnson',
-                    email: 'sarah.johnson@example.com',
-                    phone: '+1234567890',
-                    location: 'Nairobi, Kenya',
-                    currentRole: 'Community Health Coordinator',
-                    organization: 'Health for All NGO',
-                    experience: '6-10',
-                    skills: 'Community health, Training delivery, Health education, Data collection, Program management',
-                    languages: 'English, Swahili',
-                    interests: ['healthcare', 'education', 'community-development'],
-                    bio: 'Passionate about improving healthcare access in underserved communities through innovative programs and community engagement.',
-                    registeredAt: new Date().toISOString(),
-                    isVerified: true,
-                    profileComplete: true
-                };
-            } else {
-                demoUser = {
-                    id: 'demo_provider_1',
-                    accountType: 'provider',
-                    firstName: 'Michael',
-                    lastName: 'Chen',
-                    email: 'michael.chen@globalhealth.org',
-                    phone: '+1987654321',
-                    location: 'New York, USA',
-                    currentRole: 'Program Director',
-                    organization: 'Global Health Initiative',
-                    experience: '11-15',
-                    skills: 'Program management, Grant writing, Partnership development, Strategic planning, Impact measurement',
-                    languages: 'English, Mandarin, Spanish',
-                    interests: ['healthcare', 'poverty', 'economic-development'],
-                    bio: 'Leading global health programs focused on sustainable development and capacity building in emerging markets.',
-                    registeredAt: new Date().toISOString(),
-                    isVerified: true,
-                    profileComplete: true
-                };
-            }
-            
-            // Store demo user data
-            localStorage.setItem('kajopo_user', JSON.stringify(demoUser));
-            
-            // Show success message
-            showSuccessMessage(`Welcome, ${demoUser.firstName}!`);
-            
-            // Redirect after login
-            redirectAfterLogin();
+            setTimeout(() => {
+                try {
+                    // Use our enhanced auth system for demo login
+                    const loginResult = userAuth.loginDemo(type);
+                    
+                    if (loginResult.success) {
+                        formValidator.showSuccessMessage(`Welcome, ${loginResult.user.name}!`);
+                        
+                        // Handle return URL if present
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const returnUrl = urlParams.get('returnUrl');
+                        
+                        setTimeout(() => {
+                            if (returnUrl && returnUrl.startsWith('/')) {
+                                window.location.href = returnUrl;
+                            } else {
+                                window.location.href = 'dashboard.html';
+                            }
+                        }, 1500);
+                    } else {
+                        formValidator.showErrorMessage('Demo login failed. Please try again.');
+                        
+                        // Reset button state
+                        demoBtn.textContent = originalText;
+                        demoBtn.disabled = false;
+                    }
+                } catch (error) {
+                    console.error('Demo login error:', error);
+                    formValidator.showErrorMessage('An error occurred during demo login.');
+                    
+                    // Reset button state
+                    demoBtn.textContent = originalText;
+                    demoBtn.disabled = false;
+                }
+            }, 600);
         }
 
         function showSuccessMessage(message) {

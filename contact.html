@@ -6,6 +6,9 @@
     <title>Contact Us - Kájọpọ̀ Succeed Together</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="css/notifications.css">
+    <script src="js/mobile-nav.js"></script>
+    <script src="js/error-handler.js"></script>
 
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
@@ -21,11 +24,20 @@
                         </div>
                     </a>
                 </div>
-                <div class="flex items-center space-x-4">
+                <div class="hidden md:flex items-center space-x-4">
                     <a href="about-us.html" class="text-gray-600 hover:text-indigo-600 transition-colors font-medium">About Us</a>
                     <a href="contact.html" class="text-gray-600 hover:text-indigo-600 transition-colors font-medium">Contact</a>
                     <a href="signin-form.html" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors">Sign In</a>
                     <a href="registration-form.html" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">Join Now</a>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-gray-600 hover:text-gray-900 focus:outline-none focus:text-gray-900">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>
@@ -36,7 +48,7 @@
         <div class="bg-white rounded-lg shadow-lg p-8">
             <h1 class="text-4xl font-bold text-gray-900 mb-8 text-center">Contact Us</h1>
             
-            <div class="grid md:grid-cols-2 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <!-- Contact Information -->
                 <div>
                     <h2 class="text-2xl font-semibold text-gray-900 mb-6">Get in Touch</h2>
@@ -88,7 +100,7 @@
                 <!-- Contact Form -->
                 <div>
                     <h2 class="text-2xl font-semibold text-gray-900 mb-6">Send us a Message</h2>
-                    <form class="space-y-4">
+                    <form id="contactForm" class="space-y-4">
                         <div>
                             <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
                             <input type="text" id="name" name="name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
@@ -148,19 +160,62 @@
     </main>
 
     <script>
-        // Initialize contact form
+        // Contact form handling with error management
         document.addEventListener('DOMContentLoaded', function() {
+            const contactForm = document.getElementById('contactForm');
             
-            // Contact form submission
-            const contactForm = document.querySelector('form');
             if (contactForm) {
-                contactForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    alert('Thank you for your message! We\'ll get back to you soon.');
-                    contactForm.reset();
-                });
+                contactForm.addEventListener('submit', handleContactSubmission);
             }
         });
+        
+        async function handleContactSubmission(event) {
+            event.preventDefault();
+            
+            const submitButton = event.target.querySelector('button[type="submit"]');
+            
+            try {
+                // Show loading state
+                errorHandler.showLoading(submitButton, 'Sending message...');
+                
+                const formData = new FormData(event.target);
+                const contactData = {
+                    name: formData.get('name'),
+                    email: formData.get('email'),
+                    subject: formData.get('subject'),
+                    message: formData.get('message')
+                };
+                
+                // Basic validation
+                if (!contactData.name || !contactData.email || !contactData.subject || !contactData.message) {
+                    errorHandler.showError('Please fill in all required fields');
+                    return;
+                }
+                
+                // Email validation
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(contactData.email)) {
+                    errorHandler.showFieldError('email', 'Please enter a valid email address');
+                    return;
+                }
+                
+                // Simulate form submission (replace with actual API call)
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // Show success message
+                errorHandler.showSuccess('Thank you for your message! We\'ll get back to you soon.');
+                
+                // Reset form after successful submission
+                event.target.reset();
+                
+            } catch (error) {
+                console.error('Contact form error:', error);
+                errorHandler.handleError(error, 'Contact form submission');
+            } finally {
+                // Hide loading state
+                errorHandler.hideLoading(submitButton);
+            }
+        }
     </script>
 </body>
 </html>
