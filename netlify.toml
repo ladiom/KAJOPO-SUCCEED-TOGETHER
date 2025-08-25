@@ -39,6 +39,12 @@
   to = "/messaging.html"
   status = 200
 
+# Redirect legacy kajopo-connect path to root
+[[redirects]]
+  from = "/kajopo-connect/*"
+  to = "/"
+  status = 301
+
 # Headers for security
 [[headers]]
   for = "/*"
