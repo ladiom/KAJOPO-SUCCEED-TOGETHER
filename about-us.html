@@ -6,7 +6,7 @@
     <title>About Us - Kájọpọ̀ Succeed Together</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/themes.css">
-    <script src="js/theme-manager.js"></script>
+
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
     <!-- Navigation -->
@@ -140,22 +140,6 @@
         </div>
     </main>
 
-    <script>
-        // Initialize theme manager
-        document.addEventListener('DOMContentLoaded', function() {
-            // Theme toggle functionality
-            const themeToggle = document.getElementById('theme-toggle');
-            if (themeToggle) {
-                themeToggle.addEventListener('click', function() {
-                    if (typeof toggleTheme === 'function') {
-                        toggleTheme();
-                    } else {
-                        // Fallback theme toggle
-                        document.documentElement.classList.toggle('dark');
-                    }
-                });
-            }
-        });
-    </script>
+
 </body>
 </html>
