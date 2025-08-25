@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Kájọpọ̀ Connect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/theme-manager.js"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white dark:bg-gray-800 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">Kájọpọ̀ Connect</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="about-us.html" class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium">About Us</a>
+                    <a href="contact.html" class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium">Contact</a>
+                    <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                        <span class="dark:hidden">🌙</span>
+                        <span class="hidden dark:inline">☀️</span>
+                    </button>
+                    <a href="signin-form.html" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors">Sign In</a>
+                    <a href="registration-form.html" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">Join Now</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+            <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-8 text-center">About Kájọpọ̀ Connect</h1>
+            
+            <div class="prose prose-lg dark:prose-invert max-w-none">
+                <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Our Mission</h2>
+                <p class="text-gray-600 dark:text-gray-300 mb-6">
+                    Kájọpọ̀ Connect is dedicated to strengthening communities by connecting people who need help with those who can provide it. 
+                    We believe that every community has untapped potential, and by facilitating meaningful connections, we can create a more 
+                    supportive and collaborative society.
+                </p>
+
+                <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">What We Do</h2>
+                <p class="text-gray-600 dark:text-gray-300 mb-6">
+                    Our platform serves as a bridge between service seekers and service providers within local communities. Whether you're 
+                    looking for help with home repairs, tutoring, pet care, or any other service, or you're someone with skills to share, 
+                    Kájọpọ̀ Connect makes it easy to find the right match.
+                </p>
+
+                <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Our Values</h2>
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-indigo-50 dark:bg-gray-700 p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold text-indigo-600 dark:text-indigo-400 mb-2">Community First</h3>
+                        <p class="text-gray-600 dark:text-gray-300">We prioritize local connections and community building over profit.</p>
+                    </div>
+                    <div class="bg-green-50 dark:bg-gray-700 p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold text-green-600 dark:text-green-400 mb-2">Trust & Safety</h3>
+                        <p class="text-gray-600 dark:text-gray-300">We maintain high standards for user verification and safety.</p>
+                    </div>
+                    <div class="bg-blue-50 dark:bg-gray-700 p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold text-blue-600 dark:text-blue-400 mb-2">Accessibility</h3>
+                        <p class="text-gray-600 dark:text-gray-300">Our platform is designed to be inclusive and accessible to everyone.</p>
+                    </div>
+                    <div class="bg-purple-50 dark:bg-gray-700 p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold text-purple-600 dark:text-purple-400 mb-2">Empowerment</h3>
+                        <p class="text-gray-600 dark:text-gray-300">We empower individuals to both give and receive help within their communities.</p>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Join Our Community</h2>
+                <p class="text-gray-600 dark:text-gray-300 mb-6">
+                    Ready to make meaningful connections in your community? Whether you're looking for help or want to offer your skills, 
+                    Kájọpọ̀ Connect is here to facilitate those important relationships that make communities stronger.
+                </p>
+
+                <div class="text-center">
+                    <a href="registration-form.html" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-lg text-lg font-semibold transition-colors inline-block">
+                        Get Started Today
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Initialize theme manager
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle functionality
+            const themeToggle = document.getElementById('theme-toggle');
+            if (themeToggle) {
+                themeToggle.addEventListener('click', function() {
+                    if (typeof toggleTheme === 'function') {
+                        toggleTheme();
+                    } else {
+                        // Fallback theme toggle
+                        document.documentElement.classList.toggle('dark');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
