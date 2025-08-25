@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kájọpọ̀ Connect - Community Connection Platform</title>
+    <title>Kájọpọ̀ - Succeed Together</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/themes.css">
     <script src="js/theme-manager.js"></script>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 min-h-screen">
@@ -13,14 +14,18 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <h1 class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">Kájọpọ̀ Connect</h1>
+                    <div>
+                        <h1 class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">Kájọpọ̀</h1>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 italic">Succeed Together</p>
+                    </div>
                 </div>
                 <div class="flex items-center space-x-4">
                     <a href="about-us.html" class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium">About Us</a>
                     <a href="contact.html" class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium">Contact</a>
-                    <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-                        <span class="dark:hidden">🌙</span>
-                        <span class="hidden dark:inline">☀️</span>
+                    <button data-theme-toggle class="theme-toggle" aria-label="Toggle theme" title="Switch between light and dark themes">
+                        <div class="theme-toggle-handle">
+                            <span class="theme-icon">🌙</span>
+                        </div>
                     </button>
                     <a href="signin-form.html" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors">Sign In</a>
                     <a href="registration-form.html" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">Join Now</a>
@@ -33,11 +38,10 @@
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="text-center">
             <h2 class="text-4xl font-bold text-gray-900 dark:text-white mb-6">
-                Connect with Your Community
+                Intelligence in Service of Equity.
             </h2>
             <p class="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
-                Kájọpọ̀ Connect brings people together by matching service seekers with providers in your local community. 
-                Whether you need help or want to offer your skills, we make meaningful connections happen.
+                Kajopo empowers all by matching seekers with solvers—using human wisdom and AI to unlock abundance for all.
             </p>
             
             <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
@@ -70,22 +74,6 @@
         </div>
     </main>
 
-    <script>
-        // Initialize theme manager
-        document.addEventListener('DOMContentLoaded', function() {
-            // Theme toggle functionality
-            const themeToggle = document.getElementById('theme-toggle');
-            if (themeToggle) {
-                themeToggle.addEventListener('click', function() {
-                    if (typeof toggleTheme === 'function') {
-                        toggleTheme();
-                    } else {
-                        // Fallback theme toggle
-                        document.documentElement.classList.toggle('dark');
-                    }
-                });
-            }
-        });
-    </script>
+
 </body>
 </html>
