@@ -1,0 +1,2903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Kájọpọ̀ Connect</title>
+    <!-- Theme System -->
+    <link rel="stylesheet" href="css/themes.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'kajopo-blue': '#0ea5e9',
+                        'kajopo-purple': '#8b5cf6',
+                        'kajopo-green': '#10b981',
+                        'kajopo-orange': '#f59e0b'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Override Tailwind with theme variables */
+        body {
+            background-color: var(--bg-primary) !important;
+            color: var(--text-primary) !important;
+        }
+        .bg-white {
+            background-color: var(--bg-tertiary) !important;
+        }
+        .bg-gray-50 {
+            background-color: var(--bg-primary) !important;
+        }
+        .text-gray-900 {
+            color: var(--text-primary) !important;
+        }
+        .text-gray-700 {
+            color: var(--text-primary) !important;
+        }
+        .text-gray-600 {
+            color: var(--text-secondary) !important;
+        }
+        .text-gray-500 {
+            color: var(--text-secondary) !important;
+        }
+        .text-gray-400 {
+            color: var(--text-secondary) !important;
+        }
+        .border-gray-200 {
+            border-color: var(--border-primary) !important;
+        }
+        .hover\:bg-gray-100:hover {
+            background-color: var(--bg-secondary) !important;
+        }
+        .hover\:text-gray-600:hover {
+            color: var(--text-primary) !important;
+        }
+        
+        /* Navigation items theme styling */
+        .nav-item {
+            color: var(--text-primary) !important;
+        }
+        
+        .nav-item:hover {
+            background-color: var(--bg-secondary) !important;
+            color: var(--text-primary) !important;
+        }
+        
+        .nav-item.active {
+            background-color: var(--color-primary) !important;
+            color: white !important;
+        }
+        
+        .nav-item.active:hover {
+            background-color: var(--color-primary-dark) !important;
+        }
+        
+        /* Search box and input field styling */
+        input[type="text"], input[type="email"], select {
+            color: var(--text-primary) !important;
+            background-color: var(--bg-tertiary) !important;
+            border-color: var(--border-primary) !important;
+        }
+        
+        input[type="text"]:focus, input[type="email"]:focus, select:focus {
+            border-color: var(--color-primary) !important;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1) !important;
+        }
+        
+        input[type="text"]::placeholder, input[type="email"]::placeholder {
+            color: var(--text-secondary) !important;
+        }
+        
+        /* Button styling */
+        .btn-primary {
+            background-color: var(--color-primary) !important;
+            border-color: var(--color-primary) !important;
+            color: white !important;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--color-primary-dark) !important;
+            border-color: var(--color-primary-dark) !important;
+        }
+        
+        .btn-secondary {
+            background-color: var(--bg-secondary) !important;
+            border-color: var(--border-primary) !important;
+            color: var(--text-primary) !important;
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--bg-tertiary) !important;
+        }
+        
+        /* Card styling */
+        .card {
+            background-color: var(--bg-tertiary) !important;
+            border-color: var(--border-primary) !important;
+        }
+        
+        /* Table styling */
+        .table {
+            background-color: var(--bg-tertiary) !important;
+        }
+        
+        .table th {
+            background-color: var(--bg-secondary) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--border-primary) !important;
+        }
+        
+        .table td {
+            color: var(--text-primary) !important;
+            border-color: var(--border-primary) !important;
+        }
+        
+        .table tbody tr:hover {
+            background-color: var(--bg-secondary) !important;
+        }
+        
+        /* Specific text contrast fixes */
+        .main-content h1, .main-content h2, .main-content h3, 
+        .main-content p, .sidebar .nav-item {
+            color: var(--text-primary) !important;
+        }
+        
+        /* User list and activity items */
+        .user-item, .activity-item {
+            color: var(--text-primary) !important;
+        }
+        
+        .user-item .text-gray-600, .activity-item .text-gray-500 {
+            color: var(--text-secondary) !important;
+        }
+        
+        /* Theme toggle styling */
+        .theme-toggle {
+            background-color: var(--bg-secondary) !important;
+            border: 1px solid var(--border-primary) !important;
+            color: var(--text-primary) !important;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .theme-toggle:hover {
+            background-color: var(--bg-tertiary) !important;
+            border-color: var(--color-primary) !important;
+        }
+        
+        .theme-toggle .theme-icon {
+            font-size: 16px;
+            display: inline-block;
+        }
+        
+        /* Stats cards text */
+        .stats-card h3, .stats-card p {
+            color: var(--text-primary) !important;
+        }
+        
+        /* Force black text in light theme */
+        [data-theme="light"] * {
+            color: var(--text-primary) !important;
+        }
+        
+        /* Specific targeting for Recent User Registrations section */
+        [data-theme="light"] h3 {
+            color: var(--text-primary) !important;
+        }
+        
+        /* Ensure all user registration text is black */
+        [data-theme="light"] .text-sm.font-medium,
+        [data-theme="light"] .text-xs,
+        [data-theme="light"] p {
+            color: var(--text-primary) !important;
+        }
+        
+        /* Text selection should be black */
+        [data-theme="light"] ::selection {
+            background-color: rgba(0, 0, 0, 0.2);
+            color: var(--text-primary) !important;
+        }
+        
+        /* Exceptions for elements that should remain white */
+        [data-theme="light"] .nav-item.active,
+        [data-theme="light"] .btn-primary,
+        [data-theme="light"] .bg-kajopo-blue,
+        [data-theme="light"] .bg-kajopo-purple,
+        [data-theme="light"] .bg-kajopo-green,
+        [data-theme="light"] .text-white {
+            color: white !important;
+        }
+        
+        /* Status badges should keep their colors */
+        [data-theme="light"] .bg-green-100,
+        [data-theme="light"] .bg-yellow-100,
+        [data-theme="light"] .bg-red-100,
+        [data-theme="light"] .bg-blue-100 {
+            color: inherit !important;
+        }
+        
+        /* Recent Opportunities section (Recent Operations) */
+        [data-theme="light"] .border-l-4 .text-sm.font-medium,
+        [data-theme="light"] .border-l-4 .text-xs,
+        [data-theme="light"] .border-l-4 p {
+            color: var(--text-primary) !important;
+        }
+        
+        /* Left sidebar navigation text */
+        [data-theme="light"] nav .nav-item span,
+        [data-theme="light"] .nav-item span {
+            color: var(--text-primary) !important;
+        }
+        
+        /* Stats cards text in overview */
+        [data-theme="light"] .text-sm.font-medium.text-gray-600,
+        [data-theme="light"] .text-2xl.font-semibold.text-gray-900,
+        [data-theme="light"] .text-sm.text-green-600,
+        [data-theme="light"] .text-sm.text-yellow-600 {
+            color: var(--text-primary) !important;
+        }
+    </style>
+</head>
+<body class="admin-dashboard transition-colors">
+    <!-- Admin Authentication Check -->
+    <div id="authCheck" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                    <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Admin Access Required</h3>
+                <p class="text-sm text-gray-500 mb-6">You need admin privileges to access this dashboard.</p>
+                <div class="flex space-x-3">
+                    <button id="adminLoginBtn" class="flex-1 bg-kajopo-blue text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                        Go to Admin Login
+                    </button>
+                    <button id="backToSiteBtn" class="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors">
+                        Back to Site
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboard" class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b border-gray-200">
+            <div class="px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <a href="kajopo-connect/index.html" class="text-2xl font-bold text-gray-900 hover:text-kajopo-blue transition-colors">Kájọpọ̀ Connect Admin</a>
+                        <span class="bg-kajopo-blue text-white px-3 py-1 rounded-full text-sm font-medium">Dashboard</span>
+                    </div>
+                    
+                    <!-- Navigation Menu -->
+                    <nav id="mainNavigation" class="hidden md:flex space-x-8">
+                        <a href="kajopo-connect/about-us.html" class="text-gray-600 hover:text-kajopo-blue transition-colors font-medium">About Us</a>
+                        <a href="kajopo-connect/contact.html" class="text-gray-600 hover:text-kajopo-blue transition-colors font-medium">Contact</a>
+                    </nav>
+                    <div class="flex items-center space-x-4">
+                        <!-- Theme Toggle Button -->
+                        <button data-theme-toggle class="theme-toggle" aria-label="Toggle theme" title="Switch between light and dark themes">
+                            <div class="theme-toggle-handle">
+                                <span class="theme-icon">🌙</span>
+                            </div>
+                            <span class="sr-only">Toggle between light and dark themes</span>
+                        </button>
+                        <div class="relative">
+                            <button id="notificationBtn" class="p-2 text-gray-400 hover:text-gray-600 relative">
+                                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM10.07 2.82l3.12 3.12M7 7l3 3m0 0l3-3m-3 3V2"></path>
+                                </svg>
+                                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+                            </button>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <button id="backToLandingBtn" class="text-gray-400 hover:text-gray-600 flex items-center space-x-1" title="Back to Landing Page">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                                </svg>
+                                <span class="text-sm hidden md:inline">Landing</span>
+                            </button>
+                            <div class="text-right">
+                                <p class="text-sm font-medium text-gray-900" id="adminName">Admin User</p>
+                                <p class="text-xs text-gray-500">Administrator</p>
+                            </div>
+                            <div class="h-8 w-8 bg-kajopo-purple rounded-full flex items-center justify-center">
+                                <span class="text-white text-sm font-medium" id="adminInitials">AU</span>
+                            </div>
+                            <button id="adminLogoutBtn" class="text-gray-400 hover:text-gray-600">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex">
+            <!-- Sidebar -->
+            <nav class="w-64 bg-white shadow-sm h-screen sticky top-0">
+                <div class="p-6">
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="#" id="overviewTab" class="nav-item active flex items-center space-x-3 text-gray-700 p-3 rounded-lg hover:bg-gray-100 transition-colors">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                                <span>Overview</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id="usersTab" class="nav-item flex items-center space-x-3 text-gray-700 p-3 rounded-lg hover:bg-gray-100 transition-colors">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                                </svg>
+                                <span>User Management</span>
+                                <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full ml-auto">5</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id="opportunitiesTab" class="nav-item flex items-center space-x-3 text-gray-700 p-3 rounded-lg hover:bg-gray-100 transition-colors">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2V6"></path>
+                                </svg>
+                                <span>Opportunities</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id="applicationsTab" class="nav-item flex items-center space-x-3 text-gray-700 p-3 rounded-lg hover:bg-gray-100 transition-colors">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                <span>Applications</span>
+                                <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full ml-auto">12</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id="analyticsTab" class="nav-item flex items-center space-x-3 text-gray-700 p-3 rounded-lg hover:bg-gray-100 transition-colors">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                                <span>Analytics</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id="settingsTab" class="nav-item flex items-center space-x-3 text-gray-700 p-3 rounded-lg hover:bg-gray-100 transition-colors">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                <span>Settings</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="flex-1 p-6">
+                <!-- Overview Section -->
+                <div id="overviewSection" class="tab-content">
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center">
+                                <div class="p-2 bg-kajopo-blue bg-opacity-10 rounded-lg">
+                                    <svg class="h-6 w-6 text-kajopo-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-sm font-medium text-gray-600">Total Users</p>
+                                    <p class="text-2xl font-semibold text-gray-900">1,247</p>
+                                    <p class="text-sm text-green-600">+12% from last month</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center">
+                                <div class="p-2 bg-kajopo-green bg-opacity-10 rounded-lg">
+                                    <svg class="h-6 w-6 text-kajopo-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2V6"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-sm font-medium text-gray-600">Active Opportunities</p>
+                                    <p class="text-2xl font-semibold text-gray-900">89</p>
+                                    <p class="text-sm text-green-600">+5 new this week</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center">
+                                <div class="p-2 bg-kajopo-orange bg-opacity-10 rounded-lg">
+                                    <svg class="h-6 w-6 text-kajopo-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-sm font-medium text-gray-600">Pending Applications</p>
+                                    <p class="text-2xl font-semibold text-gray-900">156</p>
+                                    <p class="text-sm text-yellow-600">12 need review</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center">
+                                <div class="p-2 bg-kajopo-purple bg-opacity-10 rounded-lg">
+                                    <svg class="h-6 w-6 text-kajopo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-sm font-medium text-gray-600">Total Funding</p>
+                                    <p class="text-2xl font-semibold text-gray-900">$2.4M</p>
+                                    <p class="text-sm text-green-600">+18% this quarter</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-lg shadow">
+                            <div class="p-6 border-b border-gray-200">
+                                <h3 class="text-lg font-medium text-gray-900">Recent User Registrations</h3>
+                            </div>
+                            <div class="p-6">
+                                <div class="space-y-4">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="h-10 w-10 bg-kajopo-blue rounded-full flex items-center justify-center">
+                                            <span class="text-white text-sm font-medium">SJ</span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-900" id="adminUserName"></p>
+                                            <p class="text-xs text-gray-500">Opportunity Seeker • 2 hours ago</p>
+                                        </div>
+                                        <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">Pending</span>
+                                    </div>
+                                    <div class="flex items-center space-x-4">
+                                        <div class="h-10 w-10 bg-kajopo-green rounded-full flex items-center justify-center">
+                                            <span class="text-white text-sm font-medium">MR</span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-gray-900">Michael Rodriguez</p>
+                                            <p class="text-xs text-gray-500">Opportunity Provider • 4 hours ago</p>
+                                        </div>
+                                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Approved</span>
+                                    </div>
+                                    <div class="flex items-center space-x-4">
+                                        <div class="h-10 w-10 bg-kajopo-purple rounded-full flex items-center justify-center">
+                                            <span class="text-white text-sm font-medium">EW</span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium" style="color: var(--text-primary) !important;">Emily Wilson</p>
+                                            <p class="text-xs" style="color: var(--text-secondary) !important;">Opportunity Seeker • 6 hours ago</p>
+                                        </div>
+                                        <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow">
+                            <div class="p-6 border-b border-gray-200">
+                                <h3 class="text-lg font-medium text-gray-900">Recent Opportunities</h3>
+                            </div>
+                            <div class="p-6">
+                                <div class="space-y-4">
+                                    <div class="border-l-4 border-kajopo-blue pl-4">
+                                        <p class="text-sm font-medium text-gray-900">Education Innovation Grant 2024</p>
+                                        <p class="text-xs text-gray-500">Posted by Global Education Foundation • $500,000</p>
+                                        <p class="text-xs text-gray-400 mt-1">23 applications received</p>
+                                    </div>
+                                    <div class="border-l-4 border-kajopo-green pl-4">
+                                        <p class="text-sm font-medium text-gray-900">Healthcare Access Initiative</p>
+                                        <p class="text-xs text-gray-500">Posted by Health Partners Africa • $750,000</p>
+                                        <p class="text-xs text-gray-400 mt-1">15 applications received</p>
+                                    </div>
+                                    <div class="border-l-4 border-kajopo-orange pl-4">
+                                        <p class="text-sm font-medium text-gray-900">Environmental Conservation Program</p>
+                                        <p class="text-xs text-gray-500">Posted by Green Future Initiative • $300,000</p>
+                                        <p class="text-xs text-gray-400 mt-1">8 applications received</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other sections will be added here -->
+                <div id="usersSection" class="tab-content hidden">
+                    <!-- User Management Header -->
+                    <div class="bg-white rounded-lg shadow mb-6">
+                        <div class="p-6 border-b border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h2 class="text-xl font-semibold text-gray-900">User Management</h2>
+                                    <p class="text-sm text-gray-600 mt-1">Manage user registrations and account status</p>
+                                </div>
+                                <div class="flex space-x-3">
+                                    <button id="refreshUsersBtn" class="bg-green-100 text-green-700 px-4 py-2 rounded-lg hover:bg-green-200 transition-colors" onclick="refreshUserData()">
+                                        <svg class="h-4 w-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                        </svg>
+                                        Refresh
+                                    </button>
+                                    <button id="exportUsersBtn" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">
+                                        <svg class="h-4 w-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                        </svg>
+                                        Export
+                                    </button>
+                                    <button id="refreshUsersBtn" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
+                                        <svg class="h-4 w-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                        </svg>
+                                        Refresh
+                                    </button>
+                                    <button id="addUserBtn" class="bg-kajopo-blue text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                                        <svg class="h-4 w-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                        </svg>
+                                        Add User
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Filters and Search -->
+                        <div class="p-6 bg-gray-50">
+                            <div class="flex flex-col sm:flex-row gap-4">
+                                <div class="flex-1 flex gap-2">
+                                    <input type="text" id="userSearchInput" placeholder="Search users by name, email, or organization..." class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kajopo-blue focus:border-transparent">
+                                    <button id="searchBtn" class="px-4 py-2 bg-kajopo-blue text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center">
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="flex gap-3">
+                                    <select id="statusFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kajopo-blue focus:border-transparent">
+                                        <option value="all">All Status</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="approved">Approved</option>
+                                        <option value="rejected">Rejected</option>
+                                        <option value="suspended">Suspended</option>
+                                    </select>
+                                    <select id="typeFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kajopo-blue focus:border-transparent">
+                                        <option value="all">All Types</option>
+                                        <option value="seeker">Opportunity Seeker</option>
+                                        <option value="provider">Opportunity Provider</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Users Table -->
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <input type="checkbox" id="selectAllUsers" class="rounded border-gray-300 text-kajopo-blue focus:ring-kajopo-blue">
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Organization</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registered</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTableBody" class="bg-white divide-y divide-gray-200">
+                                    <!-- Users will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                            <div class="flex-1 flex justify-between sm:hidden">
+                                <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Previous</button>
+                                <button class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Next</button>
+                            </div>
+                            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-700">Showing <span class="font-medium">1</span> to <span class="font-medium">10</span> of <span class="font-medium">97</span> results</p>
+                                </div>
+                                <div>
+                                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                        <button class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">Previous</button>
+                                        <button class="bg-kajopo-blue border-kajopo-blue text-white relative inline-flex items-center px-4 py-2 border text-sm font-medium">1</button>
+                                        <button class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">2</button>
+                                        <button class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">3</button>
+                                        <button class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">Next</button>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="opportunitiesSection" class="tab-content hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900">Opportunity Management</h2>
+                        <div class="flex space-x-3">
+                            <button onclick="exportOpportunities()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg flex items-center space-x-2">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                <span>Export</span>
+                            </button>
+                            <button onclick="addOpportunity()" class="bg-kajopo-blue hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                <span>Add Opportunity</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+                        <div class="flex flex-wrap gap-4">
+                            <div class="flex-1 min-w-64">
+                                <input type="text" id="opportunitySearchInput" placeholder="Search opportunities..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kajopo-blue focus:border-transparent" oninput="filterOpportunities()">
+                            </div>
+                            <div>
+                                <select id="categoryFilter" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kajopo-blue focus:border-transparent" onchange="filterOpportunities()">
+                                    <option value="all">All Categories</option>
+                                    <option value="education">Education</option>
+                                    <option value="healthcare">Healthcare</option>
+                                    <option value="environment">Environment</option>
+                                    <option value="technology">Technology</option>
+                                    <option value="community">Community Development</option>
+                                </select>
+                            </div>
+                            <div>
+                                <select id="opportunityStatusFilter" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kajopo-blue focus:border-transparent" onchange="filterOpportunities()">
+                                    <option value="all">All Status</option>
+                                    <option value="active">Active</option>
+                                    <option value="draft">Draft</option>
+                                    <option value="closed">Closed</option>
+                                    <option value="expired">Expired</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Opportunities Table -->
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4">
+                                    <input type="checkbox" id="selectAllOpportunities" class="rounded border-gray-300 text-kajopo-blue focus:ring-kajopo-blue" onchange="toggleAllOpportunities()">
+                                    <span class="text-sm text-gray-600">Select All</span>
+                                </div>
+                                <div class="text-sm text-gray-600">
+                                    <span id="opportunityCount">0 opportunities</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Select</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Opportunity</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deadline</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applications</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="opportunitiesTableBody" class="bg-white divide-y divide-gray-200">
+                                    <!-- Opportunities will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-sm text-gray-700">Show</span>
+                                    <select class="border border-gray-300 rounded px-2 py-1 text-sm">
+                                        <option>10</option>
+                                        <option>25</option>
+                                        <option>50</option>
+                                    </select>
+                                    <span class="text-sm text-gray-700">per page</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <button class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">Previous</button>
+                                    <span class="px-3 py-1 bg-kajopo-blue text-white rounded text-sm">1</span>
+                                    <button class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">Next</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="applicationsSection" class="tab-content hidden">
+                    <!-- Application Review Header -->
+                    <div class="bg-white rounded-lg shadow mb-6">
+                        <div class="p-6 border-b border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h2 class="text-xl font-semibold text-gray-900">Application Review</h2>
+                                    <p class="text-sm text-gray-600 mt-1">Review and manage opportunity applications</p>
+                                </div>
+                                <div class="flex space-x-3">
+                                    <button id="exportApplicationsBtn" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">
+                                        <svg class="h-4 w-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                        </svg>
+                                        Export
+                                    </button>
+                                    <button id="bulkActionsBtn" class="bg-kajopo-blue text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                                        <svg class="h-4 w-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                                        </svg>
+                                        Bulk Actions
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Filters and Search -->
+                        <div class="p-6 bg-gray-50 border-b border-gray-200">
+                            <div class="flex flex-wrap items-center gap-4">
+                                <div class="flex-1 min-w-64">
+                                    <div class="relative">
+                                        <input type="text" id="applicationSearch" placeholder="Search applications..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kajopo-blue focus:border-transparent">
+                                        <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <select id="statusFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kajopo-blue focus:border-transparent">
+                                    <option value="">All Status</option>
+                                    <option value="pending">Pending Review</option>
+                                    <option value="under_review">Under Review</option>
+                                    <option value="approved">Approved</option>
+                                    <option value="rejected">Rejected</option>
+                                    <option value="waitlisted">Waitlisted</option>
+                                </select>
+                                <select id="opportunityFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kajopo-blue focus:border-transparent">
+                                    <option value="">All Opportunities</option>
+                                    <option value="1">Youth Skills Development</option>
+                                    <option value="2">Community Health Initiative</option>
+                                    <option value="3">Environmental Conservation</option>
+                                    <option value="4">Technology for Good</option>
+                                </select>
+                                <select id="priorityFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kajopo-blue focus:border-transparent">
+                                    <option value="">All Priority</option>
+                                    <option value="high">High Priority</option>
+                                    <option value="medium">Medium Priority</option>
+                                    <option value="low">Low Priority</option>
+                                </select>
+                                <button id="clearFilters" class="px-4 py-2 text-gray-600 hover:text-gray-800">
+                                    Clear Filters
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Applications Table -->
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <input type="checkbox" id="selectAllApplications" class="rounded border-gray-300 text-kajopo-blue focus:ring-kajopo-blue">
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Applicant
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Opportunity
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Status
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Priority
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Applied Date
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Score
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Actions
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="applicationsTableBody" class="bg-white divide-y divide-gray-200">
+                                    <!-- Applications will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <p class="text-sm text-gray-700">
+                                        Showing <span id="applicationsStart">1</span> to <span id="applicationsEnd">10</span> of <span id="applicationsTotal">156</span> applications
+                                    </p>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">Previous</button>
+                                    <span class="px-3 py-1 bg-kajopo-blue text-white rounded text-sm">1</span>
+                                    <button class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">Next</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="analyticsSection" class="tab-content hidden">
+                    <!-- Analytics Header -->
+                    <div class="bg-white rounded-lg shadow mb-6">
+                        <div class="p-6 border-b border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h2 class="text-xl font-semibold text-gray-900">Analytics & Reports</h2>
+                                    <p class="text-sm text-gray-600 mt-1">Platform insights and performance metrics</p>
+                                </div>
+                                <div class="flex space-x-3">
+                                    <select id="analyticsTimeRange" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kajopo-blue focus:border-transparent">
+                                        <option value="7d">Last 7 days</option>
+                                        <option value="30d" selected>Last 30 days</option>
+                                        <option value="90d">Last 90 days</option>
+                                        <option value="1y">Last year</option>
+                                    </select>
+                                    <button id="exportAnalyticsBtn" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">
+                                        <svg class="h-4 w-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                        </svg>
+                                        Export Report
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Key Metrics Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center">
+                                <div class="p-2 bg-blue-100 rounded-lg">
+                                    <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-sm font-medium text-gray-600">Total Users</p>
+                                    <p class="text-2xl font-semibold text-gray-900" id="totalUsersMetric">2,847</p>
+                                    <p class="text-xs text-green-600">+12% from last month</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center">
+                                <div class="p-2 bg-green-100 rounded-lg">
+                                    <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-sm font-medium text-gray-600">Active Opportunities</p>
+                                    <p class="text-2xl font-semibold text-gray-900" id="activeOpportunitiesMetric">156</p>
+                                    <p class="text-xs text-green-600">+8% from last month</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center">
+                                <div class="p-2 bg-yellow-100 rounded-lg">
+                                    <svg class="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-sm font-medium text-gray-600">Total Applications</p>
+                                    <p class="text-2xl font-semibold text-gray-900" id="totalApplicationsMetric">1,234</p>
+                                    <p class="text-xs text-green-600">+15% from last month</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center">
+                                <div class="p-2 bg-purple-100 rounded-lg">
+                                    <svg class="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-sm font-medium text-gray-600">Match Success Rate</p>
+                                    <p class="text-2xl font-semibold text-gray-900" id="matchSuccessRateMetric">78%</p>
+                                    <p class="text-xs text-green-600">+3% from last month</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Row -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <!-- User Registration Chart -->
+                        <div class="bg-white rounded-lg shadow">
+                            <div class="p-6 border-b border-gray-200">
+                                <h3 class="text-lg font-medium text-gray-900">User Registrations</h3>
+                                <p class="text-sm text-gray-600">New user sign-ups over time</p>
+                            </div>
+                            <div class="p-6">
+                                <div class="h-64 flex items-end justify-between space-x-2">
+                                    <div class="flex flex-col items-center">
+                                        <div class="bg-kajopo-blue rounded-t" style="height: 120px; width: 24px;"></div>
+                                        <span class="text-xs text-gray-500 mt-2">Mon</span>
+                                    </div>
+                                    <div class="flex flex-col items-center">
+                                        <div class="bg-kajopo-blue rounded-t" style="height: 80px; width: 24px;"></div>
+                                        <span class="text-xs text-gray-500 mt-2">Tue</span>
+                                    </div>
+                                    <div class="flex flex-col items-center">
+                                        <div class="bg-kajopo-blue rounded-t" style="height: 160px; width: 24px;"></div>
+                                        <span class="text-xs text-gray-500 mt-2">Wed</span>
+                                    </div>
+                                    <div class="flex flex-col items-center">
+                                        <div class="bg-kajopo-blue rounded-t" style="height: 100px; width: 24px;"></div>
+                                        <span class="text-xs text-gray-500 mt-2">Thu</span>
+                                    </div>
+                                    <div class="flex flex-col items-center">
+                                        <div class="bg-kajopo-blue rounded-t" style="height: 140px; width: 24px;"></div>
+                                        <span class="text-xs text-gray-500 mt-2">Fri</span>
+                                    </div>
+                                    <div class="flex flex-col items-center">
+                                        <div class="bg-kajopo-blue rounded-t" style="height: 90px; width: 24px;"></div>
+                                        <span class="text-xs text-gray-500 mt-2">Sat</span>
+                                    </div>
+                                    <div class="flex flex-col items-center">
+                                        <div class="bg-kajopo-blue rounded-t" style="height: 70px; width: 24px;"></div>
+                                        <span class="text-xs text-gray-500 mt-2">Sun</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Application Status Distribution -->
+                        <div class="bg-white rounded-lg shadow">
+                            <div class="p-6 border-b border-gray-200">
+                                <h3 class="text-lg font-medium text-gray-900">Application Status</h3>
+                                <p class="text-sm text-gray-600">Distribution of application statuses</p>
+                            </div>
+                            <div class="p-6">
+                                <div class="space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <div class="w-4 h-4 bg-yellow-400 rounded mr-3"></div>
+                                            <span class="text-sm text-gray-700">Pending Review</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <span class="text-sm font-medium text-gray-900 mr-2">45%</span>
+                                            <div class="w-24 bg-gray-200 rounded-full h-2">
+                                                <div class="bg-yellow-400 h-2 rounded-full" style="width: 45%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <div class="w-4 h-4 bg-blue-400 rounded mr-3"></div>
+                                            <span class="text-sm text-gray-700">Under Review</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <span class="text-sm font-medium text-gray-900 mr-2">25%</span>
+                                            <div class="w-24 bg-gray-200 rounded-full h-2">
+                                                <div class="bg-blue-400 h-2 rounded-full" style="width: 25%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <div class="w-4 h-4 bg-green-400 rounded mr-3"></div>
+                                            <span class="text-sm text-gray-700">Approved</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <span class="text-sm font-medium text-gray-900 mr-2">20%</span>
+                                            <div class="w-24 bg-gray-200 rounded-full h-2">
+                                                <div class="bg-green-400 h-2 rounded-full" style="width: 20%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <div class="w-4 h-4 bg-red-400 rounded mr-3"></div>
+                                            <span class="text-sm text-gray-700">Rejected</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <span class="text-sm font-medium text-gray-900 mr-2">10%</span>
+                                            <div class="w-24 bg-gray-200 rounded-full h-2">
+                                                <div class="bg-red-400 h-2 rounded-full" style="width: 10%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Analytics Tables -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Top Opportunities -->
+                        <div class="bg-white rounded-lg shadow">
+                            <div class="p-6 border-b border-gray-200">
+                                <h3 class="text-lg font-medium text-gray-900">Top Opportunities</h3>
+                                <p class="text-sm text-gray-600">Most popular opportunities by applications</p>
+                            </div>
+                            <div class="p-6">
+                                <div class="space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-900">Community Health Volunteer</p>
+                                            <p class="text-xs text-gray-500">Healthcare • Active</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-sm font-medium text-gray-900">234 applications</p>
+                                            <p class="text-xs text-green-600">+18% this week</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-900">Environmental Conservation</p>
+                                            <p class="text-xs text-gray-500">Environment • Active</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-sm font-medium text-gray-900">189 applications</p>
+                                            <p class="text-xs text-green-600">+12% this week</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-900">Youth Mentorship Program</p>
+                                            <p class="text-xs text-gray-500">Education • Active</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-sm font-medium text-gray-900">156 applications</p>
+                                            <p class="text-xs text-green-600">+8% this week</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-900">Tech Skills Training</p>
+                                            <p class="text-xs text-gray-500">Technology • Active</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-sm font-medium text-gray-900">143 applications</p>
+                                            <p class="text-xs text-green-600">+15% this week</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Activity -->
+                        <div class="bg-white rounded-lg shadow">
+                            <div class="p-6 border-b border-gray-200">
+                                <h3 class="text-lg font-medium text-gray-900">Recent Activity</h3>
+                                <p class="text-sm text-gray-600">Latest platform activities</p>
+                            </div>
+                            <div class="p-6">
+                                <div class="space-y-4">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="w-2 h-2 bg-green-400 rounded-full mt-2"></div>
+                                        <div>
+                                            <p class="text-sm text-gray-900">New user registration</p>
+                                            <p class="text-xs text-gray-500">New user joined the platform</p>
+                                            <p class="text-xs text-gray-400">2 minutes ago</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start space-x-3">
+                                        <div class="w-2 h-2 bg-blue-400 rounded-full mt-2"></div>
+                                        <div>
+                                            <p class="text-sm text-gray-900">Application submitted</p>
+                                            <p class="text-xs text-gray-500">Michael Chen applied for Environmental Conservation</p>
+                                            <p class="text-xs text-gray-400">5 minutes ago</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start space-x-3">
+                                        <div class="w-2 h-2 bg-yellow-400 rounded-full mt-2"></div>
+                                        <div>
+                                            <p class="text-sm text-gray-900">Opportunity published</p>
+                                            <p class="text-xs text-gray-500">Senior Care Companion opportunity went live</p>
+                                            <p class="text-xs text-gray-400">15 minutes ago</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start space-x-3">
+                                        <div class="w-2 h-2 bg-purple-400 rounded-full mt-2"></div>
+                                        <div>
+                                            <p class="text-sm text-gray-900">Application approved</p>
+                                            <p class="text-xs text-gray-500">Emily Rodriguez approved for Youth Mentorship</p>
+                                            <p class="text-xs text-gray-400">1 hour ago</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="settingsSection" class="tab-content hidden">
+                    <div class="bg-white rounded-lg shadow">
+                        <div class="p-6 border-b border-gray-200">
+                            <h2 class="text-xl font-semibold text-gray-900">Platform Settings</h2>
+                            <p class="text-sm text-gray-600 mt-1">Configure platform settings and preferences</p>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-gray-500">Settings interface coming soon...</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- User Edit Modal -->
+    <div id="userEditModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Edit User</h3>
+                <button id="closeEditModal" class="text-gray-400 hover:text-gray-600">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <form id="userEditForm">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                        <input type="text" id="editFirstName" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kajopo-blue focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                        <input type="text" id="editLastName" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kajopo-blue focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" id="editEmail" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kajopo-blue focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">User Type</label>
+                        <select id="editUserType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kajopo-blue focus:border-transparent">
+                            <option value="individual">Individual</option>
+                            <option value="organization">Organization</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Organization</label>
+                        <input type="text" id="editOrganization" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kajopo-blue focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                        <select id="editStatus" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kajopo-blue focus:border-transparent">
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="suspended">Suspended</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex space-x-3 mt-6">
+                    <button type="button" id="saveUserBtn" class="flex-1 bg-kajopo-blue text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                        Save Changes
+                    </button>
+                    <button type="button" id="cancelEditBtn" class="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Authentication Script -->
+    <script src="js/admin-auth.js"></script>
+    <script>
+        // Admin authentication and dashboard functionality
+        let currentAdmin = null;
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAdminAuth();
+            setupEventListeners();
+        });
+
+        function checkAdminAuth() {
+            // Use AdminAuth class to check session
+            const session = window.adminAuth.getCurrentSession();
+            
+            if (session) {
+                currentAdmin = session.admin;
+                showDashboard();
+                updateAdminInfo();
+                updateUIBasedOnPermissions(session.admin.permissions || []);
+                populateUsersTable();
+                populateOpportunitiesTable();
+                return;
+            }
+            
+            // No valid session, show auth check
+            showAuthCheck();
+        }
+
+        function showAuthCheck() {
+            document.getElementById('authCheck').classList.remove('hidden');
+            document.getElementById('dashboard').classList.add('hidden');
+        }
+
+        function showDashboard() {
+            document.getElementById('authCheck').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+        }
+
+        function updateAdminInfo() {
+            if (currentAdmin) {
+                const firstName = currentAdmin.firstName || 'Admin';
+                const lastName = currentAdmin.lastName || 'User';
+                const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+                const roleDisplay = currentAdmin.role === 'super_admin' ? 'Super Administrator' : 'Administrator';
+                
+                document.getElementById('adminName').textContent = firstName + ' ' + lastName;
+                document.getElementById('adminInitials').textContent = initials;
+                
+                // Update role display if element exists
+                const roleElement = document.querySelector('.text-xs.text-gray-500');
+                if (roleElement) {
+                    roleElement.textContent = roleDisplay;
+                }
+                
+                // Show navigation menu after successful authentication
+                const navigation = document.getElementById('mainNavigation');
+                if (navigation) {
+                    navigation.style.display = 'flex';
+                }
+            }
+        }
+        
+        function updateUIBasedOnPermissions(permissions) {
+            // Hide/show navigation items based on admin permissions
+            const navItems = {
+                'users': document.getElementById('usersTab'),
+                'opportunities': document.getElementById('opportunitiesTab'),
+                'applications': document.getElementById('applicationsTab'),
+                'analytics': document.getElementById('analyticsTab')
+            };
+            
+            Object.keys(navItems).forEach(permission => {
+                const element = navItems[permission];
+                if (element) {
+                    if (permissions && permissions.includes(permission)) {
+                        element.style.display = 'block';
+                        element.parentElement.style.display = 'block';
+                    } else {
+                        element.style.display = 'none';
+                        element.parentElement.style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        function setupEventListeners() {
+            // Auth buttons
+            document.getElementById('adminLoginBtn').addEventListener('click', function() {
+                // Redirect to proper admin login page
+                window.location.href = 'admin-login.html';
+            });
+
+            document.getElementById('backToSiteBtn').addEventListener('click', function() {
+                window.location.href = 'kajopo-connect/';
+            });
+
+            document.getElementById('adminLogoutBtn').addEventListener('click', function() {
+                // Use AdminAuth class to clear session
+                window.adminAuth.clearSession();
+                currentAdmin = null;
+                
+                // Show logout confirmation
+                showNotification('Logged out successfully. Redirecting...', 'success');
+                
+                // Redirect to admin login after a short delay
+                setTimeout(() => {
+                    window.location.href = 'admin-login.html';
+                }, 1500);
+            });
+
+            // Navigation tabs
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all nav items
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    
+                    // Add active class to clicked item
+                    this.classList.add('active');
+                    
+                    // Hide all tab contents
+                    const tabContents = document.querySelectorAll('.tab-content');
+                    tabContents.forEach(content => content.classList.add('hidden'));
+                    
+                    // Show corresponding tab content
+                    const tabId = this.id.replace('Tab', 'Section');
+                    document.getElementById(tabId).classList.remove('hidden');
+                    
+                    // Load section-specific data
+                    if (tabId === 'usersSection') {
+                        populateUsersTable();
+                        setupUserManagementListeners(); // Setup listeners when users section is shown
+                    } else if (tabId === 'opportunitiesSection') {
+                        populateOpportunitiesTable();
+                    } else if (tabId === 'applicationsSection') {
+                        populateApplicationsTable();
+                    }
+                });
+            });
+
+            // Applications management event listeners
+            setupApplicationsListeners();
+            
+            // Analytics event listeners
+            setupAnalyticsListeners();
+            
+            // User edit modal event listeners
+            document.getElementById('closeEditModal').addEventListener('click', closeEditModal);
+            document.getElementById('saveUserBtn').addEventListener('click', saveUserChanges);
+            document.getElementById('cancelEditBtn').addEventListener('click', cancelUserEdit);
+            
+            // Back to landing page functionality
+            document.getElementById('backToLandingBtn').addEventListener('click', function() {
+                window.location.href = 'dashboard.html'; // Navigate to main dashboard
+            });
+            
+            // Modal keyboard and click outside support
+            document.getElementById('userEditModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    cancelUserEdit();
+                }
+            });
+            
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && !document.getElementById('userEditModal').classList.contains('hidden')) {
+                    cancelUserEdit();
+                }
+            });
+        }
+
+        function setupUserManagementListeners() {
+            console.log('=== SETTING UP USER MANAGEMENT LISTENERS ===');
+            
+            // Wait a moment for DOM to be ready
+            setTimeout(() => {
+                // Remove existing listeners first to prevent duplicates
+                const userSearchInput = document.getElementById('userSearchInput');
+                const statusFilter = document.getElementById('statusFilter');
+                const typeFilter = document.getElementById('typeFilter');
+                const searchBtn = document.getElementById('searchBtn');
+                
+                console.log('Elements found during setup:', {
+                    userSearchInput: !!userSearchInput,
+                    statusFilter: !!statusFilter,
+                    typeFilter: !!typeFilter,
+                    searchBtn: !!searchBtn
+                });
+                
+                if (!userSearchInput || !statusFilter || !typeFilter) {
+                    console.error('Critical filter elements missing!');
+                    return;
+                }
+                
+                if (userSearchInput) {
+                    userSearchInput.removeEventListener('input', filterUsers);
+                }
+                if (statusFilter) {
+                    statusFilter.removeEventListener('change', filterUsers);
+                }
+                if (typeFilter) {
+                    typeFilter.removeEventListener('change', filterUsers);
+                }
+                if (searchBtn) {
+                    searchBtn.removeEventListener('click', filterUsers);
+                }
+                
+                // Search functionality
+                if (userSearchInput) {
+                    userSearchInput.addEventListener('input', filterUsers);
+                    console.log('✓ Search input listener attached');
+                }
+
+                // Filter functionality
+                if (statusFilter) {
+                    statusFilter.addEventListener('change', filterUsers);
+                    console.log('✓ Status filter listener attached');
+                }
+
+                if (typeFilter) {
+                    typeFilter.addEventListener('change', filterUsers);
+                    console.log('✓ Type filter listener attached');
+                }
+
+                // Search button
+                if (searchBtn) {
+                    searchBtn.addEventListener('click', filterUsers);
+                    console.log('✓ Search button listener attached');
+                }
+                
+                console.log('=== LISTENERS SETUP COMPLETE ===');
+                 
+                 // Initialize filteredUsers with all users
+                 filteredUsers = getAllUsers();
+                 console.log('Initialized filteredUsers with', filteredUsers.length, 'users');
+                 
+                 // Populate the table initially
+                 populateUsersTable();
+                 
+                 // Test the filter function immediately
+                 console.log('Testing filter function...');
+                 filterUsers();
+            }, 100);
+
+            // Select all checkbox
+            const selectAllUsers = document.getElementById('selectAllUsers');
+            if (selectAllUsers) {
+                selectAllUsers.addEventListener('change', function() {
+                    const checkboxes = document.querySelectorAll('.user-checkbox');
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = this.checked;
+                    });
+                });
+            }
+
+            // Export users
+            const exportUsersBtn = document.getElementById('exportUsersBtn');
+            if (exportUsersBtn) {
+                exportUsersBtn.addEventListener('click', function() {
+                    showNotification('Export functionality coming soon!', 'info');
+                });
+            }
+
+            // Refresh users table to show any registered users
+            setTimeout(() => {
+                populateUsersTable();
+            }, 100);
+            
+            // Add user
+            document.getElementById('addUserBtn').addEventListener('click', function() {
+                showAddUserModal();
+            });
+            
+            // Refresh users
+            document.getElementById('refreshUsersBtn').addEventListener('click', function() {
+                refreshUserData();
+            });
+        }
+
+        function showAddUserModal() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Add New User</h3>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-gray-600">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <form id="addUserForm">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                                <input type="text" name="firstName" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-kajopo-blue">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                                <input type="text" name="lastName" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-kajopo-blue">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                <input type="email" name="email" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-kajopo-blue">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Account Type</label>
+                                <select name="accountType" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-kajopo-blue">
+                                    <option value="">Select type...</option>
+                                    <option value="seeker">Seeker</option>
+                                    <option value="provider">Provider</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Organization</label>
+                                <input type="text" name="organization" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-kajopo-blue">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                                <input type="tel" name="phone" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-kajopo-blue">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                                <input type="text" name="location" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-kajopo-blue">
+                            </div>
+                        </div>
+                        <div class="flex justify-end space-x-3 mt-6">
+                            <button type="button" onclick="this.closest('.fixed').remove()" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50">
+                                Cancel
+                            </button>
+                            <button type="submit" class="px-4 py-2 bg-kajopo-blue text-white rounded-md hover:bg-blue-600">
+                                Add User
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Handle form submission with improved event handling
+            setTimeout(() => {
+                const form = document.getElementById('addUserForm');
+                const submitBtn = form.querySelector('button[type="submit"]');
+                
+                console.log('=== SETTING UP ADD USER FORM HANDLERS ===');
+                console.log('Form found:', !!form);
+                console.log('Submit button found:', !!submitBtn);
+                
+                function handleFormSubmit(e) {
+                    console.log('=== FORM SUBMIT HANDLER CALLED ===');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const formData = new FormData(form);
+                    const userData = {
+                        id: `admin_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                        firstName: formData.get('firstName'),
+                        lastName: formData.get('lastName'),
+                        email: formData.get('email'),
+                        accountType: formData.get('accountType'),
+                        organization: formData.get('organization') || 'Not specified',
+                        phone: formData.get('phone') || 'Not provided',
+                        location: formData.get('location') || 'Not specified',
+                        status: 'approved',
+                        registeredDate: new Date().toISOString().split('T')[0],
+                        registeredAt: new Date().toISOString(),
+                        isVerified: true,
+                        profileComplete: true
+                    };
+                    
+                    console.log('User data to save:', userData);
+                    
+                    // Store user data
+                    const userKey = `kajopo_user_${userData.id}`;
+                    localStorage.setItem(userKey, JSON.stringify(userData));
+                    console.log(`User saved with key: ${userKey}`);
+                    
+                    // Close modal and refresh table
+                    modal.remove();
+                    populateUsersTable();
+                    showNotification('User added successfully!', 'success');
+                    
+                    console.log('=== FORM SUBMISSION COMPLETED ===');
+                    return false;
+                }
+                
+                // Add multiple event handlers to ensure form submission is caught
+                if (form) {
+                    form.addEventListener('submit', handleFormSubmit, true);
+                    form.onsubmit = handleFormSubmit;
+                }
+                
+                if (submitBtn) {
+                    submitBtn.addEventListener('click', function(e) {
+                        console.log('Submit button clicked');
+                        handleFormSubmit(e);
+                    });
+                }
+                
+                console.log('Form handlers set up successfully');
+            }, 100);
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+            
+            notification.className = `fixed top-4 right-4 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg z-50`;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    ${message}
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Remove notification after 3 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Sample users data
+        const sampleUsers = [
+            {
+                id: 1,
+                firstName: 'Sarah',
+                lastName: 'Johnson',
+                email: 'sarah.johnson@example.com',
+                accountType: 'seeker',
+                organization: 'Community Health Initiative',
+                status: 'pending',
+                registeredDate: '2024-01-15',
+                phone: '+1 (555) 123-4567',
+                location: 'Lagos, Nigeria'
+            },
+            {
+                id: 2,
+                firstName: 'Michael',
+                lastName: 'Rodriguez',
+                email: 'michael.rodriguez@foundation.org',
+                accountType: 'provider',
+                organization: 'Global Education Foundation',
+                status: 'approved',
+                registeredDate: '2024-01-12',
+                phone: '+1 (555) 234-5678',
+                location: 'Abuja, Nigeria'
+            },
+            {
+                id: 3,
+                firstName: 'Emily',
+                lastName: 'Wilson',
+                email: 'emily.wilson@nonprofit.org',
+                accountType: 'seeker',
+                organization: 'Youth Development Center',
+                status: 'approved',
+                registeredDate: '2024-01-10',
+                phone: '+1 (555) 345-6789',
+                location: 'Kano, Nigeria'
+            },
+            {
+                id: 4,
+                firstName: 'David',
+                lastName: 'Chen',
+                email: 'david.chen@techforgood.com',
+                accountType: 'provider',
+                organization: 'Tech for Good Initiative',
+                status: 'suspended',
+                registeredDate: '2024-01-08',
+                phone: '+1 (555) 456-7890',
+                location: 'Port Harcourt, Nigeria'
+            },
+            {
+                id: 5,
+                firstName: 'Aisha',
+                lastName: 'Okafor',
+                email: 'aisha.okafor@healthpartners.ng',
+                accountType: 'provider',
+                organization: 'Health Partners Africa',
+                status: 'approved',
+                registeredDate: '2024-01-05',
+                phone: '+234 803 123 4567',
+                location: 'Ibadan, Nigeria'
+            },
+            {
+                id: 6,
+                firstName: 'James',
+                lastName: 'Thompson',
+                email: 'james.thompson@greeninitiative.org',
+                accountType: 'seeker',
+                organization: 'Green Future Initiative',
+                status: 'rejected',
+                registeredDate: '2024-01-03',
+                phone: '+1 (555) 567-8901',
+                location: 'Kaduna, Nigeria'
+            }
+        ];
+
+        // Function to get registered users from localStorage
+        function getRegisteredUsers() {
+            const registeredUsers = [];
+            const seenEmails = new Set(); // Track emails to avoid duplicates
+            
+            // Check for users stored with different keys and patterns
+            const allKeys = Object.keys(localStorage);
+            console.log('All localStorage keys:', allKeys);
+            
+            // Get all user-related keys
+            const userKeys = allKeys.filter(key => 
+                key === 'kajopo_user' || 
+                key === 'userInfo' || 
+                key.startsWith('kajopo_user_')
+            );
+            
+            console.log('Found user keys:', userKeys);
+            
+            userKeys.forEach(key => {
+                const userData = localStorage.getItem(key);
+                if (userData) {
+                    try {
+                        const user = JSON.parse(userData);
+                        console.log(`Processing user from key '${key}':`, user);
+                        
+                        // Skip if we've already seen this email (avoid duplicates)
+                        if (user.email && seenEmails.has(user.email)) {
+                            console.log(`Skipping duplicate user with email: ${user.email}`);
+                            return;
+                        }
+                        
+                        // Convert to admin dashboard format
+                        const formattedUser = {
+                            id: user.id || `reg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                            firstName: user.firstName || user.name?.split(' ')[0] || 'Unknown',
+                            lastName: user.lastName || user.name?.split(' ')[1] || 'User',
+                            email: user.email || 'No email provided',
+                            accountType: user.accountType || (user.role === 'I Need Help' ? 'seeker' : 'provider'),
+                            organization: user.organization || user.company || 'Not specified',
+                            status: user.status || (user.isVerified ? 'approved' : 'pending'),
+                            registeredDate: user.registeredAt ? new Date(user.registeredAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+                            phone: user.phone || 'Not provided',
+                            location: user.location || 'Not specified'
+                        };
+                        
+                        registeredUsers.push(formattedUser);
+                        if (user.email) {
+                            seenEmails.add(user.email);
+                        }
+                        
+                        console.log('Added user to registered users:', formattedUser);
+                    } catch (e) {
+                        console.warn('Error parsing user data from localStorage:', e, 'Key:', key, 'Data:', userData);
+                    }
+                }
+            });
+            
+            console.log('Total registered users found:', registeredUsers.length);
+            return registeredUsers;
+        }
+
+        // Combine sample users with registered users
+        function getAllUsers() {
+            const registeredUsers = getRegisteredUsers();
+            const allUsers = [...sampleUsers];
+            
+            // Add registered users, avoiding duplicates by email
+            registeredUsers.forEach(regUser => {
+                const exists = allUsers.some(user => user.email === regUser.email);
+                if (!exists) {
+                    allUsers.push(regUser);
+                }
+            });
+            
+            return allUsers;
+        }
+
+        let filteredUsers = getAllUsers();
+
+        function populateUsersTable() {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+            
+            // Use the current filteredUsers array (don't reset it here!)
+            
+            if (filteredUsers.length === 0) {
+                const emptyRow = document.createElement('tr');
+                emptyRow.innerHTML = `
+                    <td colspan="7" class="px-6 py-8 text-center text-gray-500">
+                        <div class="flex flex-col items-center">
+                            <svg class="h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                            </svg>
+                            <p class="text-lg font-medium mb-2">No users found</p>
+                            <p class="text-sm">Users who register will appear here automatically.</p>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(emptyRow);
+                return;
+            }
+
+            filteredUsers.forEach(user => {
+                const row = createUserRow(user);
+                tbody.appendChild(row);
+            });
+        }
+
+        function createUserRow(user) {
+            const row = document.createElement('tr');
+            row.className = 'hover:bg-gray-50';
+            
+            const statusColors = {
+                'pending': 'bg-yellow-100 text-yellow-800',
+                'approved': 'bg-green-100 text-green-800',
+                'rejected': 'bg-red-100 text-red-800',
+                'suspended': 'bg-gray-100 text-gray-800'
+            };
+
+            const typeColors = {
+                'seeker': 'bg-blue-100 text-blue-800',
+                'provider': 'bg-purple-100 text-purple-800'
+            };
+
+            const initials = (user.firstName.charAt(0) + user.lastName.charAt(0)).toUpperCase();
+            const formattedDate = new Date(user.registeredDate).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+
+            row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <input type="checkbox" class="user-checkbox rounded border-gray-300 text-kajopo-blue focus:ring-kajopo-blue" data-user-id="${user.id}">
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                        <div class="h-10 w-10 bg-kajopo-blue rounded-full flex items-center justify-center">
+                            <span class="text-white text-sm font-medium">${initials}</span>
+                        </div>
+                        <div class="ml-4">
+                            <div class="text-sm font-medium text-gray-900">${user.firstName} ${user.lastName}</div>
+                            <div class="text-sm text-gray-500">${user.email}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${typeColors[user.accountType]}">
+                        ${user.accountType === 'seeker' ? 'Opportunity Seeker' : 'Opportunity Provider'}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    ${user.organization}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusColors[user.status]}">
+                        ${user.status.charAt(0).toUpperCase() + user.status.slice(1)}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    ${formattedDate}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div class="flex space-x-2">
+                        <button onclick="viewUser('${user.id}')" class="text-kajopo-blue hover:text-blue-600" title="View User Details">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            </svg>
+                        </button>
+                        <button onclick="editUser('${user.id}')" class="text-gray-600 hover:text-gray-800" title="Edit User">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                        </button>
+                        ${user.status === 'pending' ? `
+                            <button onclick="approveUser('${user.id}')" class="text-green-600 hover:text-green-800" title="Approve User">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </button>
+                            <button onclick="rejectUser('${user.id}')" class="text-red-600 hover:text-red-800" title="Reject User">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        ` : ''}
+                        ${user.status === 'approved' ? `
+                            <button onclick="suspendUser('${user.id}')" class="text-orange-600 hover:text-orange-800" title="Suspend User">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728"></path>
+                                </svg>
+                            </button>
+                        ` : ''}
+                    </div>
+                </td>
+            `;
+
+            return row;
+        }
+
+        function filterUsers() {
+            console.log('=== FILTER USERS FUNCTION CALLED ===');
+            
+            const searchInput = document.getElementById('userSearchInput');
+            const statusSelect = document.getElementById('statusFilter');
+            const typeSelect = document.getElementById('typeFilter');
+            
+            if (!searchInput || !statusSelect || !typeSelect) {
+                console.error('Filter elements not found:', {
+                    searchInput: !!searchInput,
+                    statusSelect: !!statusSelect,
+                    typeSelect: !!typeSelect
+                });
+                return;
+            }
+            
+            const searchTerm = searchInput.value.toLowerCase();
+            const statusFilter = statusSelect.value;
+            const typeFilter = typeSelect.value;
+
+            console.log('Filter values:', { searchTerm, statusFilter, typeFilter });
+
+            const allUsers = getAllUsers();
+            console.log('All users count:', allUsers.length);
+            
+            if (allUsers.length > 0) {
+                console.log('Sample user for debugging:', allUsers[0]);
+            }
+            
+            filteredUsers = allUsers.filter(user => {
+                const matchesSearch = !searchTerm || 
+                    user.firstName.toLowerCase().includes(searchTerm) ||
+                    user.lastName.toLowerCase().includes(searchTerm) ||
+                    user.email.toLowerCase().includes(searchTerm) ||
+                    user.organization.toLowerCase().includes(searchTerm);
+                
+                const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
+                const matchesType = typeFilter === 'all' || user.accountType === typeFilter;
+                
+                console.log(`User ${user.firstName} ${user.lastName}:`, {
+                    matchesSearch,
+                    matchesStatus,
+                    matchesType,
+                    userStatus: user.status,
+                    userType: user.accountType
+                });
+
+                return matchesSearch && matchesStatus && matchesType;
+            });
+
+            console.log('Filtered users count:', filteredUsers.length);
+            populateUsersTable();
+            console.log('=== FILTER USERS FUNCTION COMPLETE ===');
+        }
+
+        // Test function for debugging filters
+        function testFilters() {
+            console.log('=== FILTER TEST START ===');
+            
+            // Test element existence
+            const searchInput = document.getElementById('userSearchInput');
+            const statusFilter = document.getElementById('statusFilter');
+            const typeFilter = document.getElementById('typeFilter');
+            
+            console.log('Elements found:', {
+                searchInput: !!searchInput,
+                statusFilter: !!statusFilter,
+                typeFilter: !!typeFilter
+            });
+            
+            if (searchInput) console.log('Search input value:', searchInput.value);
+            if (statusFilter) console.log('Status filter value:', statusFilter.value);
+            if (typeFilter) console.log('Type filter value:', typeFilter.value);
+            
+            // Test filter function
+            console.log('Calling filterUsers()...');
+            filterUsers();
+            
+            console.log('=== FILTER TEST END ===');
+        }
+        
+        // Make test function globally available
+        window.testFilters = testFilters;
+        
+        // Add a comprehensive test function
+        function debugFilterSystem() {
+            console.log('=== COMPREHENSIVE FILTER DEBUG ===');
+            
+            // Check if we're on the right tab
+            const userManagementTab = document.querySelector('[data-tab="users"]');
+            const isUserTabActive = userManagementTab && userManagementTab.classList.contains('bg-kajopo-blue');
+            console.log('User Management tab active:', isUserTabActive);
+            
+            // Check elements
+            const elements = {
+                searchInput: document.getElementById('userSearchInput'),
+                statusFilter: document.getElementById('statusFilter'),
+                typeFilter: document.getElementById('typeFilter'),
+                searchBtn: document.getElementById('searchBtn'),
+                tableBody: document.getElementById('usersTableBody')
+            };
+            
+            console.log('Elements found:', Object.keys(elements).reduce((acc, key) => {
+                acc[key] = !!elements[key];
+                return acc;
+            }, {}));
+            
+            // Check current values
+            if (elements.searchInput) console.log('Search value:', elements.searchInput.value);
+            if (elements.statusFilter) console.log('Status filter value:', elements.statusFilter.value);
+            if (elements.typeFilter) console.log('Type filter value:', elements.typeFilter.value);
+            
+            // Check data
+            const allUsers = getAllUsers();
+            console.log('Total users available:', allUsers.length);
+            console.log('Current filteredUsers:', filteredUsers.length);
+            
+            // Test filter function
+            console.log('Calling filterUsers()...');
+            filterUsers();
+            
+            console.log('=== DEBUG COMPLETE ===');
+        }
+        
+        window.debugFilterSystem = debugFilterSystem;
+
+        // User action functions
+        function viewUser(userId) {
+            const allUsers = getAllUsers();
+            const user = allUsers.find(u => u.id === userId);
+            if (user) {
+                showNotification(`Viewing details for ${user.firstName} ${user.lastName}`, 'info');
+                // In a real app, this would open a user details modal
+            }
+        }
+
+        let currentEditingUser = null;
+        let originalUserData = null;
+        let currentUserKey = null; // Track localStorage key for current user
+
+        function editUser(userId) {
+            const allUsers = getAllUsers();
+            const user = allUsers.find(u => u.id === userId);
+            if (user) {
+                currentEditingUser = user;
+                originalUserData = { ...user }; // Store original data for cancel functionality
+                
+                // Check if this user is from localStorage
+                currentUserKey = null;
+                const allKeys = Object.keys(localStorage);
+                const userKeys = allKeys.filter(key => key.startsWith('kajopo_user'));
+                
+                for (const key of userKeys) {
+                    try {
+                        const userData = JSON.parse(localStorage.getItem(key));
+                        if (userData && userData.id === userId) {
+                            currentUserKey = key;
+                            break;
+                        }
+                    } catch (e) {
+                        console.warn('Error parsing user data:', e);
+                    }
+                }
+                
+                // Populate modal fields
+                document.getElementById('editFirstName').value = user.firstName;
+                document.getElementById('editLastName').value = user.lastName;
+                document.getElementById('editEmail').value = user.email;
+                document.getElementById('editUserType').value = user.accountType || user.type || 'seeker';
+                document.getElementById('editOrganization').value = user.organization || '';
+                document.getElementById('editStatus').value = user.status;
+                
+                // Show modal
+                document.getElementById('userEditModal').classList.remove('hidden');
+            }
+        }
+
+        function closeEditModal() {
+            document.getElementById('userEditModal').classList.add('hidden');
+            currentEditingUser = null;
+            originalUserData = null;
+            currentUserKey = null;
+        }
+
+        function saveUserChanges() {
+            if (currentEditingUser) {
+                // Update user data
+                currentEditingUser.firstName = document.getElementById('editFirstName').value;
+                currentEditingUser.lastName = document.getElementById('editLastName').value;
+                currentEditingUser.email = document.getElementById('editEmail').value;
+                currentEditingUser.accountType = document.getElementById('editUserType').value;
+                currentEditingUser.type = document.getElementById('editUserType').value; // Keep both for compatibility
+                currentEditingUser.organization = document.getElementById('editOrganization').value;
+                currentEditingUser.status = document.getElementById('editStatus').value;
+                currentEditingUser.isVerified = currentEditingUser.status === 'approved';
+                
+                // If this user is from localStorage, save changes back
+                if (currentUserKey) {
+                    try {
+                        localStorage.setItem(currentUserKey, JSON.stringify(currentEditingUser));
+                    } catch (e) {
+                        console.error('Error saving user changes to localStorage:', e);
+                        showNotification('Error saving changes', 'error');
+                        return;
+                    }
+                }
+                
+                // Refresh table
+                populateUsersTable();
+                
+                // Show success notification
+                showNotification(`${currentEditingUser.firstName} ${currentEditingUser.lastName} has been updated successfully!`, 'success');
+                
+                // Close modal
+                closeEditModal();
+            }
+        }
+
+        function cancelUserEdit() {
+            if (currentEditingUser && originalUserData) {
+                // Restore original data
+                Object.assign(currentEditingUser, originalUserData);
+                showNotification('Changes cancelled', 'info');
+            }
+            closeEditModal();
+        }
+
+        function updateUserStatus(userId, newStatus) {
+            // First try to find user in sampleUsers
+            let user = sampleUsers.find(u => u.id === userId);
+            let isLocalStorageUser = false;
+            let userKey = null;
+            
+            if (user) {
+                // Update sample user
+                user.status = newStatus;
+            } else {
+                // Look for user in localStorage
+                const allKeys = Object.keys(localStorage);
+                const userKeys = allKeys.filter(key => key.startsWith('kajopo_user'));
+                
+                for (const key of userKeys) {
+                    try {
+                        const userData = JSON.parse(localStorage.getItem(key));
+                        if (userData && userData.id === userId) {
+                            user = userData;
+                            userKey = key;
+                            isLocalStorageUser = true;
+                            break;
+                        }
+                    } catch (e) {
+                        console.warn('Error parsing user data:', e);
+                    }
+                }
+                
+                if (user && isLocalStorageUser) {
+                    // Update user status and save back to localStorage
+                    user.status = newStatus;
+                    user.isVerified = newStatus === 'approved';
+                    localStorage.setItem(userKey, JSON.stringify(user));
+                }
+            }
+            
+            if (user) {
+                populateUsersTable();
+                const statusText = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+                const userName = user.firstName || user.name?.split(' ')[0] || 'User';
+                const userLastName = user.lastName || user.name?.split(' ')[1] || '';
+                showNotification(`${userName} ${userLastName} has been ${statusText.toLowerCase()}!`, 
+                    newStatus === 'approved' ? 'success' : 'info');
+            } else {
+                showNotification('User not found', 'error');
+            }
+        }
+
+        function approveUser(userId) {
+            updateUserStatus(userId, 'approved');
+        }
+
+        function rejectUser(userId) {
+            updateUserStatus(userId, 'rejected');
+        }
+
+        function suspendUser(userId) {
+            updateUserStatus(userId, 'suspended');
+        }
+
+         // Sample opportunities data
+         const sampleOpportunities = [
+             {
+                 id: 1,
+                 title: 'Education Innovation Grant 2024',
+                 description: 'Supporting innovative educational programs in underserved communities',
+                 category: 'education',
+                 amount: '$500,000',
+                 status: 'active',
+                 deadline: '2024-03-15',
+                 applications: 45,
+                 provider: 'Global Education Foundation',
+                 createdDate: '2024-01-01'
+             },
+             {
+                 id: 2,
+                 title: 'Healthcare Access Initiative',
+                 description: 'Expanding healthcare services to rural areas across Africa',
+                 category: 'healthcare',
+                 amount: '$750,000',
+                 status: 'active',
+                 deadline: '2024-02-28',
+                 applications: 32,
+                 provider: 'Health Partners Africa',
+                 createdDate: '2024-01-05'
+             },
+             {
+                 id: 3,
+                 title: 'Environmental Conservation Program',
+                 description: 'Climate change mitigation and environmental protection projects',
+                 category: 'environment',
+                 amount: '$300,000',
+                 status: 'draft',
+                 deadline: '2024-04-30',
+                 applications: 0,
+                 provider: 'Green Future Initiative',
+                 createdDate: '2024-01-10'
+             },
+             {
+                 id: 4,
+                 title: 'Technology for Good Grant',
+                 description: 'Supporting tech solutions for social impact',
+                 category: 'technology',
+                 amount: '$200,000',
+                 status: 'closed',
+                 deadline: '2024-01-31',
+                 applications: 78,
+                 provider: 'Tech for Good Initiative',
+                 createdDate: '2023-12-01'
+             },
+             {
+                 id: 5,
+                 title: 'Community Development Fund',
+                 description: 'Empowering local communities through sustainable development',
+                 category: 'community',
+                 amount: '$400,000',
+                 status: 'active',
+                 deadline: '2024-05-15',
+                 applications: 23,
+                 provider: 'Community Builders Network',
+                 createdDate: '2024-01-15'
+             },
+             {
+                 id: 6,
+                 title: 'Youth Leadership Program',
+                 description: 'Developing next generation leaders in Africa',
+                 category: 'education',
+                 amount: '$150,000',
+                 status: 'expired',
+                 deadline: '2024-01-15',
+                 applications: 56,
+                 provider: 'Youth Development Center',
+                 createdDate: '2023-11-01'
+             }
+         ];
+
+         let filteredOpportunities = [...sampleOpportunities];
+
+         function populateOpportunitiesTable() {
+             const tbody = document.getElementById('opportunitiesTableBody');
+             const countElement = document.getElementById('opportunityCount');
+             
+             tbody.innerHTML = '';
+             countElement.textContent = `${filteredOpportunities.length} opportunities`;
+
+             filteredOpportunities.forEach(opportunity => {
+                 const row = createOpportunityRow(opportunity);
+                 tbody.appendChild(row);
+             });
+         }
+
+         function createOpportunityRow(opportunity) {
+             const row = document.createElement('tr');
+             row.className = 'hover:bg-gray-50';
+             
+             const statusColors = {
+                 'active': 'bg-green-100 text-green-800',
+                 'draft': 'bg-yellow-100 text-yellow-800',
+                 'closed': 'bg-gray-100 text-gray-800',
+                 'expired': 'bg-red-100 text-red-800'
+             };
+
+             const categoryColors = {
+                 'education': 'bg-blue-100 text-blue-800',
+                 'healthcare': 'bg-red-100 text-red-800',
+                 'environment': 'bg-green-100 text-green-800',
+                 'technology': 'bg-purple-100 text-purple-800',
+                 'community': 'bg-orange-100 text-orange-800'
+             };
+
+             const formattedDeadline = new Date(opportunity.deadline).toLocaleDateString('en-US', {
+                 year: 'numeric',
+                 month: 'short',
+                 day: 'numeric'
+             });
+
+             const isExpired = new Date(opportunity.deadline) < new Date();
+             const deadlineClass = isExpired ? 'text-red-600' : 'text-gray-900';
+
+             row.innerHTML = `
+                 <td class="px-6 py-4 whitespace-nowrap">
+                     <input type="checkbox" class="opportunity-checkbox rounded border-gray-300 text-kajopo-blue focus:ring-kajopo-blue" data-opportunity-id="${opportunity.id}">
+                 </td>
+                 <td class="px-6 py-4">
+                     <div class="max-w-xs">
+                         <div class="text-sm font-medium text-gray-900">${opportunity.title}</div>
+                         <div class="text-sm text-gray-500 truncate">${opportunity.description}</div>
+                         <div class="text-xs text-gray-400 mt-1">by ${opportunity.provider}</div>
+                     </div>
+                 </td>
+                 <td class="px-6 py-4 whitespace-nowrap">
+                     <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${categoryColors[opportunity.category]}">
+                         ${opportunity.category.charAt(0).toUpperCase() + opportunity.category.slice(1)}
+                     </span>
+                 </td>
+                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                     ${opportunity.amount}
+                 </td>
+                 <td class="px-6 py-4 whitespace-nowrap">
+                     <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusColors[opportunity.status]}">
+                         ${opportunity.status.charAt(0).toUpperCase() + opportunity.status.slice(1)}
+                     </span>
+                 </td>
+                 <td class="px-6 py-4 whitespace-nowrap text-sm ${deadlineClass}">
+                     ${formattedDeadline}
+                     ${isExpired ? '<div class="text-xs text-red-500">Expired</div>' : ''}
+                 </td>
+                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                     <div class="flex items-center">
+                         <span class="font-medium">${opportunity.applications}</span>
+                         <span class="ml-1 text-gray-500">applications</span>
+                     </div>
+                 </td>
+                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                     <div class="flex space-x-2">
+                         <button onclick="viewOpportunity(${opportunity.id})" class="text-kajopo-blue hover:text-blue-600" title="View Details">
+                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                             </svg>
+                         </button>
+                         <button onclick="editOpportunity(${opportunity.id})" class="text-gray-600 hover:text-gray-800" title="Edit">
+                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                             </svg>
+                         </button>
+                         ${opportunity.status === 'draft' ? `
+                             <button onclick="publishOpportunity(${opportunity.id})" class="text-green-600 hover:text-green-800" title="Publish">
+                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                 </svg>
+                             </button>
+                         ` : ''}
+                         ${opportunity.status === 'active' ? `
+                             <button onclick="closeOpportunity(${opportunity.id})" class="text-orange-600 hover:text-orange-800" title="Close">
+                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728"></path>
+                                 </svg>
+                             </button>
+                         ` : ''}
+                         <button onclick="deleteOpportunity(${opportunity.id})" class="text-red-600 hover:text-red-800" title="Delete">
+                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                             </svg>
+                         </button>
+                     </div>
+                 </td>
+             `;
+
+             return row;
+         }
+
+         function filterOpportunities() {
+             const searchTerm = document.getElementById('opportunitySearchInput').value.toLowerCase();
+             const categoryFilter = document.getElementById('categoryFilter').value;
+             const statusFilter = document.getElementById('opportunityStatusFilter').value;
+
+             filteredOpportunities = sampleOpportunities.filter(opportunity => {
+                 const matchesSearch = 
+                     opportunity.title.toLowerCase().includes(searchTerm) ||
+                     opportunity.description.toLowerCase().includes(searchTerm) ||
+                     opportunity.provider.toLowerCase().includes(searchTerm);
+                 
+                 const matchesCategory = categoryFilter === 'all' || opportunity.category === categoryFilter;
+                 const matchesStatus = statusFilter === 'all' || opportunity.status === statusFilter;
+
+                 return matchesSearch && matchesCategory && matchesStatus;
+             });
+
+             populateOpportunitiesTable();
+         }
+
+         function toggleAllOpportunities() {
+             const selectAll = document.getElementById('selectAllOpportunities');
+             const checkboxes = document.querySelectorAll('.opportunity-checkbox');
+             
+             checkboxes.forEach(checkbox => {
+                 checkbox.checked = selectAll.checked;
+             });
+         }
+
+         // Opportunity action functions
+         function addOpportunity() {
+             showNotification('Add opportunity form coming soon!', 'info');
+         }
+
+         function exportOpportunities() {
+             showNotification('Exporting opportunities...', 'info');
+         }
+
+         function viewOpportunity(opportunityId) {
+             const opportunity = sampleOpportunities.find(o => o.id === opportunityId);
+             if (opportunity) {
+                 showNotification(`Viewing details for "${opportunity.title}"`, 'info');
+             }
+         }
+
+         function editOpportunity(opportunityId) {
+             const opportunity = sampleOpportunities.find(o => o.id === opportunityId);
+             if (opportunity) {
+                 showNotification(`Edit form for "${opportunity.title}" coming soon!`, 'info');
+             }
+         }
+
+         function publishOpportunity(opportunityId) {
+             const opportunity = sampleOpportunities.find(o => o.id === opportunityId);
+             if (opportunity) {
+                 opportunity.status = 'active';
+                 populateOpportunitiesTable();
+                 showNotification(`"${opportunity.title}" has been published!`, 'success');
+             }
+         }
+
+         function closeOpportunity(opportunityId) {
+             const opportunity = sampleOpportunities.find(o => o.id === opportunityId);
+             if (opportunity) {
+                 opportunity.status = 'closed';
+                 populateOpportunitiesTable();
+                 showNotification(`"${opportunity.title}" has been closed.`, 'info');
+             }
+         }
+
+         function deleteOpportunity(opportunityId) {
+             const opportunity = sampleOpportunities.find(o => o.id === opportunityId);
+             if (opportunity && confirm(`Are you sure you want to delete "${opportunity.title}"?`)) {
+                 const index = sampleOpportunities.findIndex(o => o.id === opportunityId);
+                 sampleOpportunities.splice(index, 1);
+                 filterOpportunities(); // Refresh the filtered list
+                 showNotification(`"${opportunity.title}" has been deleted.`, 'info');
+             }
+         }
+
+         // Applications Management
+         const sampleApplications = [
+             {
+                 id: 'app001',
+                 applicantName: 'Demo User',
+                 applicantEmail: 'sarah.johnson@email.com',
+                 opportunityTitle: 'Community Health Volunteer',
+                 opportunityId: 'opp001',
+                 status: 'pending',
+                 priority: 'high',
+                 appliedDate: '2024-01-15',
+                 score: 85,
+                 skills: ['Healthcare', 'Communication', 'Community Outreach'],
+                 experience: '3 years in community health'
+             },
+             {
+                 id: 'app002',
+                 applicantName: 'Michael Chen',
+                 applicantEmail: 'michael.chen@email.com',
+                 opportunityTitle: 'Environmental Conservation Project',
+                 opportunityId: 'opp002',
+                 status: 'under_review',
+                 priority: 'medium',
+                 appliedDate: '2024-01-14',
+                 score: 92,
+                 skills: ['Environmental Science', 'Research', 'Data Analysis'],
+                 experience: '5 years in environmental research'
+             },
+             {
+                 id: 'app003',
+                 applicantName: 'Emily Rodriguez',
+                 applicantEmail: 'emily.rodriguez@email.com',
+                 opportunityTitle: 'Youth Mentorship Program',
+                 opportunityId: 'opp003',
+                 status: 'approved',
+                 priority: 'high',
+                 appliedDate: '2024-01-13',
+                 score: 88,
+                 skills: ['Education', 'Mentoring', 'Youth Development'],
+                 experience: '4 years in youth programs'
+             },
+             {
+                 id: 'app004',
+                 applicantName: 'David Thompson',
+                 applicantEmail: 'david.thompson@email.com',
+                 opportunityTitle: 'Tech Skills Training Instructor',
+                 opportunityId: 'opp004',
+                 status: 'rejected',
+                 priority: 'low',
+                 appliedDate: '2024-01-12',
+                 score: 65,
+                 skills: ['Programming', 'Teaching', 'Web Development'],
+                 experience: '2 years in tech education'
+             },
+             {
+                 id: 'app005',
+                 applicantName: 'Lisa Wang',
+                 applicantEmail: 'lisa.wang@email.com',
+                 opportunityTitle: 'Senior Care Companion',
+                 opportunityId: 'opp005',
+                 status: 'pending',
+                 priority: 'medium',
+                 appliedDate: '2024-01-11',
+                 score: 78,
+                 skills: ['Caregiving', 'Patience', 'Communication'],
+                 experience: '1 year in senior care'
+             }
+         ];
+
+         let filteredApplications = [...sampleApplications];
+
+         function populateApplicationsTable() {
+             const tbody = document.getElementById('applicationsTableBody');
+             tbody.innerHTML = '';
+
+             filteredApplications.forEach(application => {
+                 const row = document.createElement('tr');
+                 row.className = 'hover:bg-gray-50';
+                 
+                 const statusColors = {
+                     'pending': 'bg-yellow-100 text-yellow-800',
+                     'under_review': 'bg-blue-100 text-blue-800',
+                     'approved': 'bg-green-100 text-green-800',
+                     'rejected': 'bg-red-100 text-red-800'
+                 };
+                 
+                 const priorityColors = {
+                     'high': 'bg-red-100 text-red-800',
+                     'medium': 'bg-yellow-100 text-yellow-800',
+                     'low': 'bg-green-100 text-green-800'
+                 };
+
+                 row.innerHTML = `
+                     <td class="px-6 py-4 whitespace-nowrap">
+                         <input type="checkbox" class="application-checkbox rounded border-gray-300 text-kajopo-blue focus:ring-kajopo-blue" value="${application.id}">
+                     </td>
+                     <td class="px-6 py-4 whitespace-nowrap">
+                         <div class="flex items-center">
+                             <div class="h-10 w-10 bg-kajopo-purple rounded-full flex items-center justify-center">
+                                 <span class="text-white text-sm font-medium">${application.applicantName.split(' ').map(n => n[0]).join('')}</span>
+                             </div>
+                             <div class="ml-4">
+                                 <div class="text-sm font-medium text-gray-900">${application.applicantName}</div>
+                                 <div class="text-sm text-gray-500">${application.applicantEmail}</div>
+                             </div>
+                         </div>
+                     </td>
+                     <td class="px-6 py-4 whitespace-nowrap">
+                         <div class="text-sm text-gray-900">${application.opportunityTitle}</div>
+                         <div class="text-sm text-gray-500">ID: ${application.opportunityId}</div>
+                     </td>
+                     <td class="px-6 py-4 whitespace-nowrap">
+                         <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusColors[application.status]}">
+                             ${application.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                         </span>
+                     </td>
+                     <td class="px-6 py-4 whitespace-nowrap">
+                         <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${priorityColors[application.priority]}">
+                             ${application.priority.charAt(0).toUpperCase() + application.priority.slice(1)}
+                         </span>
+                     </td>
+                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                         ${new Date(application.appliedDate).toLocaleDateString()}
+                     </td>
+                     <td class="px-6 py-4 whitespace-nowrap">
+                         <div class="flex items-center">
+                             <div class="text-sm font-medium text-gray-900">${application.score}%</div>
+                             <div class="ml-2 w-16 bg-gray-200 rounded-full h-2">
+                                 <div class="bg-kajopo-blue h-2 rounded-full" style="width: ${application.score}%"></div>
+                             </div>
+                         </div>
+                     </td>
+                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                         <div class="flex space-x-2">
+                             <button onclick="viewApplication('${application.id}')" class="text-kajopo-blue hover:text-blue-600" title="View Details">
+                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                 </svg>
+                             </button>
+                             <button onclick="approveApplication('${application.id}')" class="text-green-600 hover:text-green-800" title="Approve">
+                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                 </svg>
+                             </button>
+                             <button onclick="rejectApplication('${application.id}')" class="text-red-600 hover:text-red-800" title="Reject">
+                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                 </svg>
+                             </button>
+                         </div>
+                     </td>
+                 `;
+                 
+                 tbody.appendChild(row);
+             });
+
+             // Update pagination info
+             document.getElementById('applicationsTotal').textContent = filteredApplications.length;
+             document.getElementById('applicationsEnd').textContent = Math.min(10, filteredApplications.length);
+         }
+
+         function filterApplications() {
+             const searchTerm = document.getElementById('applicationSearch').value.toLowerCase();
+             const statusFilter = document.getElementById('statusFilter').value;
+             const opportunityFilter = document.getElementById('opportunityFilter').value;
+             const priorityFilter = document.getElementById('priorityFilter').value;
+
+             filteredApplications = sampleApplications.filter(application => {
+                 const matchesSearch = application.applicantName.toLowerCase().includes(searchTerm) ||
+                                     application.applicantEmail.toLowerCase().includes(searchTerm) ||
+                                     application.opportunityTitle.toLowerCase().includes(searchTerm);
+                 
+                 const matchesStatus = !statusFilter || application.status === statusFilter;
+                 const matchesOpportunity = !opportunityFilter || application.opportunityId === opportunityFilter;
+                 const matchesPriority = !priorityFilter || application.priority === priorityFilter;
+
+                 return matchesSearch && matchesStatus && matchesOpportunity && matchesPriority;
+             });
+
+             populateApplicationsTable();
+         }
+
+         function setupApplicationsListeners() {
+             // Search functionality
+             document.getElementById('applicationSearch').addEventListener('input', filterApplications);
+             
+             // Filter functionality
+             document.getElementById('statusFilter').addEventListener('change', filterApplications);
+             document.getElementById('opportunityFilter').addEventListener('change', filterApplications);
+             document.getElementById('priorityFilter').addEventListener('change', filterApplications);
+
+             // Select all checkbox
+             document.getElementById('selectAllApplications').addEventListener('change', function() {
+                 const checkboxes = document.querySelectorAll('.application-checkbox');
+                 checkboxes.forEach(checkbox => {
+                     checkbox.checked = this.checked;
+                 });
+             });
+
+             // Export applications
+             document.getElementById('exportApplicationsBtn').addEventListener('click', function() {
+                 showNotification('Exporting applications...', 'info');
+             });
+
+             // Bulk actions
+             document.getElementById('bulkActionsBtn').addEventListener('click', function() {
+                 const selectedIds = getSelectedApplications();
+                 if (selectedIds.length > 0) {
+                     showNotification('Bulk actions menu coming soon!', 'info');
+                 } else {
+                     showNotification('Please select applications first.', 'warning');
+                 }
+             });
+
+             // Clear filters
+             document.getElementById('clearFilters').addEventListener('click', function() {
+                 document.getElementById('applicationSearch').value = '';
+                 document.getElementById('statusFilter').value = '';
+                 document.getElementById('opportunityFilter').value = '';
+                 document.getElementById('priorityFilter').value = '';
+                 filterApplications();
+             });
+         }
+
+         function getSelectedApplications() {
+             const checkboxes = document.querySelectorAll('.application-checkbox:checked');
+             return Array.from(checkboxes).map(cb => cb.value);
+         }
+
+         function viewApplication(applicationId) {
+             const application = sampleApplications.find(a => a.id === applicationId);
+             if (application) {
+                 showNotification(`Viewing application from ${application.applicantName}`, 'info');
+                 // Here you would typically open a detailed view modal
+             }
+         }
+
+         function approveApplication(applicationId, showMessage = true) {
+             const application = sampleApplications.find(a => a.id === applicationId);
+             if (application) {
+                 application.status = 'approved';
+                 populateApplicationsTable();
+                 if (showMessage) {
+                     showNotification(`Application from ${application.applicantName} approved!`, 'success');
+                 }
+             }
+         }
+
+         function rejectApplication(applicationId, showMessage = true) {
+             const application = sampleApplications.find(a => a.id === applicationId);
+             if (application) {
+                 application.status = 'rejected';
+                 populateApplicationsTable();
+                 if (showMessage) {
+                     showNotification(`Application from ${application.applicantName} rejected.`, 'info');
+                 }
+             }
+         }
+
+        // Analytics functions
+        function setupAnalyticsListeners() {
+            const timeRangeSelect = document.getElementById('analyticsTimeRange');
+            const exportBtn = document.getElementById('exportAnalyticsBtn');
+
+            if (timeRangeSelect) {
+                timeRangeSelect.addEventListener('change', updateAnalyticsData);
+            }
+            if (exportBtn) {
+                exportBtn.addEventListener('click', exportAnalyticsReport);
+            }
+        }
+
+        function updateAnalyticsData() {
+            const timeRange = document.getElementById('analyticsTimeRange').value;
+            // Simulate data update based on time range
+            const metrics = getAnalyticsMetrics(timeRange);
+            
+            document.getElementById('totalUsersMetric').textContent = metrics.totalUsers;
+            document.getElementById('activeOpportunitiesMetric').textContent = metrics.activeOpportunities;
+            document.getElementById('totalApplicationsMetric').textContent = metrics.totalApplications;
+            document.getElementById('matchSuccessRateMetric').textContent = metrics.matchSuccessRate + '%';
+        }
+
+        function getAnalyticsMetrics(timeRange) {
+            // Sample data based on time range
+            const metrics = {
+                '7d': {
+                    totalUsers: '2,847',
+                    activeOpportunities: '156',
+                    totalApplications: '1,234',
+                    matchSuccessRate: '78'
+                },
+                '30d': {
+                    totalUsers: '2,847',
+                    activeOpportunities: '156',
+                    totalApplications: '1,234',
+                    matchSuccessRate: '78'
+                },
+                '90d': {
+                    totalUsers: '8,234',
+                    activeOpportunities: '423',
+                    totalApplications: '3,567',
+                    matchSuccessRate: '82'
+                },
+                '1y': {
+                    totalUsers: '24,891',
+                    activeOpportunities: '1,245',
+                    totalApplications: '12,456',
+                    matchSuccessRate: '85'
+                }
+            };
+            return metrics[timeRange] || metrics['30d'];
+        }
+
+        function exportAnalyticsReport() {
+            const timeRange = document.getElementById('analyticsTimeRange').value;
+            const reportData = {
+                timeRange: timeRange,
+                generatedAt: new Date().toISOString(),
+                metrics: getAnalyticsMetrics(timeRange)
+            };
+            
+            // Create and download CSV
+            const csvContent = generateAnalyticsCSV(reportData);
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `analytics-report-${timeRange}-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            showNotification('Analytics report exported successfully!', 'success');
+        }
+
+        function generateAnalyticsCSV(data) {
+            const headers = ['Metric', 'Value'];
+            const rows = [
+                ['Time Range', data.timeRange],
+                ['Generated At', data.generatedAt],
+                ['Total Users', data.metrics.totalUsers],
+                ['Active Opportunities', data.metrics.activeOpportunities],
+                ['Total Applications', data.metrics.totalApplications],
+                ['Match Success Rate', data.metrics.matchSuccessRate + '%']
+            ];
+            
+            return [headers, ...rows].map(row => row.join(',')).join('\n');
+        }
+
+        // Refresh user data function
+        function refreshUserData() {
+            showNotification('Refreshing user data...', 'info');
+            
+            // Debug: Log localStorage contents
+            console.log('=== REFRESH USER DATA DEBUG ===');
+            const allKeys = Object.keys(localStorage);
+            const userKeys = allKeys.filter(key => key.includes('kajopo_user') || key.includes('userInfo'));
+            console.log('Found localStorage keys:', userKeys);
+            
+            userKeys.forEach(key => {
+                try {
+                    const userData = JSON.parse(localStorage.getItem(key));
+                    console.log(`Key: ${key}`, userData);
+                } catch (e) {
+                    console.log(`Key: ${key} (raw):`, localStorage.getItem(key));
+                }
+            });
+            
+            // Clear current filtered users and repopulate
+            const registeredUsers = getRegisteredUsers();
+            console.log('Registered users found:', registeredUsers.length, registeredUsers);
+            
+            filteredUsers = getAllUsers();
+            console.log('All users (including samples):', filteredUsers.length);
+            
+            populateUsersTable();
+            
+            // Update user count display if it exists
+            const userCountElement = document.querySelector('#usersSection .text-sm.text-gray-600');
+            if (userCountElement) {
+                const totalUsers = filteredUsers.length;
+                userCountElement.textContent = `${totalUsers} user${totalUsers !== 1 ? 's' : ''} found`;
+            }
+            
+            showNotification(`User data refreshed! Found ${filteredUsers.length} users (${registeredUsers.length} registered).`, 'success');
+            console.log('=== REFRESH COMPLETE ===');
+        }
+
+        // Add active styles
+        const style = document.createElement('style');
+        style.textContent = `
+            .nav-item.active {
+                background-color: #0ea5e9;
+                color: white;
+            }
+            .nav-item.active:hover {
+                background-color: #0284c7;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+    
+    <!-- Theme Manager -->
+    <script src="js/theme-manager.js"></script>
+</body>
+</html>

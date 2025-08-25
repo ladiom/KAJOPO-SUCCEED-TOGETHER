@@ -1,0 +1,73 @@
+# Netlify configuration for Kájọpọ̀ Connect
+[build]
+  # No build command needed for static site
+  publish = "."
+
+# Redirect rules for SPA-like behavior
+[[redirects]]
+  from = "/admin"
+  to = "/admin-dashboard.html"
+  status = 200
+
+[[redirects]]
+  from = "/login"
+  to = "/signin-form.html"
+  status = 200
+
+[[redirects]]
+  from = "/register"
+  to = "/registration-form.html"
+  status = 200
+
+[[redirects]]
+  from = "/dashboard"
+  to = "/dashboard.html"
+  status = 200
+
+[[redirects]]
+  from = "/profile"
+  to = "/profile.html"
+  status = 200
+
+[[redirects]]
+  from = "/opportunities"
+  to = "/browse-opportunities.html"
+  status = 200
+
+[[redirects]]
+  from = "/messaging"
+  to = "/messaging.html"
+  status = 200
+
+# Headers for security
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com; img-src 'self' data: https:; font-src 'self' https:;"
+
+# Cache static assets
+[[headers]]
+  for = "/css/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+# Environment variables (for production)
+[context.production.environment]
+  NODE_ENV = "production"
+
+# Branch deploy settings
+[context.branch-deploy]
+  command = "echo 'Branch deploy'"
+
+# Deploy preview settings
+[context.deploy-preview]
+  command = "echo 'Deploy preview'"

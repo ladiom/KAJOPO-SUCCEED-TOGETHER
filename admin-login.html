@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Kájọpọ̀ Connect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'kajopo-blue': '#0ea5e9',
+                        'kajopo-purple': '#8b5cf6',
+                        'kajopo-green': '#10b981',
+                        'kajopo-orange': '#f59e0b'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="css/themes.css">
+    <script src="js/theme-manager.js"></script>
+    <script src="js/admin-auth.js?v=1"></script>
+    <style>
+        /* Admin Login Page - White text for better contrast */
+        .admin-login .text-gray-700,
+        .admin-login .text-gray-600,
+        .admin-login .text-gray-500 {
+            color: white !important;
+        }
+        
+        .admin-login label {
+            color: white !important;
+        }
+        
+        .admin-login h3 {
+            color: white !important;
+        }
+        
+        /* Demo credentials section with dark background for readability */
+        .admin-login .bg-gray-50 {
+            background-color: rgba(0, 0, 0, 0.3) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="admin-login min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
+    <!-- Theme Toggle -->
+    <button data-theme-toggle class="theme-toggle fixed top-4 right-4 z-50" aria-label="Toggle theme" title="Switch between light and dark themes">
+        <div class="theme-toggle-handle">
+            <span class="theme-icon">🌙</span>
+        </div>
+        <span class="sr-only">Toggle between light and dark themes</span>
+    </button>
+    
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 bg-black opacity-50"></div>
+    <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')"></div>
+    
+    <!-- Main Content -->
+    <div class="relative min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <!-- Header -->
+            <div class="text-center">
+                <div class="mx-auto h-16 w-16 bg-kajopo-blue rounded-full flex items-center justify-center mb-4">
+                    <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                    </svg>
+                </div>
+                <h2 class="text-3xl font-bold text-white mb-2">Admin Access</h2>
+                <p class="text-gray-300">Kájọpọ̀ Connect Administration Portal</p>
+            </div>
+
+            <!-- Login Form -->
+            <div class="bg-white rounded-lg shadow-xl p-8">
+                <form id="adminLoginForm" class="space-y-6">
+                    <!-- Email Field -->
+                    <div>
+                        <label for="adminEmail" class="block text-sm font-medium text-gray-700 mb-2">
+                            Admin Email
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
+                                </svg>
+                            </div>
+                            <input type="email" id="adminEmail" name="adminEmail" required 
+                                   class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kajopo-blue focus:border-kajopo-blue transition-colors"
+                                   placeholder="admin@kajopo.com">
+                        </div>
+                    </div>
+
+                    <!-- Password Field -->
+                    <div>
+                        <label for="adminPassword" class="block text-sm font-medium text-gray-700 mb-2">
+                            Password
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                </svg>
+                            </div>
+                            <input type="password" id="adminPassword" name="adminPassword" required 
+                                   class="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kajopo-blue focus:border-kajopo-blue transition-colors"
+                                   placeholder="Enter your password">
+                            <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                <svg id="eyeIcon" class="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                                <svg id="eyeOffIcon" class="h-5 w-5 text-gray-400 hover:text-gray-600 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Two-Factor Authentication -->
+                    <div id="twoFactorSection" class="hidden">
+                        <label for="twoFactorCode" class="block text-sm font-medium text-gray-700 mb-2">
+                            Two-Factor Authentication Code
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <input type="text" id="twoFactorCode" name="twoFactorCode" maxlength="6" 
+                                   class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kajopo-blue focus:border-kajopo-blue transition-colors text-center tracking-widest"
+                                   placeholder="000000">
+                        </div>
+                        <p class="text-sm text-gray-500 mt-1">Enter the 6-digit code from your authenticator app</p>
+                    </div>
+
+                    <!-- Remember Me -->
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="rememberMe" name="rememberMe" 
+                                   class="h-4 w-4 text-kajopo-blue focus:ring-kajopo-blue border-gray-300 rounded">
+                            <label for="rememberMe" class="ml-2 text-sm text-gray-700">
+                                Remember me for 30 days
+                            </label>
+                        </div>
+                        <a href="#" id="forgotPasswordLink" class="text-sm text-kajopo-blue hover:text-blue-600">
+                            Forgot password?
+                        </a>
+                    </div>
+
+                    <!-- Login Button -->
+                    <button type="submit" id="loginButton" 
+                            class="w-full bg-kajopo-blue text-white py-3 px-4 rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-kajopo-blue focus:ring-offset-2 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span id="loginButtonText">Sign In to Admin Panel</span>
+                        <svg id="loginSpinner" class="hidden animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </button>
+                </form>
+
+                <!-- Demo Credentials -->
+                <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                    <h3 class="text-sm font-medium text-gray-700 mb-2">Demo Credentials:</h3>
+                    <div class="text-sm text-gray-600 space-y-1">
+                        <p><strong>Email:</strong> admin@kajopo.com</p>
+                        <p><strong>Password:</strong> Admin123!</p>
+                        <p><strong>2FA Code:</strong> 123456 (demo)</p>
+                    </div>
+                    <button id="fillDemoCredentials" class="mt-2 text-xs text-kajopo-blue hover:text-blue-600 underline">
+                        Fill demo credentials
+                    </button>
+                </div>
+            </div>
+
+            <!-- Back to Site -->
+            <div class="text-center">
+                <a href="index.html" class="text-gray-300 hover:text-white text-sm transition-colors">
+                    ← Back to Kájọpọ̀ Connect
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error/Success Messages -->
+    <div id="messageContainer" class="fixed top-4 right-4 z-50"></div>
+
+    <!-- Admin Authentication Script -->
+    <script>
+        // Admin credentials database (in production, this would be server-side)
+        const adminCredentials = {
+            'admin@kajopo.com': {
+                password: 'Admin123!',
+                firstName: 'John',
+                lastName: 'Admin',
+                role: 'super_admin',
+                permissions: ['users', 'opportunities', 'applications', 'analytics', 'settings'],
+                requiresTwoFactor: true,
+                lastLogin: null,
+                loginAttempts: 0,
+                lockedUntil: null
+            },
+            'manager@kajopo.com': {
+                password: 'Manager123!',
+                firstName: 'Sarah',
+                lastName: 'Manager',
+                role: 'admin',
+                permissions: ['users', 'opportunities', 'applications'],
+                requiresTwoFactor: false,
+                lastLogin: null,
+                loginAttempts: 0,
+                lockedUntil: null
+            }
+        };
+
+        let loginAttempts = 0;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Debug: Check if AdminAuth is loaded
+            console.log('AdminAuth loaded:', typeof window.adminAuth);
+            console.log('AdminAuth object:', window.adminAuth);
+            
+            setupEventListeners();
+            checkExistingSession();
+        });
+
+        function setupEventListeners() {
+            const form = document.getElementById('adminLoginForm');
+            const togglePassword = document.getElementById('togglePassword');
+            const fillDemoBtn = document.getElementById('fillDemoCredentials');
+            const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+
+            form.addEventListener('submit', handleLogin);
+            togglePassword.addEventListener('click', togglePasswordVisibility);
+            fillDemoBtn.addEventListener('click', fillDemoCredentials);
+            forgotPasswordLink.addEventListener('click', handleForgotPassword);
+
+            // Auto-focus email field
+            document.getElementById('adminEmail').focus();
+        }
+
+        function checkExistingSession() {
+            // Check if AdminAuth is loaded
+            if (!window.adminAuth) {
+                console.warn('AdminAuth not loaded yet, skipping session check');
+                return;
+            }
+            
+            // Use AdminAuth class to check existing session
+            const session = window.adminAuth.getCurrentSession();
+            if (session) {
+                // Valid session exists, redirect to dashboard
+                const returnUrl = new URLSearchParams(window.location.search).get('return');
+                window.location.href = returnUrl || 'admin-dashboard.html';
+                return;
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            console.log('Login form submitted');
+            
+            const email = document.getElementById('adminEmail').value.trim();
+            const password = document.getElementById('adminPassword').value;
+            const twoFactorCode = document.getElementById('twoFactorCode').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            
+            console.log('Login attempt:', { email, hasPassword: !!password, twoFactorCode, rememberMe });
+
+            // Check if account is locked
+            if (window.adminAuth.isAccountLocked()) {
+                const remainingTime = Math.ceil((JSON.parse(localStorage.getItem('kajopo_admin_lockout')).until - Date.now()) / 60000);
+                showMessage(`Account temporarily locked. Please try again in ${remainingTime} minutes.`, 'error');
+                return;
+            }
+
+            setLoading(true);
+
+            try {
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                const result = await authenticateAdmin(email, password, twoFactorCode);
+                
+                if (result.success) {
+                    // Successful login
+                    window.adminAuth.createSession(result.admin, rememberMe);
+                    window.adminAuth.clearFailedAttempts(); // Clear any previous failed attempts
+                    showMessage('Login successful! Redirecting...', 'success');
+                    
+                    // Check for return URL
+                    const returnUrl = new URLSearchParams(window.location.search).get('return');
+                    
+                    setTimeout(() => {
+                        window.location.href = returnUrl || 'admin-dashboard.html';
+                    }, 1500);
+                } else if (result.requiresTwoFactor && !twoFactorCode) {
+                    // Show 2FA section when 2FA is required
+                    showTwoFactorSection();
+                    showMessage('Please enter your two-factor authentication code.', 'info');
+                    setLoading(false);
+                    return;
+                } else {
+                    handleLoginFailure(result.message);
+                }
+            } catch (error) {
+                handleLoginFailure('An error occurred during login. Please try again.');
+            }
+
+            setLoading(false);
+        }
+
+        async function authenticateAdmin(email, password, twoFactorCode = null) {
+            const admin = adminCredentials[email.toLowerCase()];
+            
+            if (!admin) {
+                return { success: false, message: 'Invalid email or password.' };
+            }
+
+            if (admin.lockedUntil && admin.lockedUntil > Date.now()) {
+                return { success: false, message: 'Account is temporarily locked.' };
+            }
+
+            if (admin.password !== password) {
+                admin.loginAttempts = (admin.loginAttempts || 0) + 1;
+                
+                if (admin.loginAttempts >= window.adminAuth.maxLoginAttempts) {
+                    admin.lockedUntil = Date.now() + window.adminAuth.lockoutDuration;
+                }
+                
+                return { success: false, message: 'Invalid email or password.' };
+            }
+
+            if (admin.requiresTwoFactor) {
+                if (!twoFactorCode) {
+                    return { success: false, requiresTwoFactor: true, message: 'Two-factor authentication required.' };
+                }
+                
+                // In production, this would validate against a proper 2FA service
+                if (twoFactorCode !== '123456') {
+                    return { success: false, message: 'Invalid two-factor authentication code.' };
+                }
+            }
+
+            // Reset login attempts on successful login
+            admin.loginAttempts = 0;
+            admin.lockedUntil = null;
+            admin.lastLogin = Date.now();
+
+            return { 
+                success: true, 
+                admin: {
+                    email: email,
+                    firstName: admin.firstName,
+                    lastName: admin.lastName,
+                    role: admin.role,
+                    permissions: admin.permissions
+                }
+            };
+        }
+
+        // Session management is now handled by AdminAuth class
+
+        function handleLoginFailure(message) {
+            const email = document.getElementById('adminEmail').value.trim();
+            window.adminAuth.recordFailedAttempt(email);
+            
+            const failedAttempts = window.adminAuth.getFailedAttempts();
+            const maxAttempts = window.adminAuth.maxLoginAttempts;
+            
+            if (failedAttempts >= maxAttempts) {
+                showMessage('Too many failed attempts. Account locked for 15 minutes.', 'error');
+            } else {
+                const remainingAttempts = maxAttempts - failedAttempts;
+                showMessage(`${message} ${remainingAttempts} attempts remaining.`, 'error');
+            }
+        }
+
+        function showTwoFactorSection() {
+            document.getElementById('twoFactorSection').classList.remove('hidden');
+            document.getElementById('twoFactorCode').focus();
+        }
+
+        function togglePasswordVisibility() {
+            const passwordField = document.getElementById('adminPassword');
+            const eyeIcon = document.getElementById('eyeIcon');
+            const eyeOffIcon = document.getElementById('eyeOffIcon');
+
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                eyeIcon.classList.add('hidden');
+                eyeOffIcon.classList.remove('hidden');
+            } else {
+                passwordField.type = 'password';
+                eyeIcon.classList.remove('hidden');
+                eyeOffIcon.classList.add('hidden');
+            }
+        }
+
+        function fillDemoCredentials() {
+            document.getElementById('adminEmail').value = 'admin@kajopo.com';
+            document.getElementById('adminPassword').value = 'Admin123!';
+            showMessage('Demo credentials filled. Click "Sign In" to continue.', 'info');
+        }
+
+        function handleForgotPassword(e) {
+            e.preventDefault();
+            showMessage('Password reset functionality would be implemented here in production.', 'info');
+        }
+
+        function setLoading(loading) {
+            const button = document.getElementById('loginButton');
+            const buttonText = document.getElementById('loginButtonText');
+            const spinner = document.getElementById('loginSpinner');
+
+            if (loading) {
+                button.disabled = true;
+                buttonText.textContent = 'Signing In...';
+                spinner.classList.remove('hidden');
+            } else {
+                button.disabled = false;
+                buttonText.textContent = 'Sign In to Admin Panel';
+                spinner.classList.add('hidden');
+            }
+        }
+
+        function showMessage(message, type) {
+            const container = document.getElementById('messageContainer');
+            const messageDiv = document.createElement('div');
+            
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                info: 'bg-blue-500',
+                warning: 'bg-yellow-500'
+            };
+
+            messageDiv.className = `${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg mb-4 transform transition-all duration-300 translate-x-full`;
+            messageDiv.textContent = message;
+
+            container.appendChild(messageDiv);
+
+            // Animate in
+            setTimeout(() => {
+                messageDiv.classList.remove('translate-x-full');
+            }, 100);
+
+            // Remove after 5 seconds
+            setTimeout(() => {
+                messageDiv.classList.add('translate-x-full');
+                setTimeout(() => {
+                    if (messageDiv.parentNode) {
+                        messageDiv.parentNode.removeChild(messageDiv);
+                    }
+                }, 300);
+            }, 5000);
+        }
+        
+        // Initialize theme manager
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof ThemeManager !== 'undefined') {
+                const themeManager = new ThemeManager();
+                themeManager.init();
+            }
+        });
+    </script>
+</body>
+</html>

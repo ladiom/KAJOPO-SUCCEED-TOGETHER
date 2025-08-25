@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply for Opportunity - Kájọpọ̀ Connect</title>
+    <!-- Theme System -->
+    <link rel="stylesheet" href="css/themes.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Override Tailwind with theme variables */
+        body {
+            background-color: var(--bg-primary) !important;
+            color: var(--text-primary) !important;
+        }
+        .bg-gray-50 {
+            background-color: var(--bg-primary) !important;
+        }
+        .bg-white {
+            background-color: var(--card-bg) !important;
+        }
+        .text-gray-900 {
+            color: var(--text-primary) !important;
+        }
+        .text-gray-700 {
+            color: var(--text-secondary) !important;
+        }
+        .text-gray-600 {
+            color: var(--text-secondary) !important;
+        }
+        .text-gray-500 {
+            color: var(--text-tertiary) !important;
+        }
+        .border-gray-200 {
+            border-color: var(--border-primary) !important;
+        }
+        .border-gray-300 {
+            border-color: var(--border-primary) !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <a href="kajopo-connect/index.html" class="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">Kájọpọ̀</a>
+                    <span class="ml-3 text-sm text-gray-500 italic">Succeed Together</span>
+                </div>
+                
+                <!-- Navigation Menu -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="kajopo-connect/about-us.html" class="text-gray-600 hover:text-cyan-600 transition-colors font-medium">About Us</a>
+                    <a href="kajopo-connect/contact.html" class="text-gray-600 hover:text-cyan-600 transition-colors font-medium">Contact</a>
+                </nav>
+                
+                <!-- User Menu -->
+                <div id="userMenu" class="relative" style="display: none;">
+                    <button id="userMenuBtn" class="flex items-center space-x-2 text-gray-700 hover:text-gray-900 focus:outline-none">
+                        <div class="h-8 w-8 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full flex items-center justify-center">
+                            <span id="userInitials" class="text-white text-sm font-medium"></span>
+                        </div>
+                        <span id="userName" class="font-medium"></span>
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    
+                    <!-- Dropdown Menu -->
+                    <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                        <div class="py-2">
+                            <a href="dashboard.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <svg class="h-4 w-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                                Dashboard
+                            </a>
+
+                            <hr class="my-1">
+                            <button id="signOutBtn" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <svg class="h-4 w-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                </svg>
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Guest Menu -->
+                <div id="guestMenu" class="flex space-x-4">
+                    <button id="signInBtn" class="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 transition-colors">
+                        Sign In
+                    </button>
+                    <button id="registerBtn" class="border border-cyan-400 text-cyan-400 px-4 py-2 rounded-lg hover:bg-cyan-400 hover:text-white transition-colors">
+                        Register
+                    </button></div>
+                </div>
+                <!-- Theme Toggle -->
+                <button data-theme-toggle class="theme-toggle ml-4" aria-label="Toggle theme" title="Switch between light and dark themes">
+                    <div class="theme-toggle-handle">
+                        <span class="theme-icon">🌙</span>
+                    </div>
+                    <span class="sr-only">Toggle between light and dark themes</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Authentication Check Message -->
+        <div id="authMessage" class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6 hidden">
+            <div class="flex items-center">
+                <svg class="h-5 w-5 text-yellow-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.962-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+                <div>
+                    <h3 class="text-sm font-medium text-yellow-800">Registration Required</h3>
+                    <p class="text-sm text-yellow-700 mt-1">Please register or sign in to apply for opportunities. Registration helps us match you with the most relevant opportunities.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Application Form (shown for authenticated users) -->
+        <div id="applicationForm" class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <!-- Opportunity Details Header -->
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <h1 class="text-2xl font-bold text-gray-900 mb-2" id="opportunityTitle">Community Health Worker Training Program</h1>
+                        <p class="text-gray-600 mb-3" id="opportunityDescription">Comprehensive training program for community health workers in rural areas, focusing on maternal and child health, disease prevention, and health education.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">Healthcare</span>
+                            <span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">Training</span>
+                            <span class="px-2 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full">Africa</span>
+                        </div>
+                    </div>
+                    <div class="ml-6 text-right">
+                        <div class="text-sm text-gray-500 mb-1">Application Deadline</div>
+                        <div class="text-lg font-semibold text-red-600" id="deadline">March 15, 2024</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Application Form Content -->
+            <form id="applicationFormContent" class="p-6 space-y-6">
+                <!-- Personal Information -->
+                <div class="space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Personal Information</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
+                            <input type="text" id="firstName" name="firstName" required class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
+                            <input type="text" id="lastName" name="lastName" required class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
+                            <input type="email" id="email" name="email" required class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="location" class="block text-sm font-medium text-gray-700 mb-1">Location *</label>
+                        <input type="text" id="location" name="location" required placeholder="City, Country" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+
+                <!-- Professional Background -->
+                <div class="space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Professional Background</h2>
+                    
+                    <div>
+                        <label for="currentRole" class="block text-sm font-medium text-gray-700 mb-1">Current Role/Position</label>
+                        <input type="text" id="currentRole" name="currentRole" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+
+                    <div>
+                        <label for="organization" class="block text-sm font-medium text-gray-700 mb-1">Current Organization</label>
+                        <input type="text" id="organization" name="organization" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+
+                    <div>
+                        <label for="experience" class="block text-sm font-medium text-gray-700 mb-1">Years of Relevant Experience</label>
+                        <select id="experience" name="experience" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Select experience level</option>
+                            <option value="0-1">0-1 years</option>
+                            <option value="2-5">2-5 years</option>
+                            <option value="6-10">6-10 years</option>
+                            <option value="11-15">11-15 years</option>
+                            <option value="15+">15+ years</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="skills" class="block text-sm font-medium text-gray-700 mb-1">Relevant Skills *</label>
+                        <textarea id="skills" name="skills" rows="3" required placeholder="List your relevant skills, separated by commas" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                        <p class="text-xs text-gray-500 mt-1">Example: Community health, Training delivery, Health education, Data collection</p>
+                    </div>
+                </div>
+
+                <!-- Motivation and Fit -->
+                <div class="space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Motivation & Fit</h2>
+                    
+                    <div>
+                        <label for="motivation" class="block text-sm font-medium text-gray-700 mb-1">Why are you interested in this opportunity? *</label>
+                        <textarea id="motivation" name="motivation" rows="4" required placeholder="Describe your motivation and what draws you to this opportunity..." class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    </div>
+
+                    <div>
+                        <label for="contribution" class="block text-sm font-medium text-gray-700 mb-1">How can you contribute to this program? *</label>
+                        <textarea id="contribution" name="contribution" rows="4" required placeholder="Describe how your skills and experience can contribute to the success of this program..." class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    </div>
+
+                    <div>
+                        <label for="availability" class="block text-sm font-medium text-gray-700 mb-1">Availability *</label>
+                        <select id="availability" name="availability" required class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Select your availability</option>
+                            <option value="full-time">Full-time commitment</option>
+                            <option value="part-time">Part-time (20+ hours/week)</option>
+                            <option value="flexible">Flexible schedule</option>
+                            <option value="weekends">Weekends only</option>
+                            <option value="project-based">Project-based</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Additional Information -->
+                <div class="space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Additional Information</h2>
+                    
+                    <div>
+                        <label for="languages" class="block text-sm font-medium text-gray-700 mb-1">Languages Spoken</label>
+                        <input type="text" id="languages" name="languages" placeholder="English, French, Swahili, etc." class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+
+                    <div>
+                        <label for="references" class="block text-sm font-medium text-gray-700 mb-1">Professional References</label>
+                        <textarea id="references" name="references" rows="3" placeholder="Please provide 2-3 professional references with contact information..." class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    </div>
+
+                    <div>
+                        <label for="additionalInfo" class="block text-sm font-medium text-gray-700 mb-1">Additional Comments</label>
+                        <textarea id="additionalInfo" name="additionalInfo" rows="3" placeholder="Any additional information you'd like to share..." class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    </div>
+                </div>
+
+                <!-- File Upload -->
+                <div class="space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Documents</h2>
+                    
+                    <div>
+                        <label for="resume" class="block text-sm font-medium text-gray-700 mb-1">Resume/CV *</label>
+                        <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx" required class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <p class="text-xs text-gray-500 mt-1">Accepted formats: PDF, DOC, DOCX (Max 5MB)</p>
+                    </div>
+
+                    <div>
+                        <label for="coverLetter" class="block text-sm font-medium text-gray-700 mb-1">Cover Letter</label>
+                        <input type="file" id="coverLetter" name="coverLetter" accept=".pdf,.doc,.docx" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <p class="text-xs text-gray-500 mt-1">Optional: PDF, DOC, DOCX (Max 5MB)</p>
+                    </div>
+                </div>
+
+                <!-- Terms and Conditions -->
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <input type="checkbox" id="terms" name="terms" required class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label for="terms" class="ml-2 text-sm text-gray-700">
+                            I agree to the <a href="#" class="text-blue-600 hover:text-blue-500">Terms of Service</a> and <a href="#" class="text-blue-600 hover:text-blue-500">Privacy Policy</a> *
+                        </label>
+                    </div>
+
+                    <div class="flex items-start">
+                        <input type="checkbox" id="updates" name="updates" class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label for="updates" class="ml-2 text-sm text-gray-700">
+                            I would like to receive updates about similar opportunities
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+                    <button type="button" onclick="history.back()" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium">
+                        Submit Application
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Registration Prompt (shown for non-authenticated users) -->
+        <div id="registrationPrompt" class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center hidden">
+            <div class="max-w-md mx-auto">
+                <div class="mb-6">
+                    <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">Registration Required</h2>
+                <p class="text-gray-600 mb-6">To apply for opportunities on Kájọpọ̀ Connect, you need to create an account. Registration is free and helps us match you with the most relevant opportunities.</p>
+                <div class="space-y-3">
+                    <button id="registerNowBtn" class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                        Register Now
+                    </button>
+                    <button id="signInExistingBtn" class="w-full border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors">
+                        Already have an account? Sign In
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Simulate user authentication status
+        let isAuthenticated = false; // This would be determined by actual auth system
+        let userProfile = null;
+
+        // Check authentication status on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthenticationStatus();
+            setupEventListeners();
+            populateOpportunityDetails();
+        });
+
+        function checkAuthenticationStatus() {
+            // Check URL parameter for user ID (simulating signed-in state)
+            const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get('id');
+            
+            // In a real application, this would check with your auth system
+            // For demo purposes, we'll check localStorage or URL parameter
+            let user = localStorage.getItem('kajopo_user');
+            
+            // If URL has id parameter, simulate user authentication
+            if (userId && !user) {
+                const demoUser = {
+                    id: userId,
+                    firstName: 'Sarah',
+                    lastName: 'Johnson',
+                    email: 'sarah.johnson@example.com',
+                    phone: '+1234567890',
+                    location: 'New York, USA',
+                    currentRole: 'Community Health Coordinator',
+                    organization: 'Health for All NGO',
+                    experience: '6-10',
+                    skills: 'Community health, Training delivery, Health education, Data collection',
+                    languages: 'English, Spanish'
+                };
+                
+                // No default user - require authentication
+            }
+            
+            if (user) {
+                isAuthenticated = true;
+                userProfile = JSON.parse(user);
+                localStorage.setItem('userAuthenticated', 'true');
+                showApplicationForm();
+                populateUserData();
+            } else {
+                isAuthenticated = false;
+                // Redirect to sign-in page if not authenticated
+                window.location.href = 'signin-form.html';
+                localStorage.removeItem('userAuthenticated');
+                showRegistrationPrompt();
+            }
+        }
+
+        function showApplicationForm() {
+            document.getElementById('applicationForm').classList.remove('hidden');
+            document.getElementById('registrationPrompt').classList.add('hidden');
+            document.getElementById('authMessage').classList.add('hidden');
+        }
+
+        function showRegistrationPrompt() {
+            document.getElementById('applicationForm').classList.add('hidden');
+            document.getElementById('registrationPrompt').classList.remove('hidden');
+            document.getElementById('authMessage').classList.remove('hidden');
+        }
+
+        function populateUserData() {
+            if (userProfile) {
+                document.getElementById('firstName').value = userProfile.firstName || '';
+                document.getElementById('lastName').value = userProfile.lastName || '';
+                document.getElementById('email').value = userProfile.email || '';
+                document.getElementById('phone').value = userProfile.phone || '';
+                document.getElementById('location').value = userProfile.location || '';
+                document.getElementById('currentRole').value = userProfile.currentRole || '';
+                document.getElementById('organization').value = userProfile.organization || '';
+                document.getElementById('experience').value = userProfile.experience || '';
+                document.getElementById('skills').value = userProfile.skills || '';
+                document.getElementById('languages').value = userProfile.languages || '';
+            }
+        }
+
+        function populateOpportunityDetails() {
+            // Get opportunity details from URL parameters or localStorage
+            const urlParams = new URLSearchParams(window.location.search);
+            const opportunityId = urlParams.get('id');
+            
+            // In a real application, you would fetch opportunity details from your API
+            // For demo purposes, we'll use sample data
+            if (opportunityId) {
+                // This would be an API call in a real application
+                const opportunity = getSampleOpportunity(opportunityId);
+                if (opportunity) {
+                    document.getElementById('opportunityTitle').textContent = opportunity.title;
+                    document.getElementById('opportunityDescription').textContent = opportunity.description;
+                    document.getElementById('deadline').textContent = opportunity.deadline;
+                }
+            }
+        }
+
+        function getSampleOpportunity(id) {
+            // Sample opportunity data - in real app this would come from API
+            const opportunities = {
+                '1': {
+                    title: 'Community Health Worker Training Program',
+                    description: 'Comprehensive training program for community health workers in rural areas, focusing on maternal and child health, disease prevention, and health education.',
+                    deadline: 'March 15, 2024'
+                },
+                '2': {
+                    title: 'Youth Education Technology Initiative',
+                    description: 'Innovative program providing digital literacy and technology access to underserved youth communities, including device distribution and mentorship.',
+                    deadline: 'April 30, 2024'
+                }
+            };
+            return opportunities[id];
+        }
+
+        function setupEventListeners() {
+            // Registration buttons
+            document.getElementById('registerNowBtn').addEventListener('click', function() {
+                window.location.href = 'registration-form.html';
+            });
+
+            document.getElementById('signInExistingBtn').addEventListener('click', function() {
+                window.location.href = 'signin-form.html';
+            });
+
+            document.getElementById('registerBtn').addEventListener('click', function() {
+                window.location.href = 'registration-form.html';
+            });
+
+            document.getElementById('signInBtn').addEventListener('click', function() {
+                window.location.href = 'signin-form.html';
+            });
+
+            // Form submission
+            document.getElementById('applicationFormContent').addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitApplication();
+            });
+        }
+
+        function submitApplication() {
+            // Validate form
+            const form = document.getElementById('applicationFormContent');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            // Collect form data
+            const formData = new FormData(form);
+            const applicationData = {};
+            
+            for (let [key, value] of formData.entries()) {
+                applicationData[key] = value;
+            }
+
+            // Add metadata
+            applicationData.opportunityId = new URLSearchParams(window.location.search).get('id');
+            applicationData.submittedAt = new Date().toISOString();
+            applicationData.userId = userProfile?.id;
+
+            // In a real application, you would send this to your API
+            console.log('Application submitted:', applicationData);
+            
+            // Show success message
+            alert('Application submitted successfully! You will receive a confirmation email shortly.');
+            
+            // Redirect to applications page or back to opportunities
+            window.location.href = 'browse-opportunities.html';
+        }
+
+        // Demo function to simulate login (for testing)
+        function simulateLogin() {
+            const demoUser = {
+                id: '1',
+                firstName: 'John',
+                lastName: 'Doe',
+                email: 'john.doe@example.com',
+                phone: '+1234567890',
+                location: 'New York, USA',
+                currentRole: 'Community Health Coordinator',
+                organization: 'Health for All NGO',
+                experience: '6-10',
+                skills: 'Community health, Training delivery, Health education, Data collection',
+                languages: 'English, Spanish'
+            };
+            
+            localStorage.setItem('kajopo_user', JSON.stringify(demoUser));
+            checkAuthenticationStatus();
+        }
+
+        // Demo function to simulate logout (for testing)
+        function simulateLogout() {
+            localStorage.removeItem('kajopo_user');
+            checkAuthenticationStatus();
+        }
+
+        // User Menu Functionality
+        function checkUserAuth() {
+            // Check if user is authenticated (in a real app, this would check session/token)
+            const isAuthenticated = localStorage.getItem('userAuthenticated') === 'true';
+            const userMenu = document.getElementById('userMenu');
+            const guestMenu = document.getElementById('guestMenu');
+            
+            if (isAuthenticated) {
+                userMenu.style.display = 'block';
+                guestMenu.style.display = 'none';
+                updateUserInfo();
+            } else {
+                userMenu.style.display = 'none';
+                guestMenu.style.display = 'flex';
+            }
+        }
+
+        function updateUserInfo() {
+            // Get user info from localStorage (in a real app, this would come from API)
+            const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+            const userName = userInfo.name || 'User';
+            const userInitials = userName.split(' ').map(n => n[0]).join('').toUpperCase();
+            
+            document.getElementById('userName').textContent = userName;
+            document.getElementById('userInitials').textContent = userInitials;
+        }
+
+        function setupUserMenuListeners() {
+            const userMenuBtn = document.getElementById('userMenuBtn');
+            const userDropdown = document.getElementById('userDropdown');
+            const signOutBtn = document.getElementById('signOutBtn');
+            const signInBtn = document.getElementById('signInBtn');
+            const registerBtn = document.getElementById('registerBtn');
+
+            // Toggle dropdown
+            if (userMenuBtn) {
+                userMenuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    userDropdown.classList.toggle('hidden');
+                });
+            }
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function() {
+                if (userDropdown) {
+                    userDropdown.classList.add('hidden');
+                }
+            });
+
+            // Prevent dropdown from closing when clicking inside
+            if (userDropdown) {
+                userDropdown.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
+
+            // Sign out functionality
+            if (signOutBtn) {
+                signOutBtn.addEventListener('click', function() {
+                    localStorage.removeItem('userAuthenticated');
+                    localStorage.removeItem('userInfo');
+                    window.location.href = 'index.html';
+                });
+            }
+
+            // Guest menu functionality
+            if (signInBtn) {
+                signInBtn.addEventListener('click', function() {
+                    window.location.href = 'signin-form.html';
+                });
+            }
+
+            if (registerBtn) {
+                registerBtn.addEventListener('click', function() {
+                    window.location.href = 'registration-form.html';
+                });
+            }
+        }
+
+        // Update the existing DOMContentLoaded event listener
+        document.addEventListener('DOMContentLoaded', function() {
+            checkUserAuth();
+            setupUserMenuListeners();
+            checkAuthenticationStatus();
+        });
+    </script>
+    <!-- Theme Toggle Script -->
+    <script src="js/theme-manager.js"></script>
+</body>
+</html>

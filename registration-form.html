@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Kájọpọ̀ Connect</title>
+    <!-- Theme System -->
+    <link rel="stylesheet" href="css/themes.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Override Tailwind with theme variables */
+        body {
+            background-color: var(--bg-primary) !important;
+            color: var(--text-primary) !important;
+        }
+        .bg-gray-50 {
+            background-color: var(--bg-primary) !important;
+        }
+        .bg-white {
+            background-color: var(--card-bg) !important;
+        }
+        .text-gray-900 {
+            color: var(--text-primary) !important;
+        }
+        .text-gray-700 {
+            color: var(--text-secondary) !important;
+        }
+        .text-gray-600 {
+            color: var(--text-secondary) !important;
+        }
+        .text-gray-500 {
+            color: var(--text-tertiary) !important;
+        }
+        .border-gray-200 {
+            border-color: var(--border-primary) !important;
+        }
+        .border-gray-300 {
+            border-color: var(--border-primary) !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <a href="kajopo-connect/index.html" class="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">Kájọpọ̀</a>
+                    <span class="ml-3 text-sm text-gray-500 italic">Succeed Together</span>
+                </div>
+                
+                <!-- Navigation Menu -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="kajopo-connect/about-us.html" class="text-gray-600 hover:text-cyan-600 transition-colors font-medium">About Us</a>
+                    <a href="kajopo-connect/contact.html" class="text-gray-600 hover:text-cyan-600 transition-colors font-medium">Contact</a>
+                </nav>
+                
+                <div class="flex space-x-4">
+                    <!-- Theme Toggle -->
+                    <button data-theme-toggle class="theme-toggle" aria-label="Toggle theme" title="Switch between light and dark themes">
+                        <div class="theme-toggle-handle">
+                            <span class="theme-icon">🌙</span>
+                        </div>
+                        <span class="sr-only">Toggle between light and dark themes</span>
+                    </button>
+                    <a href="signin-form.html" class="text-cyan-600 hover:text-cyan-700 px-4 py-2 rounded-lg transition-colors">
+                        Already have an account? Sign In
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <!-- Header -->
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <h1 class="text-2xl font-bold text-gray-900">Create Your Account</h1>
+                <p class="text-gray-600 mt-1">Join Kájọpọ̀ Connect to discover opportunities and make meaningful connections</p>
+            </div>
+
+            <!-- Registration Form -->
+            <form id="registrationForm" class="p-6 space-y-6">
+                <!-- Account Type Selection -->
+                <div class="space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Account Type</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <label class="relative cursor-pointer">
+                            <input type="radio" name="accountType" value="seeker" class="sr-only peer" required>
+                            <div class="p-4 border-2 border-gray-200 rounded-lg peer-checked:border-blue-500 peer-checked:bg-blue-50 hover:border-gray-300 transition-colors">
+                                <div class="flex items-center space-x-3">
+                                    <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                    <div>
+                                        <h3 class="font-medium text-gray-900">I Need Help</h3>
+                                        <p class="text-sm text-gray-500">Looking for opportunities, resources, or support</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+                        
+                        <label class="relative cursor-pointer">
+                            <input type="radio" name="accountType" value="provider" class="sr-only peer" required>
+                            <div class="p-4 border-2 border-gray-200 rounded-lg peer-checked:border-blue-500 peer-checked:bg-blue-50 hover:border-gray-300 transition-colors">
+                                <div class="flex items-center space-x-3">
+                                    <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
+                                    </svg>
+                                    <div>
+                                        <h3 class="font-medium text-gray-900">I Can Help</h3>
+                                        <p class="text-sm text-gray-500">Offering opportunities, resources, or support</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Personal Information -->
+                <div class="space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Personal Information</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
+                            <input type="text" id="firstName" name="firstName" required class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
+                            <input type="text" id="lastName" name="lastName" required class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
+                        <input type="email" id="email" name="email" required class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+
+                    <div>
+                        <label for="location" class="block text-sm font-medium text-gray-700 mb-1">Location *</label>
+                        <input type="text" id="location" name="location" required placeholder="City, Country" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+
+                <!-- Account Security -->
+                <div class="space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Account Security</h2>
+                    
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password *</label>
+                        <input type="password" id="password" name="password" required minlength="8" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <p class="text-xs text-gray-500 mt-1">Must be at least 8 characters long</p>
+                    </div>
+
+                    <div>
+                        <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password *</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" required minlength="8" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+
+                <!-- Professional Information -->
+                <div class="space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Professional Background</h2>
+                    
+                    <div>
+                        <label for="currentRole" class="block text-sm font-medium text-gray-700 mb-1">Current Role/Position</label>
+                        <input type="text" id="currentRole" name="currentRole" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+
+                    <div>
+                        <label for="organization" class="block text-sm font-medium text-gray-700 mb-1">Organization/Company</label>
+                        <input type="text" id="organization" name="organization" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+
+                    <div>
+                        <label for="experience" class="block text-sm font-medium text-gray-700 mb-1">Years of Experience</label>
+                        <select id="experience" name="experience" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Select experience level</option>
+                            <option value="0-1">0-1 years</option>
+                            <option value="2-5">2-5 years</option>
+                            <option value="6-10">6-10 years</option>
+                            <option value="11-15">11-15 years</option>
+                            <option value="15+">15+ years</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="skills" class="block text-sm font-medium text-gray-700 mb-1">Skills & Expertise</label>
+                        <textarea id="skills" name="skills" rows="3" placeholder="List your key skills, separated by commas" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    </div>
+                </div>
+
+                <!-- Areas of Interest -->
+                <div class="space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Areas of Interest</h2>
+                    <p class="text-sm text-gray-600">Select the impact areas you're most interested in (check all that apply):</p>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" name="interests" value="healthcare" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <span class="text-sm text-gray-700">Healthcare</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" name="interests" value="education" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <span class="text-sm text-gray-700">Education</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" name="interests" value="environment" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <span class="text-sm text-gray-700">Environment</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" name="interests" value="poverty" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <span class="text-sm text-gray-700">Poverty Alleviation</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" name="interests" value="technology" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <span class="text-sm text-gray-700">Technology</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" name="interests" value="human-rights" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <span class="text-sm text-gray-700">Human Rights</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" name="interests" value="economic-development" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <span class="text-sm text-gray-700">Economic Development</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" name="interests" value="disaster-relief" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <span class="text-sm text-gray-700">Disaster Relief</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" name="interests" value="community-development" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <span class="text-sm text-gray-700">Community Development</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Additional Information -->
+                <div class="space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Additional Information</h2>
+                    
+                    <div>
+                        <label for="languages" class="block text-sm font-medium text-gray-700 mb-1">Languages Spoken</label>
+                        <input type="text" id="languages" name="languages" placeholder="English, French, Spanish, etc." class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+
+                    <div>
+                        <label for="bio" class="block text-sm font-medium text-gray-700 mb-1">Brief Bio</label>
+                        <textarea id="bio" name="bio" rows="3" placeholder="Tell us a bit about yourself and your interests..." class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    </div>
+                </div>
+
+                <!-- Terms and Conditions -->
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <input type="checkbox" id="terms" name="terms" required class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label for="terms" class="ml-2 text-sm text-gray-700">
+                            I agree to the <a href="#" class="text-blue-600 hover:text-blue-500">Terms of Service</a> and <a href="#" class="text-blue-600 hover:text-blue-500">Privacy Policy</a> *
+                        </label>
+                    </div>
+
+                    <div class="flex items-start">
+                        <input type="checkbox" id="newsletter" name="newsletter" class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label for="newsletter" class="ml-2 text-sm text-gray-700">
+                            I would like to receive updates about new opportunities and platform features
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+                    <button type="button" onclick="history.back()" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium">
+                        Create Account
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sign In Link -->
+        <div class="text-center mt-6">
+            <p class="text-gray-600">
+                Already have an account? 
+                <a href="signin-form.html" class="text-blue-600 hover:text-blue-500 font-medium">Sign in here</a>
+            </p>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setupFormValidation();
+            setupEventListeners();
+        });
+
+        function setupFormValidation() {
+            const form = document.getElementById('registrationForm');
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirmPassword');
+
+            // Password confirmation validation
+            confirmPassword.addEventListener('input', function() {
+                if (password.value !== confirmPassword.value) {
+                    confirmPassword.setCustomValidity('Passwords do not match');
+                } else {
+                    confirmPassword.setCustomValidity('');
+                }
+            });
+
+            password.addEventListener('input', function() {
+                if (confirmPassword.value && password.value !== confirmPassword.value) {
+                    confirmPassword.setCustomValidity('Passwords do not match');
+                } else {
+                    confirmPassword.setCustomValidity('');
+                }
+            });
+        }
+
+        function setupEventListeners() {
+            const form = document.getElementById('registrationForm');
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleRegistration();
+            });
+        }
+
+        function handleRegistration() {
+            const form = document.getElementById('registrationForm');
+            
+            // Validate form
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            // Collect form data
+            const formData = new FormData(form);
+            const userData = {};
+            
+            // Process regular form fields
+            for (let [key, value] of formData.entries()) {
+                if (key === 'interests') {
+                    if (!userData.interests) userData.interests = [];
+                    userData.interests.push(value);
+                } else {
+                    userData[key] = value;
+                }
+            }
+
+            // Add metadata
+            userData.id = generateUserId();
+            userData.registeredAt = new Date().toISOString();
+            userData.isVerified = false;
+            userData.profileComplete = false;
+            userData.status = 'Pending'; // Default status for admin approval
+
+            // In a real application, you would send this to your API
+            console.log('Registration data:', userData);
+            
+            // Simulate successful registration
+            // Store user data in localStorage for demo purposes
+            // Use unique key to support multiple user registrations
+            const userKey = `kajopo_user_${userData.id}`;
+            localStorage.setItem(userKey, JSON.stringify(userData));
+            
+            // Also keep the main user key for backward compatibility
+            localStorage.setItem('kajopo_user', JSON.stringify(userData));
+            
+            // Show success message
+            showSuccessMessage();
+            
+            // Redirect after a short delay
+            setTimeout(() => {
+                const returnUrl = new URLSearchParams(window.location.search).get('returnUrl');
+                if (returnUrl) {
+                    window.location.href = returnUrl;
+                } else {
+                    window.location.href = 'kajopo-connect/index.html';
+                }
+            }, 2000);
+        }
+
+        function generateUserId() {
+            return 'user_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function showSuccessMessage() {
+            // Create success overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            overlay.innerHTML = `
+                <div class="bg-white rounded-lg p-8 max-w-md mx-4 text-center">
+                    <div class="mb-4">
+                        <svg class="mx-auto h-16 w-16 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Welcome to Kájọpọ̀!</h2>
+                    <p class="text-gray-600 mb-4">Your account has been created successfully. You can now apply for opportunities and connect with others.</p>
+                    <p class="text-sm text-gray-500">Redirecting you to the platform...</p>
+                </div>
+            `;
+            
+            document.body.appendChild(overlay);
+        }
+
+        // Demo function to clear registration (for testing)
+        function clearRegistration() {
+            localStorage.removeItem('kajopo_user');
+            alert('Registration cleared. You can now test the registration flow again.');
+        }
+    </script>
+    <!-- Theme Toggle Script -->
+    <script src="js/theme-manager.js"></script>
+</body>
+</html>
