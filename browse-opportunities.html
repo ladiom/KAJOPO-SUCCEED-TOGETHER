@@ -41,13 +41,7 @@
             border-color: var(--border-primary) !important;
         }
         
-        /* Dark theme - specific dropdown text color override */
-        [data-theme="dark"] #categoryFilter,
-        [data-theme="dark"] #typeFilter,
-        [data-theme="dark"] #regionFilter,
-        [data-theme="dark"] #sortBy {
-            color: #000000 !important;
-        }
+
     </style>
 </head>
 <body class="min-h-screen bg-gray-50">
@@ -107,13 +101,6 @@
                 <div id="guestMenu" class="flex space-x-4">
                     <button id="signInBtn" class="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 transition-colors">
                         Sign In
-                    </button>
-                    <!-- Theme Toggle -->
-                    <button data-theme-toggle class="theme-toggle" aria-label="Toggle theme" title="Switch between light and dark themes">
-                        <div class="theme-toggle-handle">
-                            <span class="theme-icon">🌙</span>
-                        </div>
-                        <span class="sr-only">Toggle between light and dark themes</span>
                     </button>
                     <button id="getStartedBtn" class="border border-cyan-400 text-cyan-400 px-4 py-2 rounded-lg hover:bg-cyan-400 hover:text-white transition-colors">
                         Get Started
@@ -600,7 +587,5 @@
             document.getElementById('resultsCount').textContent = filteredCount;
         }
     </script>
-    <!-- Theme Toggle Script -->
-    <script src="js/theme-manager.js"></script>
 </body>
 </html>

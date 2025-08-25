@@ -1,4 +1,4 @@
-/* Kajopo Connect - Dual Theme System */
+/* Kajopo Connect - Light Theme Only */
 /* Accessibility-first design with high contrast ratios and dyslexia-friendly fonts */
 
 :root {
@@ -44,11 +44,8 @@
   --transition-fast: 150ms ease-in-out;
   --transition-normal: 250ms ease-in-out;
   --transition-slow: 350ms ease-in-out;
-}
-
-/* Light Theme (Default) - Modern Clean Design with Blue Accent */
-:root,
-[data-theme="light"] {
+  
+  /* Light Theme Colors */
   /* Background Colors */
   --bg-primary: #FFFFFF; /* Pure white */
   --bg-secondary: #F8FAFC; /* Light blue-gray for cards */
@@ -88,57 +85,6 @@
   --button-shadow: var(--shadow-sm);
   --input-bg: #FFFFFF;
   --input-border: var(--border-primary);
-  
-  /* Theme Toggle Colors */
-  --toggle-bg: var(--color-primary);
-  --toggle-handle: #FFFFFF;
-}
-
-/* Dark Theme - Modern Clean Design with Blue Accent */
-[data-theme="dark"] {
-  /* Background Colors */
-  --bg-primary: #0F172A; /* Dark slate */
-  --bg-secondary: #1E293B; /* Slate panel */
-  --bg-tertiary: #334155; /* Elevated surface */
-  --bg-overlay: rgba(0, 0, 0, 0.8);
-  
-  /* Text Colors */
-  --text-primary: #F8FAFC; /* Light slate */
-  --text-secondary: rgba(248, 250, 252, 0.8);
-  --text-tertiary: rgba(248, 250, 252, 0.6);
-  --text-inverse: #0F172A;
-  
-  /* Accent Colors */
-  --color-primary: #60A5FA; /* Light blue */
-  --color-primary-hover: #3B82F6;
-  --color-primary-dark: #2563EB;
-  --color-primary-light: rgba(96, 165, 250, 0.1);
-  
-  --color-secondary: #93C5FD; /* Lighter blue complement */
-  --color-secondary-hover: #60A5FA;
-  --color-secondary-light: rgba(147, 197, 253, 0.1);
-  
-  /* Status Colors */
-  --status-success: #34D399; /* Modern emerald green */
-  --status-warning: #FBBF24; /* Modern amber warning */
-  --status-error: #F87171; /* Modern red alert */
-  --status-info: #60A5FA; /* Modern blue info */
-  
-  /* Border Colors */
-  --border-primary: rgba(248, 250, 252, 0.1);
-  --border-secondary: rgba(248, 250, 252, 0.05);
-  --border-focus: var(--color-primary);
-  
-  /* Component Specific */
-  --card-bg: var(--bg-secondary);
-  --card-shadow: var(--shadow-lg);
-  --button-shadow: var(--shadow-sm);
-  --input-bg: var(--bg-secondary);
-  --input-border: var(--border-primary);
-  
-  /* Theme Toggle Colors */
-  --toggle-bg: var(--color-secondary);
-  --toggle-handle: var(--bg-primary);
 }
 
 /* Base Styles */
@@ -257,10 +203,6 @@ a:focus {
   box-shadow: var(--shadow-lg);
 }
 
-[data-theme="dark"] .btn-primary:hover:not(:disabled) {
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3), var(--shadow-lg);
-}
-
 /* Secondary Button */
 .btn-secondary {
   background-color: var(--color-secondary);
@@ -272,10 +214,6 @@ a:focus {
   background-color: var(--color-secondary-hover);
   transform: translateY(-1px);
   box-shadow: var(--shadow-lg);
-}
-
-[data-theme="dark"] .btn-secondary:hover:not(:disabled) {
-  box-shadow: 0 0 20px rgba(0, 191, 166, 0.3), var(--shadow-lg);
 }
 
 /* Outline Button */
@@ -349,55 +287,6 @@ a:focus {
   box-shadow: 0 0 0 3px var(--color-primary-light);
 }
 
-/* Theme Toggle */
-.theme-toggle {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  width: 60px;
-  height: 30px;
-  background-color: var(--toggle-bg);
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  transition: background-color var(--transition-normal);
-  border: none;
-  padding: 0;
-}
-
-.theme-toggle:focus {
-  outline: 2px solid var(--border-focus);
-  outline-offset: 2px;
-}
-
-.theme-toggle-handle {
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 24px;
-  height: 24px;
-  background-color: var(--toggle-handle);
-  border-radius: 50%;
-  transition: transform var(--transition-normal);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-}
-
-[data-theme="dark"] .theme-toggle-handle {
-  transform: translateX(30px);
-}
-
-/* Icons */
-.icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1em;
-  height: 1em;
-  font-size: inherit;
-}
-
 /* Accessibility Enhancements */
 .sr-only {
   position: absolute;
@@ -451,10 +340,10 @@ a:focus {
   border-radius: 50%;
 }
 
-.status-success::before { background-color: var(--color-success); }
-.status-warning::before { background-color: var(--color-warning); }
-.status-error::before { background-color: var(--color-error); }
-.status-info::before { background-color: var(--color-info); }
+.status-success::before { background-color: var(--status-success); }
+.status-warning::before { background-color: var(--status-warning); }
+.status-error::before { background-color: var(--status-error); }
+.status-info::before { background-color: var(--status-info); }
 
 /* Responsive Design */
 @media (max-width: 768px) {
@@ -468,93 +357,6 @@ a:focus {
   .card {
     padding: var(--space-4);
   }
-}
-
-/* Menu Styling for Both Themes */
-/* Main Menu Dropdown */
-[data-theme="dark"] #mainMenuDropdown {
-  background-color: var(--bg-secondary) !important;
-  border-color: var(--border-primary) !important;
-  box-shadow: var(--card-shadow) !important;
-}
-
-[data-theme="dark"] #mainMenuDropdown a {
-  color: var(--text-primary) !important;
-  transition: all var(--transition-fast);
-}
-
-[data-theme="dark"] #mainMenuDropdown a:hover {
-  background-color: var(--bg-tertiary) !important;
-  color: var(--color-primary) !important;
-}
-
-/* User Dropdown Menu - Theme-specific text colors */
-[data-theme="dark"] #userDropdown a {
-  color: white !important;
-}
-
-[data-theme="light"] #userDropdown a {
-  color: black !important;
-}
-
-[data-theme="dark"] #userDropdown a:hover {
-  color: white !important;
-  background: var(--color-primary-light) !important;
-}
-
-[data-theme="light"] #userDropdown a:hover {
-  color: black !important;
-  background: var(--color-primary-light) !important;
-}
-
-/* User Name - Theme-specific colors */
-[data-theme="dark"] #userName {
-  color: white !important;
-}
-
-[data-theme="light"] #userName {
-  color: black !important;
-}
-
-/* Admin Dashboard Text Styling for Better Contrast */
-.admin-dashboard .text-gray-900,
-.admin-dashboard .text-gray-700,
-.admin-dashboard .text-gray-500 {
-    color: white !important;
-}
-
-.admin-dashboard h1,
-.admin-dashboard h2,
-.admin-dashboard h3,
-.admin-dashboard h4,
-.admin-dashboard h5,
-.admin-dashboard h6,
-.admin-dashboard p,
-.admin-dashboard span,
-.admin-dashboard .nav-item {
-    color: white !important;
-}
-
-/* Admin dashboard header text */
-.admin-dashboard header .text-gray-900,
-.admin-dashboard header .text-gray-700,
-.admin-dashboard header .text-gray-500 {
-    color: white !important;
-}
-
-/* Admin dashboard sidebar text */
-.admin-dashboard nav .text-gray-700 {
-    color: white !important;
-}
-
-[data-theme="dark"] #userDropdown {
-  background: var(--bg-secondary) !important;
-  border: 1px solid var(--border-primary) !important;
-}
-
-[data-theme="light"] #userDropdown {
-  background: var(--bg-secondary) !important;
-  border: 1px solid var(--border-primary) !important;
 }
 
 /* Print Styles */

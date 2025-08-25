@@ -181,67 +181,7 @@
             color: var(--text-primary) !important;
         }
         
-        /* Force black text in light theme */
-        [data-theme="light"] * {
-            color: var(--text-primary) !important;
-        }
-        
-        /* Specific targeting for Recent User Registrations section */
-        [data-theme="light"] h3 {
-            color: var(--text-primary) !important;
-        }
-        
-        /* Ensure all user registration text is black */
-        [data-theme="light"] .text-sm.font-medium,
-        [data-theme="light"] .text-xs,
-        [data-theme="light"] p {
-            color: var(--text-primary) !important;
-        }
-        
-        /* Text selection should be black */
-        [data-theme="light"] ::selection {
-            background-color: rgba(0, 0, 0, 0.2);
-            color: var(--text-primary) !important;
-        }
-        
-        /* Exceptions for elements that should remain white */
-        [data-theme="light"] .nav-item.active,
-        [data-theme="light"] .btn-primary,
-        [data-theme="light"] .bg-kajopo-blue,
-        [data-theme="light"] .bg-kajopo-purple,
-        [data-theme="light"] .bg-kajopo-green,
-        [data-theme="light"] .text-white {
-            color: white !important;
-        }
-        
-        /* Status badges should keep their colors */
-        [data-theme="light"] .bg-green-100,
-        [data-theme="light"] .bg-yellow-100,
-        [data-theme="light"] .bg-red-100,
-        [data-theme="light"] .bg-blue-100 {
-            color: inherit !important;
-        }
-        
-        /* Recent Opportunities section (Recent Operations) */
-        [data-theme="light"] .border-l-4 .text-sm.font-medium,
-        [data-theme="light"] .border-l-4 .text-xs,
-        [data-theme="light"] .border-l-4 p {
-            color: var(--text-primary) !important;
-        }
-        
-        /* Left sidebar navigation text */
-        [data-theme="light"] nav .nav-item span,
-        [data-theme="light"] .nav-item span {
-            color: var(--text-primary) !important;
-        }
-        
-        /* Stats cards text in overview */
-        [data-theme="light"] .text-sm.font-medium.text-gray-600,
-        [data-theme="light"] .text-2xl.font-semibold.text-gray-900,
-        [data-theme="light"] .text-sm.text-green-600,
-        [data-theme="light"] .text-sm.text-yellow-600 {
-            color: var(--text-primary) !important;
-        }
+
     </style>
 </head>
 <body class="admin-dashboard transition-colors">
@@ -286,13 +226,6 @@
                         <a href="contact.html" class="text-gray-600 hover:text-kajopo-blue transition-colors font-medium">Contact</a>
                     </nav>
                     <div class="flex items-center space-x-4">
-                        <!-- Theme Toggle Button -->
-                        <button data-theme-toggle class="theme-toggle" aria-label="Toggle theme" title="Switch between light and dark themes">
-                            <div class="theme-toggle-handle">
-                                <span class="theme-icon">🌙</span>
-                            </div>
-                            <span class="sr-only">Toggle between light and dark themes</span>
-                        </button>
                         <div class="relative">
                             <button id="notificationBtn" class="p-2 text-gray-400 hover:text-gray-600 relative">
                                 <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2897,8 +2830,5 @@
         `;
         document.head.appendChild(style);
     </script>
-    
-    <!-- Theme Manager -->
-    <script src="js/theme-manager.js"></script>
 </body>
 </html>

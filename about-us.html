@@ -5,24 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us - Kájọpọ̀ Succeed Together</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/themes.css">
     <script src="js/theme-manager.js"></script>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 min-h-screen">
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
     <!-- Navigation -->
-    <nav class="bg-white dark:bg-gray-800 shadow-lg">
+    <nav class="bg-white shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <h1 class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">Kájọpọ̀</h1>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 italic">Succeed Together</p>
+                    <a href="index.html" class="flex items-center">
+                        <div>
+                            <h1 class="text-2xl font-bold text-indigo-600">Kájọpọ̀</h1>
+                        <p class="text-sm text-gray-500 italic">Succeed Together</p>
+                        </div>
+                    </a>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <a href="about-us.html" class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium">About Us</a>
-                    <a href="contact.html" class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium">Contact</a>
-                    <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-                        <span class="dark:hidden">🌙</span>
-                        <span class="hidden dark:inline">☀️</span>
-                    </button>
+                    <a href="about-us.html" class="text-gray-600 hover:text-indigo-600 transition-colors font-medium">About Us</a>
+                    <a href="contact.html" class="text-gray-600 hover:text-indigo-600 transition-colors font-medium">Contact</a>
                     <a href="signin-form.html" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors">Sign In</a>
                     <a href="registration-form.html" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">Join Now</a>
                 </div>
@@ -32,48 +33,102 @@
 
     <!-- Main Content -->
     <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-            <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-8 text-center">About Kájọpọ̀</h1>
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <h1 class="text-4xl font-bold text-gray-900 mb-8 text-center">About Kájọpọ̀</h1>
             
-            <div class="prose prose-lg dark:prose-invert max-w-none">
-                <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Our Mission</h2>
-                <p class="text-gray-600 dark:text-gray-300 mb-6">
-                    Kájọpọ̀ is dedicated to strengthening communities by connecting people who need help with those who can provide it. 
-                    We believe that every community has untapped potential, and by facilitating meaningful connections, we can create a more 
-                    supportive and collaborative society.
+            <div class="prose prose-lg max-w-none">
+                <h2 class="text-2xl font-semibold text-gray-900 mb-4">Our Mission</h2>
+                <p class="text-gray-600 mb-6">
+                    We're on a mission to democratize access to opportunities while providing the tools, mentorship, support, and knowledge needed to build solutions. We create a world where every meaningful connection has the potential to make a positive impact through comprehensive empowerment.
+                </p>
+                <p class="text-gray-600 mb-8">
+                    In the age of AI, we're on the cusp of a future where resources will be more abundant than ever. However, just because resources exist doesn't mean they'll be accessible to everyone who needs them. Kájọpọ̀'s mission is to bridge this gap by not only connecting those most in need with the right providers, but also equipping them with the tools, mentorship, support, and knowledge to build their own solutions and create lasting impact.
                 </p>
 
-                <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">What We Do</h2>
-                <p class="text-gray-600 dark:text-gray-300 mb-6">
-                    Our platform serves as a bridge between service seekers and service providers within local communities. Whether you're 
-                    looking for help with home repairs, tutoring, pet care, or any other service, or you're someone with skills to share, 
-                    Kájọpọ̀ makes it easy to find the right match.
+                <h2 class="text-2xl font-semibold text-gray-900 mb-4">Our Vision</h2>
+                <p class="text-gray-600 mb-8">
+                    A world where AI-driven abundance is accessible to all - where every person and organization with a mission to create positive change has seamless access to the resources, connections, tools, mentorship, support, and knowledge they need to build solutions and thrive, regardless of their size, location, or existing networks.
                 </p>
 
-                <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Our Values</h2>
+                <h2 class="text-2xl font-semibold text-gray-900 mb-4">Our Core Values</h2>
+                <p class="text-gray-600 mb-4">These principles guide every decision we make and every feature we build.</p>
                 <div class="grid md:grid-cols-2 gap-6 mb-8">
-                    <div class="bg-indigo-50 dark:bg-gray-700 p-6 rounded-lg">
-                        <h3 class="text-xl font-semibold text-indigo-600 dark:text-indigo-400 mb-2">Community First</h3>
-                        <p class="text-gray-600 dark:text-gray-300">We prioritize local connections and community building over profit.</p>
+                    <div class="bg-indigo-50 p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold text-indigo-600 mb-2">Compassion</h3>
+                        <p class="text-gray-600">We believe in the power of human kindness and work to amplify compassionate initiatives worldwide.</p>
                     </div>
-                    <div class="bg-green-50 dark:bg-gray-700 p-6 rounded-lg">
-                        <h3 class="text-xl font-semibold text-green-600 dark:text-green-400 mb-2">Trust & Safety</h3>
-                        <p class="text-gray-600 dark:text-gray-300">We maintain high standards for user verification and safety.</p>
+                    <div class="bg-green-50 p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold text-green-600 mb-2">Integrity</h3>
+                        <p class="text-gray-600">Transparency and ethical practices guide every aspect of our platform and partnerships.</p>
                     </div>
-                    <div class="bg-blue-50 dark:bg-gray-700 p-6 rounded-lg">
-                        <h3 class="text-xl font-semibold text-blue-600 dark:text-blue-400 mb-2">Accessibility</h3>
-                        <p class="text-gray-600 dark:text-gray-300">Our platform is designed to be inclusive and accessible to everyone.</p>
+                    <div class="bg-blue-50 p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold text-blue-600 mb-2">Global Impact</h3>
+                        <p class="text-gray-600">Breaking down barriers to create meaningful connections across continents and cultures.</p>
                     </div>
-                    <div class="bg-purple-50 dark:bg-gray-700 p-6 rounded-lg">
-                        <h3 class="text-xl font-semibold text-purple-600 dark:text-purple-400 mb-2">Empowerment</h3>
-                        <p class="text-gray-600 dark:text-gray-300">We empower individuals to both give and receive help within their communities.</p>
+                    <div class="bg-purple-50 p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold text-purple-600 mb-2">Innovation</h3>
+                        <p class="text-gray-600">Harnessing AI and cutting-edge technology to revolutionize how resources and opportunities reach those who need them most.</p>
                     </div>
                 </div>
 
-                <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Join Our Community</h2>
-                <p class="text-gray-600 dark:text-gray-300 mb-6">
-                    Ready to make meaningful connections in your community? Whether you're looking for help or want to offer your skills, 
-                    Kájọpọ̀ is here to facilitate those important relationships that make communities stronger.
+                <h2 class="text-2xl font-semibold text-gray-900 mb-4">Our Journey</h2>
+                <p class="text-gray-600 mb-4">From recognizing the resource accessibility gap in the AI age to building a global platform that ensures abundance reaches those who need it most.</p>
+                <div class="space-y-4 mb-8">
+                    <div class="border-l-4 border-indigo-500 pl-4">
+                        <h4 class="font-semibold text-gray-900">2019</h4>
+                        <p class="text-gray-600">Kájọpọ̀ founded with vision to democratize access to resources in the AI age</p>
+                    </div>
+                    <div class="border-l-4 border-green-500 pl-4">
+                        <h4 class="font-semibold text-gray-900">2020</h4>
+                        <p class="text-gray-600">First 1,000 connections made between help seekers and providers globally</p>
+                    </div>
+                    <div class="border-l-4 border-blue-500 pl-4">
+                        <h4 class="font-semibold text-gray-900">2021</h4>
+                        <p class="text-gray-600">AI-powered matching system launched, improving success rates by 300%</p>
+                    </div>
+                    <div class="border-l-4 border-purple-500 pl-4">
+                        <h4 class="font-semibold text-gray-900">2022</h4>
+                        <p class="text-gray-600">Universal connection platform launched - expanding beyond grants to all resource types</p>
+                    </div>
+                    <div class="border-l-4 border-cyan-500 pl-4">
+                        <h4 class="font-semibold text-gray-900">2023</h4>
+                        <p class="text-gray-600">Expanded to 150+ countries, connecting diverse resource providers with those in need</p>
+                    </div>
+                    <div class="border-l-4 border-orange-500 pl-4">
+                        <h4 class="font-semibold text-gray-900">2024</h4>
+                        <p class="text-gray-600">Reached $2.5B in total resources facilitated across all service categories, serving 15,000+ users</p>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-semibold text-gray-900 mb-4">Meet Our Team</h2>
+                <p class="text-gray-600 mb-8">
+                    Passionate professionals dedicated to ensuring AI-driven abundance reaches everyone through strategic connections, intelligent matching, and comprehensive empowerment with tools, mentorship, and solution-building support.
+                </p>
+
+                <h2 class="text-2xl font-semibold text-gray-900 mb-4">Our Global Impact</h2>
+                <p class="text-gray-600 mb-4">Measuring how we're bridging the resource accessibility gap in the AI age - real connections, comprehensive support, and solution-building tools creating real change worldwide.</p>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="text-center p-6 bg-gradient-to-br from-indigo-50 to-blue-50 rounded-lg">
+                        <div class="text-3xl font-bold text-indigo-600 mb-2">$2.5B+</div>
+                        <div class="text-sm text-gray-600">Total Resources Connected</div>
+                    </div>
+                    <div class="text-center p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg">
+                        <div class="text-3xl font-bold text-green-600 mb-2">15,000+</div>
+                        <div class="text-sm text-gray-600">People & Organizations Connected</div>
+                    </div>
+                    <div class="text-center p-6 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg">
+                        <div class="text-3xl font-bold text-blue-600 mb-2">150+</div>
+                        <div class="text-sm text-gray-600">Countries Reached</div>
+                    </div>
+                    <div class="text-center p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg">
+                        <div class="text-3xl font-bold text-purple-600 mb-2">85%</div>
+                        <div class="text-sm text-gray-600">Successful Connection Rate</div>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-semibold text-gray-900 mb-4">Ready to Be Part of Our Story?</h2>
+                <p class="text-gray-600 mb-6">
+                    Join thousands of people and organizations who are bridging the resource accessibility gap through strategic connections and comprehensive empowerment, ensuring AI-driven abundance and solution-building capabilities reach those who need them most.
                 </p>
 
                 <div class="text-center">
