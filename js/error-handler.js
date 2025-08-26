@@ -6,18 +6,33 @@
 class ErrorHandler {
     constructor() {
         this.notificationContainer = null;
-        this.init();
+        this.initialized = false;
+        // Defer initialization until DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.init());
+        } else {
+            this.init();
+        }
     }
 
     init() {
+        if (this.initialized) return;
+        
         // Create notification container if it doesn't exist
         if (!document.getElementById('notification-container')) {
             this.createNotificationContainer();
         }
         this.notificationContainer = document.getElementById('notification-container');
+        this.initialized = true;
     }
 
     createNotificationContainer() {
+        // Wait for document.body to be available
+        if (!document.body) {
+            setTimeout(() => this.createNotificationContainer(), 10);
+            return;
+        }
+        
         const container = document.createElement('div');
         container.id = 'notification-container';
         container.className = 'fixed top-4 right-4 z-50 space-y-2';
@@ -26,6 +41,11 @@ class ErrorHandler {
     }
 
     showNotification(message, type = 'info', duration = 5000) {
+        // Ensure initialization
+        if (!this.initialized) {
+            this.init();
+        }
+        
         const notification = document.createElement('div');
         notification.className = `notification ${this.getNotificationClasses(type)} transform translate-x-full transition-transform duration-300 ease-in-out`;
         
@@ -214,15 +234,28 @@ class ErrorHandler {
 }
 
 // Global error handler instance
-const errorHandler = new ErrorHandler();
+let errorHandler;
+
+// Initialize error handler when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        errorHandler = new ErrorHandler();
+    });
+} else {
+    errorHandler = new ErrorHandler();
+}
 
 // Global error event listeners
 window.addEventListener('error', (event) => {
-    errorHandler.handleError(event.error, 'Global error');
+    if (errorHandler) {
+        errorHandler.handleError(event.error, 'Global error');
+    }
 });
 
 window.addEventListener('unhandledrejection', (event) => {
-    errorHandler.handleError(event.reason, 'Unhandled promise rejection');
+    if (errorHandler) {
+        errorHandler.handleError(event.reason, 'Unhandled promise rejection');
+    }
 });
 
 // Export for use in other modules

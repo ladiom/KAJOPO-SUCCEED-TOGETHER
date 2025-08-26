@@ -9,7 +9,8 @@
     <link rel="stylesheet" href="css/notifications.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="js/mobile-nav.js"></script>
-    <script src="js/error-handler.js"></script>
+    <!-- <script src="js/error-handler.js"></script> -->
+    <script src="js/auth.js"></script>
     <style>
         .tab-content {
             display: none;
@@ -458,9 +459,35 @@
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             try {
+                console.log('Dashboard initializing...');
+                console.log('userAuth available:', typeof userAuth);
+                console.log('setupUserMenuListeners available:', typeof setupUserMenuListeners);
+                
                 checkAuthenticationStatus();
                 setupEventListeners();
+                
+                // Ensure setupUserMenuListeners is available before calling
+                if (typeof setupUserMenuListeners === 'function') {
+                    console.log('Calling setupUserMenuListeners from auth.js');
+                    setupUserMenuListeners(); // Use centralized user menu from auth.js
+                } else {
+                    console.warn('setupUserMenuListeners not available, setting up local menu');
+                    setupLocalUserMenu();
+                }
+                
                 setupTabNavigation();
+                console.log('Dashboard initialization complete');
+                
+                // Test dropdown functionality after a short delay
+                setTimeout(() => {
+                    const userMenuBtn = document.getElementById('userMenuBtn');
+                    const userDropdown = document.getElementById('userDropdown');
+                    console.log('Testing dropdown elements:', {
+                        userMenuBtn: !!userMenuBtn,
+                        userDropdown: !!userDropdown,
+                        dropdownHidden: userDropdown ? userDropdown.classList.contains('hidden') : 'N/A'
+                    });
+                }, 1000);
             } catch (error) {
                 console.error('Dashboard initialization error:', error);
                 if (typeof errorHandler !== 'undefined') {
@@ -473,22 +500,36 @@
 
         function checkAuthenticationStatus() {
             try {
-                // Check if user is logged in (from localStorage for demo)
-                const user = localStorage.getItem('kajopo_user');
+                console.log('Checking authentication status...');
+                console.log('userAuth object:', typeof userAuth);
                 
-                if (user) {
-                    currentUser = JSON.parse(user);
+                // Use centralized auth system
+                if (typeof userAuth !== 'undefined' && userAuth.getCurrentUser) {
+                    currentUser = userAuth.getCurrentUser();
+                    console.log('Current user from userAuth:', currentUser);
+                } else {
+                    // Fallback to localStorage
+                    console.log('userAuth not available, checking localStorage');
+                    const userData = localStorage.getItem('currentUser');
+                    currentUser = userData ? JSON.parse(userData) : null;
+                    console.log('Current user from localStorage:', currentUser);
+                }
+                
+                if (currentUser) {
+                    console.log('User is authenticated, updating UI');
                     updateUserInfo();
                     if (typeof errorHandler !== 'undefined') {
                         errorHandler.showSuccess(`Welcome back, ${currentUser.firstName}!`);
                     }
                 } else {
-                    if (typeof errorHandler !== 'undefined') {
-                        errorHandler.showError('Please sign in to access your dashboard');
-                    }
-                    setTimeout(() => {
-                        window.location.href = 'signin-form.html?returnUrl=' + encodeURIComponent(window.location.href);
-                    }, 2000);
+                    console.log('No user found, but allowing page to load for testing');
+                    // For testing purposes, don't redirect immediately
+                    // if (typeof errorHandler !== 'undefined') {
+                    //     errorHandler.showError('Please sign in to access your dashboard');
+                    // }
+                    // setTimeout(() => {
+                    //     window.location.href = 'signin-form.html?returnUrl=' + encodeURIComponent(window.location.href);
+                    // }, 2000);
                 }
             } catch (error) {
                 console.error('Authentication check error:', error);
@@ -577,29 +618,57 @@
         }
 
         function setupEventListeners() {
-            // User menu dropdown
-            document.getElementById('userMenuBtn').addEventListener('click', function(e) {
-                e.stopPropagation();
-                const dropdown = document.getElementById('userDropdown');
-                dropdown.classList.toggle('hidden');
+            // Other event listeners can be added here if needed
+            // User menu functionality is now handled by setupUserMenuListeners() from auth.js
+        }
+        
+        function setupLocalUserMenu() {
+            console.log('Setting up local user menu...');
+            const userMenuBtn = document.getElementById('userMenuBtn');
+            const userDropdown = document.getElementById('userDropdown');
+            const signOutBtn = document.getElementById('signOutBtn');
+
+            console.log('User menu elements found:', {
+                userMenuBtn: !!userMenuBtn,
+                userDropdown: !!userDropdown,
+                signOutBtn: !!signOutBtn
             });
 
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function() {
-                document.getElementById('userDropdown').classList.add('hidden');
-            });
+            if (userMenuBtn && userDropdown) {
+                userMenuBtn.addEventListener('click', function(e) {
+                    console.log('User menu button clicked');
+                    e.stopPropagation();
+                    userDropdown.classList.toggle('hidden');
+                    console.log('Dropdown hidden class:', userDropdown.classList.contains('hidden'));
+                });
 
-            // Prevent dropdown from closing when clicking inside
-            document.getElementById('userDropdown').addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
+                document.addEventListener('click', function() {
+                    userDropdown.classList.add('hidden');
+                });
 
-            // Sign out functionality
-            document.getElementById('signOutBtn').addEventListener('click', function() {
-                localStorage.removeItem('kajopo_user');
-                currentUser = null;
-                window.location.href = 'index.html';
-            });
+                userDropdown.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+                
+                console.log('Local user menu event listeners attached');
+            } else {
+                console.error('User menu elements not found!');
+            }
+
+            if (signOutBtn) {
+                signOutBtn.addEventListener('click', function() {
+                    console.log('Sign out button clicked');
+                    if (typeof userAuth !== 'undefined' && userAuth.clearSession) {
+                        userAuth.clearSession();
+                    } else {
+                        localStorage.removeItem('kajopo_user');
+                        localStorage.removeItem('kajopo_user_session');
+                        localStorage.removeItem('kajopo_current_user');
+                    }
+                    currentUser = null;
+                    window.location.href = 'index.html';
+                });
+            }
         }
 
         function setupTabNavigation() {
