@@ -799,7 +799,10 @@
         });
 
         function checkUserAuth() {
-            const user = localStorage.getItem('kajopo_user');
+            let user = localStorage.getItem('kajopo_current_user');
+            if (!user) {
+                user = localStorage.getItem('kajopo_user');
+            }
             if (!user) {
                 console.log('No user found, redirecting to signin');
                 window.location.href = 'signin-form.html';
@@ -816,7 +819,10 @@
         }
 
         function updateUserInfo() {
-            const user = localStorage.getItem('kajopo_user');
+            let user = localStorage.getItem('kajopo_current_user');
+            if (!user) {
+                user = localStorage.getItem('kajopo_user');
+            }
             if (user) {
                 const userData = JSON.parse(user);
                 const firstName = userData.firstName || 'Provider';
@@ -840,7 +846,11 @@
 
         
         function loadProviderOpportunities() {
-            const user = JSON.parse(localStorage.getItem('kajopo_user'));
+            let userData = localStorage.getItem('kajopo_current_user');
+            if (!userData) {
+                userData = localStorage.getItem('kajopo_user');
+            }
+            const user = JSON.parse(userData);
             const opportunities = JSON.parse(localStorage.getItem('kajopo_opportunities') || '[]');
             const providerOpportunities = opportunities.filter(opp => 
                 opp.providerId === (user.id || user.email)
@@ -896,6 +906,8 @@
         
         function signOut() {
             localStorage.removeItem('kajopo_user');
+            localStorage.removeItem('kajopo_user_session');
+            localStorage.removeItem('kajopo_current_user');
             localStorage.removeItem('userAuthenticated');
             window.location.href = 'index.html';
         }

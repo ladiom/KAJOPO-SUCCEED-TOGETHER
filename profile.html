@@ -1484,28 +1484,21 @@ Project Management Professional (PMP)</textarea>
         // User Menu Functionality
         function checkUserAuth() {
             // Check if user is authenticated (in a real app, this would check session/token)
-            const user = localStorage.getItem('kajopo_user');
+            const user = localStorage.getItem('kajopo_current_user') || localStorage.getItem('kajopo_user');
             
             console.log('Checking user auth, user data:', user);
             
             if (user) {
                 updateUserInfo();
             } else {
-                // Set default user for demo purposes
-                const defaultUser = {
-                    firstName: 'Sarah',
-                    lastName: 'Johnson',
-                    email: 'sarah.johnson@example.com',
-                    userType: 'seeker'
-                };
-                localStorage.setItem('kajopo_user', JSON.stringify(defaultUser));
-                updateUserInfo();
+                // Redirect to sign-in if no user data found
+                window.location.href = 'signin-form.html';
             }
         }
 
         function updateUserInfo() {
             // Get user info from localStorage (in a real app, this would come from API)
-            const userInfo = JSON.parse(localStorage.getItem('kajopo_user') || '{}');
+            const userInfo = JSON.parse(localStorage.getItem('kajopo_current_user') || localStorage.getItem('kajopo_user') || '{}');
             const firstName = userInfo.firstName || 'New';
             const lastName = userInfo.lastName || 'User';
             const userName = firstName + ' ' + lastName;
@@ -1559,6 +1552,8 @@ Project Management Professional (PMP)</textarea>
             // Sign out functionality
             signOutBtn.addEventListener('click', function() {
                 localStorage.removeItem('kajopo_user');
+                localStorage.removeItem('kajopo_user_session');
+                localStorage.removeItem('kajopo_current_user');
                 window.location.href = 'index.html';
             });
         }

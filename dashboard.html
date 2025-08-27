@@ -508,9 +508,12 @@
                     currentUser = userAuth.getCurrentUser();
                     console.log('Current user from userAuth:', currentUser);
                 } else {
-                    // Fallback to localStorage
+                    // Fallback to localStorage - check both possible keys
                     console.log('userAuth not available, checking localStorage');
-                    const userData = localStorage.getItem('currentUser');
+                    let userData = localStorage.getItem('kajopo_current_user');
+                    if (!userData) {
+                        userData = localStorage.getItem('kajopo_user');
+                    }
                     currentUser = userData ? JSON.parse(userData) : null;
                     console.log('Current user from localStorage:', currentUser);
                 }
@@ -661,6 +664,7 @@
                     if (typeof userAuth !== 'undefined' && userAuth.clearSession) {
                         userAuth.clearSession();
                     } else {
+                        // Clear all possible user data keys
                         localStorage.removeItem('kajopo_user');
                         localStorage.removeItem('kajopo_user_session');
                         localStorage.removeItem('kajopo_current_user');

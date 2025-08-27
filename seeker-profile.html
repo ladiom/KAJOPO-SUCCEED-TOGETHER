@@ -660,6 +660,8 @@
 
         function signOut() {
             localStorage.removeItem('kajopo_user');
+            localStorage.removeItem('kajopo_user_session');
+            localStorage.removeItem('kajopo_current_user');
             window.location.href = 'index.html';
         }
 
@@ -676,7 +678,10 @@
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             // Check authentication
-            const userData = localStorage.getItem('kajopo_user');
+            let userData = localStorage.getItem('kajopo_current_user');
+            if (!userData) {
+                userData = localStorage.getItem('kajopo_user');
+            }
             if (!userData) {
                 window.location.href = 'signin-form.html';
                 return;
@@ -687,7 +692,10 @@
         });
         
         function updateUserInfo() {
-            const user = localStorage.getItem('kajopo_user');
+            let user = localStorage.getItem('kajopo_current_user');
+            if (!user) {
+                user = localStorage.getItem('kajopo_user');
+            }
             if (user) {
                 const userData = JSON.parse(user);
                 const firstName = userData.firstName || 'User';

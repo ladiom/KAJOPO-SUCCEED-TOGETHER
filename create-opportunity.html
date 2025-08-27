@@ -251,7 +251,7 @@
     <script>
         // Authentication check
         function checkUserAuth() {
-            const userData = localStorage.getItem('kajopo_user');
+            const userData = localStorage.getItem('kajopo_current_user') || localStorage.getItem('kajopo_user');
             if (!userData) {
                 alert('Please sign in to create opportunities.');
                 window.location.href = 'signin-form.html?returnUrl=' + encodeURIComponent(window.location.href);
@@ -313,6 +313,8 @@
             // Handle sign out
             signOutBtn.addEventListener('click', function() {
                 localStorage.removeItem('kajopo_user');
+                localStorage.removeItem('kajopo_current_user');
+                localStorage.removeItem('kajopo_user_session');
                 localStorage.removeItem('userAuthenticated');
                 localStorage.removeItem('userInfo');
                 window.location.href = 'signin-form.html';

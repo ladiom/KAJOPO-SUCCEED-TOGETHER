@@ -364,10 +364,12 @@
                 existingDynamic.forEach(el => el.remove());
                 
                 // Add dynamic opportunities at the beginning
-                opportunities.forEach(opportunity => {
-                    const opportunityCard = createOpportunityCard(opportunity);
-                    opportunitiesList.insertBefore(opportunityCard, opportunitiesList.firstChild);
-                });
+                if (Array.isArray(opportunities) && opportunities.length > 0) {
+                    opportunities.forEach(opportunity => {
+                        const opportunityCard = createOpportunityCard(opportunity);
+                        opportunitiesList.insertBefore(opportunityCard, opportunitiesList.firstChild);
+                    });
+                }
                 
                 // Update results count
                 updateResultsCount();
@@ -411,7 +413,7 @@
             }
             
             // Create category tags
-            const categoryTags = opportunity.categories.map(category => {
+            const categoryTags = (opportunity.categories || []).map(category => {
                 const colors = {
                     'Healthcare': 'bg-blue-100 text-blue-800',
                     'Education': 'bg-green-100 text-green-800',
@@ -479,7 +481,7 @@
 
         function checkUserAuth() {
             // Check for user session
-            const user = localStorage.getItem('kajopo_user');
+            const user = localStorage.getItem('kajopo_current_user') || localStorage.getItem('kajopo_user');
             
             if (user) {
                 currentUser = JSON.parse(user);
@@ -526,6 +528,8 @@
             // Sign out functionality
             document.getElementById('signOutBtn').addEventListener('click', function() {
                 localStorage.removeItem('kajopo_user');
+                localStorage.removeItem('kajopo_user_session');
+                localStorage.removeItem('kajopo_current_user');
                 currentUser = null;
                 showGuestMenu();
                 // Optionally redirect to home page

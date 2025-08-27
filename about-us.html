@@ -7,8 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/themes.css">
     <link rel="stylesheet" href="css/notifications.css">
+    <script src="js/auth.js"></script>
     <script src="js/mobile-nav.js"></script>
-
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
     <!-- Navigation -->
@@ -23,10 +23,38 @@
                         </div>
                     </a>
                 </div>
-                <div class="hidden md:flex items-center space-x-4">
+                
+                <!-- Main Navigation -->
+                <div class="hidden md:flex items-center space-x-6">
                     <a href="about-us.html" class="text-gray-600 hover:text-indigo-600 transition-colors font-medium">About Us</a>
                     <a href="contact.html" class="text-gray-600 hover:text-indigo-600 transition-colors font-medium">Contact</a>
-                    <a href="signin-form.html" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors">Sign In</a>
+                </div>
+                
+                <!-- User Menu (shown when signed in) -->
+                <div id="userMenu" class="hidden items-center space-x-4">
+                    <div class="relative">
+                        <button id="userMenuBtn" class="flex items-center space-x-2 text-gray-700 hover:text-gray-900 focus:outline-none">
+                            <div class="h-8 w-8 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full flex items-center justify-center">
+                                <span id="userInitials" class="text-white text-sm font-semibold">U</span>
+                            </div>
+                            <span id="userName" class="font-medium"></span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                            <a href="dashboard.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Dashboard</a>
+                            <a href="browse-opportunities.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Browse Opportunities</a>
+                            <a href="profile.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                            <div class="border-t border-gray-100"></div>
+                            <button id="signOutBtn" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign Out</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Guest Menu (shown when not signed in) -->
+                <div id="guestMenu" class="hidden md:flex items-center space-x-4">
+                    <a href="signin-form.html" class="text-gray-600 hover:text-indigo-600 transition-colors font-medium">Sign In</a>
                     <a href="registration-form.html" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">Join Now</a>
                 </div>
                 
@@ -151,6 +179,105 @@
         </div>
     </main>
 
-
+    <script>
+        // Initialize authentication check when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            checkUserAuth();
+            setupUserMenuListeners();
+        });
+        
+        // Check user authentication and update navigation
+        function checkUserAuth() {
+            const userMenu = document.getElementById('userMenu');
+            const guestMenu = document.getElementById('guestMenu');
+            
+            let user = null;
+            let isAuthenticated = false;
+            
+            // Try to get user from auth system first
+            if (typeof userAuth !== 'undefined' && userAuth.getCurrentUser) {
+                user = userAuth.getCurrentUser();
+                isAuthenticated = !!user;
+            } else {
+                // Check for authentication flag in localStorage
+                const authFlag = localStorage.getItem('userAuthenticated') || localStorage.getItem('kajopo_user_session');
+                if (authFlag === 'true' || authFlag) {
+                    // Only then check for user data
+                    const userData = localStorage.getItem('kajopo_current_user') || localStorage.getItem('kajopo_user');
+                    if (userData) {
+                        try {
+                            user = JSON.parse(userData);
+                            isAuthenticated = true;
+                        } catch (e) {
+                            console.error('Error parsing user data:', e);
+                            isAuthenticated = false;
+                        }
+                    }
+                }
+            }
+            
+            if (user && isAuthenticated) {
+                updateUserInfo(user);
+                userMenu.classList.remove('hidden');
+                userMenu.classList.add('md:flex');
+                guestMenu.classList.add('hidden');
+                guestMenu.classList.remove('md:flex');
+            } else {
+                userMenu.classList.add('hidden');
+                userMenu.classList.remove('md:flex');
+                guestMenu.classList.remove('hidden');
+                guestMenu.classList.add('md:flex');
+            }
+        }
+        
+        // Update user information in the navigation
+        function updateUserInfo(user) {
+            const userNameElement = document.getElementById('userName');
+            const userInitialsElement = document.getElementById('userInitials');
+            
+            if (user) {
+                const firstName = user.firstName || 'User';
+                const lastName = user.lastName || '';
+                const initials = (firstName.charAt(0) + (lastName.charAt(0) || '')).toUpperCase();
+                
+                userNameElement.textContent = firstName + (lastName ? ' ' + lastName : '');
+                userInitialsElement.textContent = initials;
+            }
+        }
+        
+        // Setup user menu dropdown functionality
+        function setupUserMenuListeners() {
+            const userMenuBtn = document.getElementById('userMenuBtn');
+            const userDropdown = document.getElementById('userDropdown');
+            const signOutBtn = document.getElementById('signOutBtn');
+            
+            if (userMenuBtn && userDropdown) {
+                // Toggle dropdown
+                userMenuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    userDropdown.classList.toggle('hidden');
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!userMenuBtn.contains(e.target) && !userDropdown.contains(e.target)) {
+                        userDropdown.classList.add('hidden');
+                    }
+                });
+            }
+            
+            if (signOutBtn) {
+                // Handle sign out
+                signOutBtn.addEventListener('click', function() {
+                    localStorage.removeItem('kajopo_user');
+                    localStorage.removeItem('kajopo_current_user');
+                    localStorage.removeItem('kajopo_user_session');
+                    localStorage.removeItem('userAuthenticated');
+                    localStorage.removeItem('userInfo');
+                    window.location.href = 'index.html';
+                });
+            }
+        }
+    </script>
 </body>
 </html>

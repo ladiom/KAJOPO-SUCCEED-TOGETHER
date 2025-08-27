@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kájọpọ̀ - Succeed Together</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .category-card {
+            transition: all 0.3s ease;
+        }
+        .category-card:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-900 text-white">
+    <!-- Header -->
+    <header class="bg-gray-800 shadow-lg border-b border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-6">
+                <div class="flex items-center">
+                    <h1 class="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">Kájọpọ̀</h1>
+                    <span class="ml-3 text-sm text-gray-300 italic">Succeed Together</span>
+                </div>
+                <div class="flex space-x-4">
+                    <button class="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 transition-colors">
+                        Sign In
+                    </button>
+                    <button class="border border-cyan-400 text-cyan-400 px-4 py-2 rounded-lg hover:bg-cyan-400 hover:text-gray-900 transition-colors">
+                        Get Started
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="py-20 bg-gradient-to-br from-gray-900 via-gray-800 to-black relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+            <h2 class="text-5xl font-bold text-white mb-6">
+                Connect. Impact. <span class="bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">Succeed Together.</span>
+            </h2>
+            <p class="text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
+                Kajopo brings opportunity seekers and providers together, combining the power of human wisdom with artificial intelligence to create intelligent solutions, stronger operations, and positive social change.
+            </p>
+            
+            <!-- Role Selection -->
+            <div class="flex justify-center space-x-6 mb-12">
+                <button id="seekerBtn" class="px-8 py-4 rounded-xl text-lg font-semibold transition-all bg-gray-800 text-white border border-cyan-400 hover:bg-cyan-400 hover:text-gray-900">
+                    🔍 Explore Opportunities
+                </button>
+                <button id="providerBtn" class="px-8 py-4 rounded-xl text-lg font-semibold transition-all bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 hover:from-purple-600 hover:to-pink-600">
+                    🤝 Get Started Today
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="py-16 bg-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h3 class="text-3xl font-bold text-center text-white mb-12">
+                Explore Impact Categories
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="categoriesGrid">
+                <!-- Categories will be populated by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-gradient-to-r from-cyan-600 via-purple-600 to-pink-600">
+        <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+            <h3 class="text-3xl font-bold text-white mb-6">
+                Ready to Make an Impact?
+            </h3>
+            <p class="text-xl text-cyan-100 mb-8">
+                Join thousands of changemakers connecting across Africa and beyond.
+            </p>
+            <button class="bg-white text-gray-900 px-8 py-4 rounded-xl text-lg font-semibold hover:bg-gray-100 transition-colors">
+                Get Started Today
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h4 class="text-lg font-semibold mb-4 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">Kájọpọ̀</h4>
+                    <p class="text-gray-400 text-sm">
+                        Connecting opportunity seekers with providers across Africa for sustainable impact.
+                    </p>
+                </div>
+                <div>
+                    <h5 class="font-semibold mb-3 text-cyan-400">For Seekers</h5>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-cyan-400 transition duration-300">Find Opportunities</a></li>
+                        <li><a href="#" class="hover:text-cyan-400 transition duration-300">Build Profile</a></li>
+                        <li><a href="#" class="hover:text-cyan-400 transition duration-300">Get Matched</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="font-semibold mb-3 text-purple-400">For Providers</h5>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-purple-400 transition duration-300">Post Opportunities</a></li>
+                        <li><a href="#" class="hover:text-purple-400 transition duration-300">Find Candidates</a></li>
+                        <li><a href="#" class="hover:text-purple-400 transition duration-300">Track Impact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="font-semibold mb-3 text-pink-400">Support</h5>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-pink-400 transition duration-300">Help Center</a></li>
+                        <li><a href="#" class="hover:text-pink-400 transition duration-300">Contact Us</a></li>
+                        <li><a href="#" class="hover:text-pink-400 transition duration-300">Community</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
+                <p>&copy; 2024 <span class="bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent font-semibold">Kájọpọ̀</span>. All rights reserved. Built with <span class="text-pink-400">❤️</span> for social impact.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Categories data
+        const categories = [
+            {
+                id: 'education',
+                name: 'Education',
+                description: 'Educational opportunities and learning initiatives',
+                icon: '🎓',
+                subcategories: ['Scholarships', 'EdTech', 'Teacher Training', 'STEM Labs']
+            },
+            {
+                id: 'health',
+                name: 'Health',
+                description: 'Healthcare and wellness initiatives',
+                icon: '🏥',
+                subcategories: ['Preventive Care', 'Mental Health', 'Mobile Clinics', 'HealthTech']
+            },
+            {
+                id: 'social-impact',
+                name: 'Social Impact',
+                description: 'Social justice and community empowerment',
+                icon: '🤝',
+                subcategories: ['Gender Equity', 'Disability Inclusion', 'Refugee Support', 'Youth Empowerment']
+            },
+            {
+                id: 'economic-empowerment',
+                name: 'Economic Empowerment',
+                description: 'Financial inclusion and economic development',
+                icon: '💰',
+                subcategories: ['Microfinance', 'Vocational Grants', 'SME Support', 'Financial Literacy']
+            },
+            {
+                id: 'housing-infrastructure',
+                name: 'Housing & Infrastructure',
+                description: 'Housing solutions and infrastructure development',
+                icon: '🏠',
+                subcategories: ['Affordable Housing', 'Green Building', 'Emergency Shelter', 'Urban Renewal']
+            },
+            {
+                id: 'food-agriculture',
+                name: 'Food & Agriculture',
+                description: 'Food security and agricultural development',
+                icon: '🌾',
+                subcategories: ['Sustainable Farming', 'Nutrition Programs', 'AgriTech', 'Community Gardens']
+            },
+            {
+                id: 'arts-culture',
+                name: 'Arts & Culture',
+                description: 'Creative expression and cultural preservation',
+                icon: '🎨',
+                subcategories: ['Creative Grants', 'Cultural Preservation', 'Indigenous Knowledge', 'Media Impact']
+            },
+            {
+                id: 'digital-access',
+                name: 'Digital Access & Innovation',
+                description: 'Technology access and digital inclusion',
+                icon: '💻',
+                subcategories: ['Broadband Equity', 'Civic Tech', 'Open Source Tools', 'AI/STEM for Underserved']
+            },
+            {
+                id: 'climate-environment',
+                name: 'Climate & Environment',
+                description: 'Environmental protection and climate action',
+                icon: '🌍',
+                subcategories: ['Renewable Energy', 'Conservation', 'Climate Resilience', 'Circular Economy']
+            },
+            {
+                id: 'justice-governance',
+                name: 'Justice & Governance',
+                description: 'Legal aid and governance reform',
+                icon: '⚖️',
+                subcategories: ['Legal Aid', 'Civic Engagement', 'Anti-Corruption Tech', 'Restorative Justice']
+            },
+            {
+                id: 'mental-wellness',
+                name: 'Mental Wellness & Belonging',
+                description: 'Mental health and community belonging',
+                icon: '🧠',
+                subcategories: ['Trauma-Informed Care', 'Interfaith Dialogue', 'Identity Support', 'Community Healing']
+            }
+        ];
+
+        let selectedCategory = null;
+        let userRole = null;
+
+        // Role selection functionality
+        document.getElementById('seekerBtn').addEventListener('click', function() {
+            userRole = 'seeker';
+            updateRoleButtons();
+        });
+
+        document.getElementById('providerBtn').addEventListener('click', function() {
+            userRole = 'provider';
+            updateRoleButtons();
+        });
+
+        function updateRoleButtons() {
+            const seekerBtn = document.getElementById('seekerBtn');
+            const providerBtn = document.getElementById('providerBtn');
+            
+            seekerBtn.className = userRole === 'seeker' 
+                ? 'px-8 py-4 rounded-xl text-lg font-semibold transition-all bg-cyan-600 text-white shadow-lg'
+                : 'px-8 py-4 rounded-xl text-lg font-semibold transition-all bg-gray-800 text-white border border-cyan-400 hover:bg-cyan-400 hover:text-gray-900';
+            
+            providerBtn.className = userRole === 'provider'
+                ? 'px-8 py-4 rounded-xl text-lg font-semibold transition-all bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+                : 'px-8 py-4 rounded-xl text-lg font-semibold transition-all bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 hover:from-purple-600 hover:to-pink-600';
+        }
+
+        // Render categories
+        function renderCategories() {
+            const grid = document.getElementById('categoriesGrid');
+            grid.innerHTML = '';
+
+            categories.forEach(category => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category-card bg-gray-700 border border-gray-600 rounded-xl p-6 hover:shadow-lg transition-all cursor-pointer hover:border-cyan-400';
+                categoryDiv.onclick = () => toggleCategory(category.id);
+
+                const subcategoriesHtml = selectedCategory === category.id 
+                    ? `<div class="mt-4 pt-4 border-t border-gray-600">
+                        <h5 class="text-sm font-medium text-gray-300 mb-2">Subcategories:</h5>
+                        <div class="space-y-1">
+                            ${category.subcategories.map(sub => 
+                                `<div class="text-xs text-gray-300 bg-gray-600 px-2 py-1 rounded">${sub}</div>`
+                            ).join('')}
+                        </div>
+                    </div>`
+                    : '';
+
+                categoryDiv.innerHTML = `
+                    <div class="text-4xl mb-4">${category.icon}</div>
+                    <h4 class="text-lg font-semibold text-white mb-2">${category.name}</h4>
+                    <p class="text-sm text-gray-300 mb-4">${category.description}</p>
+                    ${subcategoriesHtml}
+                `;
+
+                grid.appendChild(categoryDiv);
+            });
+        }
+
+        function toggleCategory(categoryId) {
+            selectedCategory = selectedCategory === categoryId ? null : categoryId;
+            renderCategories();
+        }
+
+        // Initial render
+        renderCategories();
+    </script>
+</body>
+</html>
