@@ -572,3 +572,35 @@ a:focus {
     box-shadow: none !important;
   }
 }
+
+/* Mobile Navigation Fix - Hide elements when not active */
+.mobile-nav-menu:not(.open) {
+  display: none !important;
+}
+
+.mobile-nav-overlay:not(.open) {
+  display: none !important;
+}
+
+/* Ensure mobile nav toggle is properly hidden on larger screens */
+@media (min-width: 768px) {
+  .mobile-nav-toggle,
+  #mobile-menu-button {
+    display: none !important;
+  }
+  
+  .mobile-nav-menu,
+  .mobile-nav-overlay {
+    display: none !important;
+  }
+}
+
+/* Additional safety to prevent mobile nav from showing on desktop */
+@media (min-width: 1024px) {
+  .mobile-nav-menu,
+  .mobile-nav-overlay,
+  .mobile-nav-toggle,
+  #mobile-menu-button {
+    display: none !important;
+  }
+}
