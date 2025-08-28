@@ -93,7 +93,7 @@
                             <hr class="my-1">
                             <button id="signOutBtn" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                 <svg class="h-4 w-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v10m-6 0a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 012-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                                 </svg>
                                 Sign Out
                             </button>
@@ -148,17 +148,10 @@
                     <label for="categoryFilter" class="block text-sm font-medium text-gray-700 mb-2">Service Category</label>
                     <select id="categoryFilter" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900">
                         <option value="">All Categories</option>
-                        <option value="grants">Grants & Funding</option>
-                        <option value="jobs">Jobs & Employment</option>
-                        <option value="education">Education & Training</option>
-                        <option value="healthcare">Healthcare Services</option>
-                        <option value="housing">Housing & Shelter</option>
-                        <option value="food">Food & Nutrition</option>
-                        <option value="legal">Legal Services</option>
-                        <option value="mental-health">Mental Health</option>
-                        <option value="childcare">Childcare</option>
-                        <option value="eldercare">Elder Care</option>
-                        <option value="technology">Technology Access</option>
+                        <option value="health">Health</option>
+                        <option value="education">Education</option>
+                        <option value="technology-solutions">Technology Solutions</option>
+                        <option value="social-impact">Social Impact</option>
                     </select>
                 </div>
 
@@ -167,14 +160,56 @@
                     <label for="typeFilter" class="block text-sm font-medium text-gray-700 mb-2">Service Type</label>
                     <select id="typeFilter" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900">
                         <option value="">All Types</option>
-                        <option value="direct-service">Direct Service</option>
-                        <option value="funding">Funding</option>
-                        <option value="mentorship">Mentorship</option>
-                        <option value="training">Training</option>
-                        <option value="consultation">Consultation</option>
-                        <option value="volunteer">Volunteer</option>
-                        <option value="internship">Internship</option>
-                        <option value="partnership">Partnership</option>
+                        <!-- Education Types -->
+                        <optgroup label="Education">
+                            <option value="scholarships">Scholarships</option>
+                            <option value="fellowships">Fellowships</option>
+                            <option value="research-grants">Research Grants</option>
+                            <option value="student-loans">Student Loans</option>
+                            <option value="school-vouchers">School Vouchers</option>
+                            <option value="institutional-grants">Institutional Grants</option>
+                            <option value="government-block-grants">Government Block Grants</option>
+                            <option value="private-foundation-grants">Private Foundation Grants</option>
+                            <option value="corporate-sponsorships">Corporate Sponsorships</option>
+                            <option value="crowdfunding">Crowdfunding</option>
+                        </optgroup>
+                        
+                        <!-- Health Types -->
+                        <optgroup label="Health">
+                            <option value="nih-grants">NIH Grants</option>
+                            <option value="cdc-grants">CDC Grants</option>
+                            <option value="health-dept-grants">State & Local Health Department Grants</option>
+                            <option value="health-foundation-grants">Private Foundation Grants (Health)</option>
+                            <option value="pharma-grants">Pharmaceutical Company Grants</option>
+                            <option value="hospital-grants">Hospital & Healthcare System Grants</option>
+                            <option value="medicare-medicaid">Medicare/Medicaid Reimbursements</option>
+                            <option value="patient-assistance">Patient Assistance Programs</option>
+                        </optgroup>
+                        
+                        <!-- Technology Solutions Types -->
+                        <optgroup label="Technology Solutions">
+                            <option value="venture-capital">Venture Capital</option>
+                            <option value="angel-funding">Angel Investor Funding</option>
+                            <option value="seed-funding">Seed Funding</option>
+                            <option value="series-funding">Series A/B/C Funding</option>
+                            <option value="sbir-grants">SBIR Grants</option>
+                            <option value="sttr-grants">STTR Grants</option>
+                            <option value="corporate-venture">Corporate Venture Arms</option>
+                            <option value="incubator-accelerator">Incubator & Accelerator Programs</option>
+                            <option value="tech-crowdfunding">Crowdfunding (Tech)</option>
+                        </optgroup>
+                        
+                        <!-- Social Impact Types -->
+                        <optgroup label="Social Impact">
+                            <option value="public-charity-grants">Public Charity Grants</option>
+                            <option value="social-foundation-grants">Private Foundation Grants (Social)</option>
+                            <option value="community-foundation-grants">Community Foundation Grants</option>
+                            <option value="csr-grants">Corporate Social Responsibility Grants</option>
+                            <option value="impact-investing">Impact Investing</option>
+                            <option value="government-grants">Government Grants</option>
+                            <option value="philanthropic-donations">Philanthropic Donations</option>
+                            <option value="in-kind-donations">In-Kind Donations</option>
+                        </optgroup>
                     </select>
                 </div>
 
@@ -349,7 +384,8 @@
                 }
                 
                 // Simulate API delay
-                await new Promise(resolve => setTimeout(resolve, 500));
+                // Comment out the artificial delay (line 387)
+                // await new Promise(resolve => setTimeout(resolve, 500));
                 
                 const opportunities = JSON.parse(localStorage.getItem('kajopo_opportunities') || '[]');
                 
@@ -412,8 +448,55 @@
                 deadlineText = `Deadline: ${deadlineDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`;
             }
             
-            // Create category tags
-            const categoryTags = (opportunity.categories || []).map(category => {
+            // Validate and fix category data
+            let validCategories = [];
+            const validCategoryNames = ['Healthcare', 'Education', 'Technology', 'Agriculture', 'Training', 'Mentorship'];
+            
+            if (Array.isArray(opportunity.categories)) {
+                // Filter out invalid categories (numbers, undefined, null, etc.)
+                validCategories = opportunity.categories.filter(cat => 
+                    typeof cat === 'string' && 
+                    cat !== 'undefined' && 
+                    cat !== 'null' && 
+                    !(/^\d+$/.test(cat)) && // Remove pure numbers like "5"
+                    cat.trim().length > 0
+                );
+                
+                // If we have valid categories, ensure they match our expected format
+                validCategories = validCategories.map(cat => {
+                    const normalized = cat.charAt(0).toUpperCase() + cat.slice(1).toLowerCase();
+                    // Check if it matches any of our valid categories (case-insensitive)
+                    const match = validCategoryNames.find(valid => 
+                        valid.toLowerCase() === normalized.toLowerCase()
+                    );
+                    return match || normalized;
+                });
+            }
+            
+            // If no valid categories found, assign based on title/description analysis
+            if (validCategories.length === 0) {
+                const text = `${opportunity.title || ''} ${opportunity.description || ''}`.toLowerCase();
+                
+                if (text.includes('health') || text.includes('medical') || text.includes('clinic')) {
+                    validCategories = ['Healthcare'];
+                } else if (text.includes('education') || text.includes('school') || text.includes('student') || text.includes('learning')) {
+                    validCategories = ['Education'];
+                } else if (text.includes('technology') || text.includes('tech') || text.includes('software') || text.includes('digital')) {
+                    validCategories = ['Technology'];
+                } else if (text.includes('agriculture') || text.includes('farming') || text.includes('crop') || text.includes('agricultural')) {
+                    validCategories = ['Agriculture'];
+                } else if (text.includes('training') || text.includes('workshop') || text.includes('skill')) {
+                    validCategories = ['Training'];
+                } else if (text.includes('mentor') || text.includes('guidance') || text.includes('coaching')) {
+                    validCategories = ['Mentorship'];
+                } else {
+                    // Default fallback category
+                    validCategories = ['Training'];
+                }
+            }
+            
+            // Create category tags with validated categories
+            const categoryTags = validCategories.map(category => {
                 const colors = {
                     'Healthcare': 'bg-blue-100 text-blue-800',
                     'Education': 'bg-green-100 text-green-800',
@@ -479,6 +562,7 @@
             }
         });
 
+        // Remove this entire duplicate function:
         function checkUserAuth() {
             // Check for user session
             const user = localStorage.getItem('kajopo_current_user') || localStorage.getItem('kajopo_user');
@@ -487,9 +571,8 @@
                 currentUser = JSON.parse(user);
                 showUserMenu();
                 updateUserInfo();
+                updateUserDropdownMenu(currentUser);
             } else {
-                // Allow public browsing - show guest menu instead of redirecting
-                currentUser = null;
                 showGuestMenu();
             }
         }
@@ -608,7 +691,54 @@
             }
         });
 
-        document.getElementById('categoryFilter').addEventListener('change', filterOpportunities);
+        // Add this new function after the filterOpportunities function (around line 890)
+        function updateTypeDropdown(selectedCategory) {
+            const typeFilter = document.getElementById('typeFilter');
+            const allOptgroups = typeFilter.querySelectorAll('optgroup');
+            const allOptions = typeFilter.querySelectorAll('option[value=""]'); // "All Types" option
+            
+            // Reset type filter value when category changes
+            typeFilter.value = '';
+            
+            if (!selectedCategory) {
+                // Show all optgroups when no category is selected
+                allOptgroups.forEach(optgroup => {
+                    optgroup.style.display = 'block';
+                });
+                return;
+            }
+            
+            // Define category to optgroup mapping
+            const categoryToOptgroup = {
+                'education': 'Education',
+                'health': 'Health', 
+                'technology-solutions': 'Technology Solutions',
+                'social-impact': 'Social Impact'
+            };
+            
+            const targetOptgroupLabel = categoryToOptgroup[selectedCategory];
+            
+            // Hide all optgroups first
+            allOptgroups.forEach(optgroup => {
+                optgroup.style.display = 'none';
+            });
+            
+            // Show only the relevant optgroup
+            if (targetOptgroupLabel) {
+                const targetOptgroup = Array.from(allOptgroups).find(optgroup => 
+                    optgroup.label === targetOptgroupLabel
+                );
+                if (targetOptgroup) {
+                    targetOptgroup.style.display = 'block';
+                }
+            }
+        }
+
+        document.getElementById('categoryFilter').addEventListener('change', function() {
+            const selectedCategory = this.value;
+            updateTypeDropdown(selectedCategory);
+            filterOpportunities();
+        });
         document.getElementById('typeFilter').addEventListener('change', filterOpportunities);
         document.getElementById('regionFilter').addEventListener('change', filterOpportunities);
         document.getElementById('sortBy').addEventListener('change', filterOpportunities);
@@ -620,20 +750,181 @@
                 const type = document.getElementById('typeFilter').value;
                 const region = document.getElementById('regionFilter').value;
                 const sortBy = document.getElementById('sortBy').value;
-
-                // Here you would implement the actual filtering logic
-                // For now, we'll just update the results count as a demo
-                let filteredCount = 247;
+    
+                console.log('=== FILTER DEBUG ===');
+                console.log('Filter values:', { searchTerm, category, type, region, sortBy });
+    
+                // Get all opportunity cards (both static and dynamic)
+                const opportunityCards = document.querySelectorAll('#opportunitiesList > div:not(.loading-indicator)');
+                console.log('Found opportunity cards:', opportunityCards.length);
                 
-                if (searchTerm) filteredCount = Math.floor(filteredCount * 0.6);
-                if (category) filteredCount = Math.floor(filteredCount * 0.7);
-                if (type) filteredCount = Math.floor(filteredCount * 0.8);
-                if (region) filteredCount = Math.floor(filteredCount * 0.9);
-
-                document.getElementById('resultsCount').textContent = filteredCount;
+                let visibleCount = 0;
+    
+                opportunityCards.forEach((card, index) => {
+                    let shouldShow = true;
+                    console.log(`\n--- Card ${index + 1} ---`);
+    
+                    // Get card content for filtering
+                    const cardText = card.textContent.toLowerCase();
+                    const categoryTags = card.querySelectorAll('span[class*="bg-"][class*="text-"]');
+                    
+                    console.log('Card text preview:', cardText.substring(0, 100) + '...');
+                    console.log('Category tags found:', categoryTags.length);
+                    
+                    // Extract categories and regions from tags
+                    const cardCategories = [];
+                    const cardRegions = [];
+                    
+                    categoryTags.forEach(tag => {
+                        const tagText = tag.textContent.trim();
+                        console.log('Processing tag:', tagText);
+                        // Check if it's a region (common regions)
+                        if (['africa', 'asia', 'europe', 'north america', 'south america', 'oceania', 'middle east', 'global'].includes(tagText.toLowerCase())) {
+                            cardRegions.push(tagText.toLowerCase());
+                        } else {
+                            cardCategories.push(tagText.toLowerCase());
+                        }
+                    });
+                    
+                    console.log('Card categories:', cardCategories);
+                    console.log('Card regions:', cardRegions);
+    
+                    // Apply search term filter
+                    if (searchTerm && !cardText.includes(searchTerm)) {
+                        console.log('❌ Failed search term filter');
+                        shouldShow = false;
+                    }
+    
+                    // Apply category filter - IMPROVED MAPPING
+if (category) {
+    const categoryMappings = {
+        'health': ['healthcare', 'health', 'medical'],
+        'education': ['education', 'training', 'learning'],
+        'technology-solutions': ['technology', 'tech', 'digital'],
+        'social-impact': ['social', 'community', 'impact']
+    };
+    
+    const categoryKeywords = categoryMappings[category.toLowerCase()] || [category.toLowerCase()];
+    
+    const hasCategoryMatch = categoryKeywords.some(keyword => {
+        const textMatch = cardText.includes(keyword);
+        const tagMatch = cardCategories.some(cat => cat.includes(keyword) || keyword.includes(cat));
+        return textMatch || tagMatch;
+    });
+    
+    if (!hasCategoryMatch) {
+        console.log('❌ Failed category filter');
+        shouldShow = false;
+    }
+}
+    
+                    // Apply type filter - improved mapping for actual card content
+                    if (type) {
+                        console.log('Applying type filter for:', type);
+                        const typeKeywords = {
+                            // Education types - map to actual content
+                            'scholarships': ['scholarship', 'education', 'student', 'youth', 'learning'],
+                            'fellowships': ['fellowship', 'fellow', 'mentorship', 'mentor'],
+                            'research-grants': ['research', 'grant', 'funding', 'study'],
+                            'student-loans': ['loan', 'student', 'education', 'financial'],
+                            'school-vouchers': ['voucher', 'school', 'education'],
+                            'institutional-grants': ['institutional', 'grant', 'funding'],
+                            'government-block-grants': ['government', 'grant', 'funding', 'public'],
+                            'private-foundation-grants': ['foundation', 'grant', 'funding', 'private'],
+                            'corporate-sponsorships': ['corporate', 'sponsor', 'funding', 'business', 'sponsorship'],
+                            'crowdfunding': ['crowdfunding', 'crowd', 'funding'],
+                            
+                            // Health types - map to actual content
+                            'nih-grants': ['health', 'medical', 'healthcare', 'community health', 'maternal', 'child health'],
+                            'cdc-grants': ['health', 'disease', 'prevention', 'community health'],
+                            'health-dept-grants': ['health', 'department', 'community health', 'healthcare'],
+                            'health-foundation-grants': ['health', 'foundation', 'healthcare', 'medical'],
+                            'pharma-grants': ['pharmaceutical', 'pharma', 'medical', 'health'],
+                            'hospital-grants': ['hospital', 'healthcare', 'medical', 'health'],
+                            'medicare-medicaid': ['medicare', 'medicaid', 'health', 'healthcare'],
+                            'patient-assistance': ['patient', 'assistance', 'health', 'healthcare'],
+                            
+                            // Technology types - map to actual content
+                            'venture-capital': ['technology', 'tech', 'innovation', 'digital'],
+                            'angel-funding': ['technology', 'startup', 'innovation', 'tech'],
+                            'seed-funding': ['technology', 'startup', 'innovation', 'tech'],
+                            'series-funding': ['technology', 'investment', 'tech', 'digital'],
+                            'sbir-grants': ['technology', 'research', 'innovation', 'tech'],
+                            'sttr-grants': ['technology', 'research', 'tech', 'innovation'],
+                            'corporate-venture': ['technology', 'corporate', 'tech', 'digital'],
+                            'incubator-accelerator': ['technology', 'program', 'tech', 'innovation'],
+                            'tech-crowdfunding': ['technology', 'crowdfunding', 'tech', 'digital'],
+                            
+                            // Social Impact types - map to actual content
+                            'public-charity-grants': ['charity', 'community', 'social', 'public'],
+                            'social-foundation-grants': ['social', 'foundation', 'community'],
+                            'community-foundation-grants': ['community', 'foundation', 'social'],
+                            'csr-grants': ['corporate', 'social', 'responsibility', 'community'],
+                            'impact-investing': ['impact', 'social', 'community', 'sustainable'],
+                            'government-grants': ['government', 'public', 'community'],
+                            'philanthropic-donations': ['philanthropic', 'donation', 'charity', 'community'],
+                            'in-kind-donations': ['donation', 'support', 'community'],
+                            
+                            // Map existing card content to types
+                            'training': ['training', 'program', 'education', 'learning'],
+                            'mentorship': ['mentorship', 'mentor', 'guidance', 'program'],
+                            'agriculture': ['agriculture', 'farming', 'sustainable', 'crop'],
+                            'healthcare': ['healthcare', 'health', 'medical', 'community health']
+                        };
+                        
+                        const selectedTypeKeywords = typeKeywords[type.toLowerCase()] || [type.toLowerCase()];
+                        console.log('Looking for keywords:', selectedTypeKeywords);
+                        
+                        const hasTypeMatch = selectedTypeKeywords.some(keyword => {
+                            const textMatch = cardText.includes(keyword);
+                            const categoryMatch = cardCategories.some(cat => cat.includes(keyword) || keyword.includes(cat));
+                            console.log(`  Keyword "${keyword}": text=${textMatch}, category=${categoryMatch}`);
+                            return textMatch || categoryMatch;
+                        });
+                        
+                        console.log('Type match result:', hasTypeMatch);
+                        
+                        if (!hasTypeMatch) {
+                            console.log('❌ Failed type filter');
+                            shouldShow = false;
+                        }
+                    }
+    
+                    // Apply region filter
+                    if (region) {
+                        const regionMatch = cardRegions.some(cardRegion => 
+                            cardRegion.includes(region.toLowerCase()) || 
+                            region.toLowerCase().includes(cardRegion)
+                        ) || (region.toLowerCase() === 'global' && cardText.includes('multiple countries'));
+                        
+                        if (!regionMatch) {
+                            console.log('❌ Failed region filter');
+                            shouldShow = false;
+                        }
+                    }
+    
+                    // Show/hide the card
+                    if (shouldShow) {
+                        card.style.display = 'block';
+                        visibleCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+    
+                // Update results count
+                document.getElementById('resultsCount').textContent = visibleCount;
+                
+                // Update pagination info
+                const resultsElements = document.querySelectorAll('span.font-medium');
+                if (resultsElements.length >= 3) {
+                    resultsElements[0].textContent = visibleCount > 0 ? '1' : '0'; // From
+                    resultsElements[1].textContent = Math.min(visibleCount, 10); // To (assuming 10 per page)
+                    resultsElements[2].textContent = visibleCount; // Total
+                }
                 
                 if (typeof errorHandler !== 'undefined') {
-                    errorHandler.showInfo(`Filtered to ${filteredCount} opportunities`);
+                    errorHandler.showInfo(`Filtered to ${visibleCount} opportunities`);
                 }
                 
             } catch (error) {
@@ -641,6 +932,105 @@
                 if (typeof errorHandler !== 'undefined') {
                     errorHandler.handleError(error, 'Filter opportunities');
                 }
+            }
+        }
+
+        function updateUserDropdownMenu(user) {
+            const userDropdown = document.getElementById('userDropdown');
+            if (!userDropdown || !user) return;
+            
+            // Clear existing menu items
+            const menuContainer = userDropdown.querySelector('.py-2');
+            if (!menuContainer) return;
+            
+            let menuHTML = '';
+            
+            if (user.accountType === 'provider') {
+                // Provider menu options
+                menuHTML = `
+                    <a href="index.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <svg class="h-4 w-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                        Home</a>
+                    </a>
+                    <a href="dashboard.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <svg class="h-4 w-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        </a>Dashboard
+                    </a>
+                    <a href="create-opportunity.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <svg class="h-4 w-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Create New Opportunity
+                    </a>
+                    <hr class="my-1">
+                    <button id="signOutBtn" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <svg class="h-4 w-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v10m-6 0a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 012-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        Sign Out
+                    </button>
+                `;
+            } else {
+                // Enhanced Seeker menu options (6 options)
+                menuHTML = `
+                    <a href="index.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <svg class="h-4 w-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                        <a href="dashboard.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <svg class="h-4 w-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                            Dashboard
+                        </a>
+                        <a href="browse-opportunities.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <svg class="h-4 w-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            Browse Opportunities
+                        </a>
+                        <a href="profile.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <svg class="h-4 w-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                            Profile
+                        </a>
+                        <a href="messaging.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <svg class="h-4 w-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                            </svg>
+                            Messages
+                        </a>
+                        <a href="contact.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <svg class="h-4 w-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                            Contact
+                        </a>
+                        <hr class="my-1">
+                        <button id="signOutBtn" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <svg class="h-4 w-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v10m-6 0a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 012-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                            Sign Out
+                        </button>
+                    `;
+            }
+            
+            menuContainer.innerHTML = menuHTML;
+            
+            // Re-attach sign out event listener
+            const signOutBtn = document.getElementById('signOutBtn');
+            if (signOutBtn) {
+                signOutBtn.addEventListener('click', function() {
+                    localStorage.removeItem('kajopo_current_user');
+                    localStorage.removeItem('kajopo_user_session');
+                    window.location.href = 'index.html';
+                });
             }
         }
     </script>
