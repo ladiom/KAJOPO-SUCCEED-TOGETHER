@@ -1,0 +1,124 @@
+/* Kajopo Connect - Light Theme Only */
+/* Accessibility-first design with high contrast ratios and dyslexia-friendly fonts */
+
+:root {
+  /* Font System - Dyslexia-friendly */
+  --font-primary: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --font-secondary: 'Open Sans', Arial, sans-serif;
+  --font-mono: 'Fira Code', 'Consolas', monospace;
+  
+  /* Font Sizes with Scaling Support */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  
+  /* Spacing System */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  /* Transitions */
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 250ms ease-in-out;
+  --transition-slow: 350ms ease-in-out;
+  
+  /* Light Theme Colors */
+  /* Background Colors */
+  --bg-primary: #FFFFFF; /* Pure white */
+  --bg-secondary: #F8FAFC; /* Light blue-gray for cards */
+  --bg-tertiary: #F1F5F9;
+  --bg-overlay: rgba(0, 0, 0, 0.5);
+  
+  /* Text Colors */
+  --text-primary: #000000; /* Pure black for better contrast */
+  --text-secondary: rgba(0, 0, 0, 0.7);
+  --text-tertiary: rgba(0, 0, 0, 0.5);
+  --text-inverse: #FFFFFF;
+  
+  /* Accent Colors */
+  --color-primary: #3B82F6; /* Modern blue */
+  --color-primary-hover: #2563EB;
+  --color-primary-dark: #1D4ED8;
+  --color-primary-light: rgba(59, 130, 246, 0.1);
+  
+  --color-secondary: #1D4ED8; /* Deeper blue complement */
+  --color-secondary-hover: #1E40AF;
+  --color-secondary-light: rgba(29, 78, 216, 0.1);
+  
+  /* Status Colors */
+  --status-success: #10B981;
+  --status-warning: #F59E0B;
+  --status-error: #EF4444;
+  --status-info: #3B82F6;
+  
+  /* Border Colors */
+  --border-primary: rgba(51, 51, 51, 0.12);
+  --border-secondary: rgba(51, 51, 51, 0.08);
+  --border-focus: var(--color-primary);
+  
+  /* Component Specific */
+  --card-bg: var(--bg-secondary);
+  --card-shadow: var(--shadow-md);
+  --button-shadow: var(--shadow-sm);
+  --input-bg: #FFFFFF;
+  --input-border: var(--border-primary);
+}
+
+/* Base Styles */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  font-family: var(--font-primary);
+  font-size: var(--text-base);
+  line-height: 1.6;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  margin: 0;
+  padding: 0;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+... (remaining CSS file content)

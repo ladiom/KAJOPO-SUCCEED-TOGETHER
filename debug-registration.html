@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Registration - Kajopo</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/error-handler.js"></script>
+    <script src="js/form-validation.js"></script>
+    <script src="js/auth.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; max-width: 800px; }
+        .test-section { border: 1px solid #ddd; padding: 20px; margin: 20px 0; border-radius: 8px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; }
+        button:hover { background: #0056b3; }
+        input { padding: 8px; margin: 5px; border: 1px solid #ddd; border-radius: 4px; width: 200px; }
+        .console-output { background: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <h1>Registration Debug Tool</h1>
+    <p>This tool helps debug registration issues step by step.</p>
+    
+    <div class="test-section">
+        <h2>Step 1: Test Database Connection</h2>
+        <button onclick="testConnection()">Test Supabase Connection</button>
+        <div id="connection-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Step 2: Check Users Table</h2>
+        <button onclick="checkUsersTable()">Check Users Table</button>
+        <div id="table-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Step 3: Test Registration Process</h2>
+        <div style="margin-bottom: 15px;">
+            <input type="text" id="testFirstName" placeholder="First Name" value="Test">
+            <input type="text" id="testLastName" placeholder="Last Name" value="User">
+            <input type="email" id="testEmail" placeholder="Email" value="test@example.com">
+            <input type="password" id="testPassword" placeholder="Password" value="testpass123">
+        </div>
+        <button onclick="testRegistration()">Test Registration</button>
+        <div id="registration-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Console Output</h2>
+        <button onclick="clearConsole()">Clear Console</button>
+        <div id="console-output" class="console-output"></div>
+    </div>
+    
+    <script>
+        // Capture console logs
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        function logToConsole(type, ...args) {
+            const consoleDiv = document.getElementById('console-output');
+            const timestamp = new Date().toLocaleTimeString();
+            const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg).join(' ');
+            consoleDiv.textContent += `[${timestamp}] ${type.toUpperCase()}: ${message}\n`;
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            logToConsole('log', ...args);
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            logToConsole('error', ...args);
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            logToConsole('warn', ...args);
+        };
+        
+        function clearConsole() {
+            document.getElementById('console-output').textContent = '';
+        }
+        
+        async function testConnection() {
+            const resultsDiv = document.getElementById('connection-results');
+            resultsDiv.innerHTML = '<div class="info">Testing connection...</div>';
+            
+            try {
+                console.log('Testing Supabase connection...');
+                
+                if (typeof window.supabaseClient === 'undefined') {
+                    resultsDiv.innerHTML = '<div class="error">❌ Supabase client not initialized</div>';
+                    return;
+                }
+                
+                const { data, error } = await window.supabaseClient
+                    .from('opportunities')
+                    .select('count', { count: 'exact', head: true });
+                
+                if (error) {
+                    console.error('Connection test error:', error);
+                    resultsDiv.innerHTML = `<div class="error">❌ Connection failed: ${error.message}</div>`;
+                } else {
+                    console.log('Connection test successful');
+                    resultsDiv.innerHTML = '<div class="success">✅ Supabase connection successful!</div>';
+                }
+            } catch (error) {
+                console.error('Connection test exception:', error);
+                resultsDiv.innerHTML = `<div class="error">❌ Connection error: ${error.message}</div>`;
+            }
+        }
+        
+        async function checkUsersTable() {
+            const resultsDiv = document.getElementById('table-results');
+            resultsDiv.innerHTML = '<div class="info">Checking users table...</div>';
+            
+            try {
+                console.log('Checking users table...');
+                
+                const { data, error } = await window.supabaseClient
+                    .from('users')
+                    .select('*')
+                    .limit(1);
+                
+                if (error) {
+                    console.error('Users table check error:', error);
+                    if (error.message.includes('does not exist')) {
+                        resultsDiv.innerHTML = '<div class="error">❌ Users table does not exist! You need to run the database setup SQL.</div>';
+                    } else {
+                        resultsDiv.innerHTML = `<div class="error">❌ Users table error: ${error.message}</div>`;
+                    }
+                } else {
+                    console.log('Users table exists and accessible');
+                    resultsDiv.innerHTML = '<div class="success">✅ Users table exists and is accessible!</div>';
+                }
+            } catch (error) {
+                console.error('Users table check exception:', error);
+                resultsDiv.innerHTML = `<div class="error">❌ Error checking users table: ${error.message}</div>`;
+            }
+        }
+        
+        async function testRegistration() {
+            const resultsDiv = document.getElementById('registration-results');
+            resultsDiv.innerHTML = '<div class="info">Testing registration...</div>';
+            
+            try {
+                const userData = {
+                    firstName: document.getElementById('testFirstName').value,
+                    lastName: document.getElementById('testLastName').value,
+                    email: document.getElementById('testEmail').value,
+                    password: document.getElementById('testPassword').value,
+                    accountType: 'seeker',
+                    location: 'Test Location'
+                };
+                
+                console.log('Testing registration with data:', userData);
+                
+                const result = await userAuth.register(userData);
+                
+                console.log('Registration result:', result);
+                
+                if (result.success) {
+                    resultsDiv.innerHTML = '<div class="success">✅ Registration successful!</div>';
+                } else {
+                    resultsDiv.innerHTML = `<div class="error">❌ Registration failed: ${result.message}</div>`;
+                }
+            } catch (error) {
+                console.error('Registration test exception:', error);
+                resultsDiv.innerHTML = `<div class="error">❌ Registration error: ${error.message}</div>`;
+            }
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Debug registration tool loaded');
+            console.log('Supabase client available:', typeof window.supabaseClient !== 'undefined');
+            console.log('UserAuth available:', typeof userAuth !== 'undefined');
+        });
+    </script>
+</body>
+</html>

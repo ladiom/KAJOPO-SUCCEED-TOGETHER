@@ -1,0 +1,163 @@
+/* Theme System for Kájọpọ̀ Succeed Together */
+
+/* Light Theme (Default) */
+:root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8fafc;
+    --bg-tertiary: #f1f5f9;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --border-color: #e2e8f0;
+    --accent-color: #3b82f6;
+    --accent-hover: #2563eb;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --error-color: #ef4444;
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-tertiary: #334155;
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+    --border-color: #475569;
+    --accent-color: #60a5fa;
+    --accent-hover: #3b82f6;
+    --success-color: #34d399;
+    --warning-color: #fbbf24;
+    --error-color: #f87171;
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+}
+
+/* Apply theme variables to body and common elements */
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Navigation theming */
+.nav-header {
+    background-color: var(--bg-primary);
+    border-bottom-color: var(--border-color);
+}
+
+/* Card theming */
+.card {
+    background-color: var(--bg-secondary);
+    border-color: var(--border-color);
+    box-shadow: var(--shadow);
+}
+
+/* Button theming */
+.btn-primary {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-hover);
+    border-color: var(--accent-hover);
+}
+
+/* Input theming */
+input, select, textarea {
+    background-color: var(--bg-primary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgb(59 130 246 / 0.1);
+}
+
+/* Dropdown theming */
+.dropdown-content {
+    background-color: var(--bg-secondary);
+    border-color: var(--border-color);
+    box-shadow: var(--shadow-lg);
+}
+
+.dropdown-content a {
+    color: var(--text-primary);
+}
+
+.dropdown-content a:hover {
+    background-color: var(--bg-tertiary);
+}
+
+/* Profile specific theming */
+.profile-header {
+    background-color: var(--bg-secondary);
+}
+
+.stats-grid .stat-item {
+    background-color: var(--bg-primary);
+    border-color: var(--border-color);
+}
+
+/* Skills and tags theming */
+.skill-tag, .interest-tag {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+/* Experience items theming */
+.experience-item {
+    background-color: var(--bg-primary);
+    border-color: var(--border-color);
+}
+
+/* Contact items theming */
+.contact-item {
+    color: var(--text-secondary);
+}
+
+/* Availability items theming */
+.availability-item {
+    border-bottom-color: var(--border-color);
+}
+
+.availability-label {
+    color: var(--text-secondary);
+}
+
+.availability-value {
+    color: var(--text-primary);
+}
+
+/* Theme toggle button styling */
+#theme-toggle {
+    background-color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+    color: white !important;
+}
+
+#theme-toggle:hover {
+    background-color: var(--accent-hover) !important;
+    border-color: var(--accent-hover) !important;
+    transform: scale(1.05);
+}
+
+#theme-toggle svg {
+    color: white !important;
+    stroke: white !important;
+}
+
+/* Smooth transitions for theme switching */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+#theme-toggle {
+    transition: all 0.3s ease !important;
+}

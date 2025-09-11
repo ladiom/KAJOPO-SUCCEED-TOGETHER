@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Kájọpọ̀ Succeed Together</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+<script src="js/database-manager.js"></script>
+    <link rel="stylesheet" href="css/themesNew.css">
+    <link rel="stylesheet" href="css/notifications.css">
+    <script src="js/auth.js"></script>
+    <script src="js/mobile-nav.js"></script>
+    <style>
+      html[data-theme='dark'] body, html[data-theme='dark'] body * {
+        color: #fff !important;
+        background-color: #181e2a !important;
+        border-color: #333 !important;
+      }
+      html[data-theme='dark'] .bg-white {
+        background-color: #222a36 !important;
+      }
+      html[data-theme='dark'] .text-gray-500, html[data-theme='dark'] .text-gray-600, html[data-theme='dark'] .text-gray-700 {
+        color: #fff !important;
+      }
+    </style>
+</head>
+<body>
+    <nav class="bg-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex items-center">
+                <a href="index.html" class="flex items-center">
+                    <div>
+                        <h1 class="text-2xl font-bold text-indigo-600">Kájọpọ̀</h1>
+                        <p class="text-sm text-gray-500 italic">Succeed Together</p>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="hidden md:flex items-center space-x-3 flex-nowrap">
+                <a href="about-us.html" class="text-gray-600 hover:text-indigo-600 transition-colors font-medium">About Us</a>
+                <a href="contact.html" class="text-gray-600 hover:text-indigo-600 transition-colors font-medium">Contact</a>
+
+                <!-- Theme Toggle Button in Navigation -->
+                <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors ml-2">
+                  <svg id="sun-icon" class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+                  </svg>
+                  <svg id="moon-icon" class="w-5 h-5 text-gray-700 hidden" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                  </svg>
+                </button>
+                
+                <div id="guestMenu" class="flex items-center space-x-4 flex-nowrap">
+                    <a href="signin-form.html" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors">Sign In</a>
+                    <a href="registration-form.html" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">Join Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>   
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <h1 class="text-4xl font-extrabold text-gray-900 mb-6">About Kájọpọ̀</h1>
+        <div class="prose prose-lg max-w-none text-gray-600">
+            <p>
+                Kájọpọ̀ is more than just a platform; it's a movement. The name, derived from the Yoruba phrase meaning "let's come together to succeed," embodies our core belief: that collective effort and mutual support can create abundance for everyone.
+            </p>
+            <p>
+                In a world where technology and AI are rapidly evolving, we aim to bridge the gap between those who need help and those who can provide it. We leverage cutting-edge AI to intelligently match opportunity seekers with solution providers, but we never forget that true success comes from human connection and a shared sense of community.
+            </p>
+            <h3>Our Mission</h3>
+            <p>
+                To empower individuals and communities by making AI abundance inclusive. We do this by creating a trusted, seamless platform where people can connect, collaborate, and grow together.
+            </p>
+            <h3>Our Values</h3>
+            <ul>
+                <li><strong>Inclusivity:</strong> We believe that everyone, regardless of their background or circumstance, should have access to opportunities and the tools for success.</li>
+                <li><strong>Collaboration:</strong> <p>We foster an environment of mutual support, where sharing knowledge and resources leads to collective progress.<p/></li>
+                <li><strong>Integrity:</strong> We are committed to transparency, trust, and ethical practices in all our operations and interactions.</li>
+                <li><strong>Innovation:</strong> We continuously seek new ways to use technology to solve real-world problems and create meaningful connections.</li>
+            </ul>
+        </div>
+    </main>
+
+    <script src="js/auth.js"></script>
+    <script>
+        // Check authentication state
+        function checkUserAuth() {
+            const userIsAuthenticated = localStorage.getItem('userAuthenticated') === 'true';
+            const userMenu = document.getElementById('userMenu');
+            const guestMenu = document.getElementById('guestMenu');
+            
+            if (userIsAuthenticated) {
+                if (userMenu) userMenu.classList.remove('hidden');
+                if (guestMenu) guestMenu.classList.add('hidden');
+            } else {
+                if (userMenu) userMenu.classList.add('hidden');
+                if (guestMenu) guestMenu.classList.remove('hidden');
+            }
+        }
+
+        // Setup user menu event listeners
+        function setupUserMenuListeners() {
+            const userMenuBtn = document.getElementById('userMenuBtn');
+            const userDropdown = document.getElementById('userDropdown');
+            const signOutBtn = document.getElementById('signOutBtn');
+
+            if (userMenuBtn && userDropdown) {
+                userMenuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    userDropdown.classList.toggle('hidden');
+                });
+                
+                document.addEventListener('click', function(e) {
+                    if (!userMenuBtn.contains(e.target) && !userDropdown.contains(e.target)) {
+                        userDropdown.classList.add('hidden');
+                    }
+                });
+            }
+
+            if (signOutBtn) {
+                signOutBtn.addEventListener('click', function() {
+                    localStorage.removeItem('userAuthenticated');
+                    localStorage.removeItem('userInfo');
+                    window.location.href = 'index.html';
+                });
+            }
+        }
+        
+        // Theme-switching logic (reuse on all pages)
+        function setupThemeToggle() {
+          const themeToggleBtn = document.getElementById('theme-toggle');
+          const sunIcon = document.getElementById('sun-icon');
+          const moonIcon = document.getElementById('moon-icon');
+          const html = document.documentElement;
+          const savedTheme = localStorage.getItem('theme');
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          function applyTheme(theme) {
+            if (theme === 'dark') {
+              html.setAttribute('data-theme', 'dark');
+              sunIcon.classList.add('hidden');
+              moonIcon.classList.remove('hidden');
+              localStorage.setItem('theme', 'dark');
+            } else {
+              html.removeAttribute('data-theme');
+              sunIcon.classList.remove('hidden');
+              moonIcon.classList.add('hidden');
+              localStorage.setItem('theme', 'light');
+            }
+          }
+          if (savedTheme) {
+            applyTheme(savedTheme);
+          } else if (prefersDark) {
+            applyTheme('dark');
+          } else {
+            applyTheme('light');
+          }
+          if (themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', () => {
+              const currentTheme = html.getAttribute('data-theme');
+              if (currentTheme === 'dark') {
+                applyTheme('light');
+              } else {
+                applyTheme('dark');
+              }
+            });
+          }
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            checkUserAuth();
+            setupUserMenuListeners();
+            setupThemeToggle();
+        });
+    </script>
+</body>
+</html>

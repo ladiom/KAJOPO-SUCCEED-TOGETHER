@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Connection Test - Kajopo</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/data-manager.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        pre { background-color: #f8f9fa; padding: 10px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Database Connection Test</h1>
+    <div id="test-results"></div>
+    <button onclick="runTests()">Run Tests</button>
+    
+    <script>
+        async function runTests() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<div class="info">Running tests...</div>';
+            
+            const results = [];
+            
+            // Test 1: Check if Supabase client is initialized
+            try {
+                if (window.supabaseClient) {
+                    results.push({ type: 'success', message: 'Supabase client is initialized' });
+                } else {
+                    results.push({ type: 'error', message: 'Supabase client is not initialized' });
+                }
+            } catch (error) {
+                results.push({ type: 'error', message: 'Error checking Supabase client: ' + error.message });
+            }
+            
+            // Test 2: Check if DatabaseManager is initialized
+            try {
+                if (window.dbManager) {
+                    results.push({ type: 'success', message: 'DatabaseManager is initialized' });
+                } else {
+                    results.push({ type: 'error', message: 'DatabaseManager is not initialized' });
+                }
+            } catch (error) {
+                results.push({ type: 'error', message: 'Error checking DatabaseManager: ' + error.message });
+            }
+            
+            // Test 3: Test database connection
+            try {
+                const { data, error } = await window.supabaseClient.from('opportunities').select('count', { count: 'exact', head: true });
+                if (error) {
+                    results.push({ type: 'error', message: 'Database connection failed: ' + error.message });
+                } else {
+                    results.push({ type: 'success', message: `Database connection successful. Found ${data} opportunities in database.` });
+                }
+            } catch (error) {
+                results.push({ type: 'error', message: 'Error testing database connection: ' + error.message });
+            }
+            
+            // Test 4: Test getOpportunities method
+            try {
+                const result = await window.dbManager.getOpportunities();
+                if (result.success) {
+                    results.push({ type: 'success', message: `getOpportunities() successful. Retrieved ${result.data.length} opportunities.` });
+                    if (result.data.length > 0) {
+                        results.push({ type: 'info', message: 'Sample opportunity data:', data: JSON.stringify(result.data[0], null, 2) });
+                    }
+                } else {
+                    results.push({ type: 'error', message: 'getOpportunities() failed: ' + result.error });
+                }
+            } catch (error) {
+                results.push({ type: 'error', message: 'Error testing getOpportunities(): ' + error.message });
+            }
+            
+            // Test 5: Test filter methods
+            try {
+                const categoriesResult = await window.dbManager.getUniqueCategories();
+                if (categoriesResult.success) {
+                    results.push({ type: 'success', message: `getUniqueCategories() successful. Found categories: ${categoriesResult.data.join(', ')}` });
+                } else {
+                    results.push({ type: 'error', message: 'getUniqueCategories() failed: ' + categoriesResult.error });
+                }
+            } catch (error) {
+                results.push({ type: 'error', message: 'Error testing getUniqueCategories(): ' + error.message });
+            }
+            
+            // Display results
+            resultsDiv.innerHTML = results.map(result => {
+                let html = `<div class="test-result ${result.type}">${result.message}</div>`;
+                if (result.data) {
+                    html += `<pre>${result.data}</pre>`;
+                }
+                return html;
+            }).join('');
+        }
+        
+        // Auto-run tests when page loads
+        window.addEventListener('load', () => {
+            setTimeout(runTests, 1000); // Wait for all scripts to load
+        });
+    </script>
+</body>
+</html>

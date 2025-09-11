@@ -1,0 +1,44 @@
+{
+  "name": "kajopo-connect",
+  "version": "1.0.0",
+  "description": "Kájọpọ̀ Connect - A platform connecting opportunity seekers with providers for social impact",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "serve": "python -m http.server 8000",
+    "deploy:netlify": "netlify deploy --prod --dir .",
+    "deploy:surge": "surge . --domain kajopo-connect.surge.sh",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": [
+    "social-impact",
+    "opportunities",
+    "matching-platform",
+    "community",
+    "nigeria",
+    "africa",
+    "development"
+  ],
+  "author": "LaDIOM LLC",
+  "license": "MIT",
+  "homepage": "https://kajopo-connect.netlify.app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ladiomlabs/kajopo-connect.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ladiomlabs/kajopo-connect/issues"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.0.0",
+    "surge": "^0.23.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}

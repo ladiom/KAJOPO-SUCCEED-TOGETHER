@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Users Table - Kajopo</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        pre { background-color: #f8f9fa; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Users Table Test</h1>
+    <div id="test-results"></div>
+    <button onclick="testUsersTable()">Test Users Table</button>
+    <button onclick="testRegistration()">Test Registration</button>
+    <button onclick="createUsersTable()">Create Users Table</button>
+    
+    <script>
+        async function testUsersTable() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<div class="info">Testing users table...</div>';
+            
+            try {
+                // Test if users table exists by trying to select from it
+                const { data, error } = await window.supabaseClient
+                    .from('users')
+                    .select('*')
+                    .limit(1);
+                
+                if (error) {
+                    resultsDiv.innerHTML = `<div class="error">Users table error: ${error.message}</div>`;
+                    if (error.message.includes('relation "public.users" does not exist')) {
+                        resultsDiv.innerHTML += '<div class="info">Users table does not exist. Click "Create Users Table" to create it.</div>';
+                    }
+                } else {
+                    resultsDiv.innerHTML = `<div class="success">Users table exists! Found ${data.length} users.</div>`;
+                    if (data.length > 0) {
+                        resultsDiv.innerHTML += `<pre>${JSON.stringify(data[0], null, 2)}</pre>`;
+                    }
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">Error testing users table: ${error.message}</div>`;
+            }
+        }
+        
+        async function testRegistration() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<div class="info">Testing registration...</div>';
+            
+            const testUser = {
+                email: `testuser${Date.now()}@gmail.com`,
+                password: 'testpassword123',
+                firstName: 'Test',
+                lastName: 'User',
+                accountType: 'seeker',
+                phone: '123-456-7890',
+                location: 'Test City',
+                organization: 'Test Org'
+            };
+            
+            try {
+                // Test Supabase auth signup
+                const { data, error } = await window.supabaseClient.auth.signUp({
+                    email: testUser.email,
+                    password: testUser.password,
+                    options: {
+                        data: {
+                            firstName: testUser.firstName,
+                            lastName: testUser.lastName,
+                            name: `${testUser.firstName} ${testUser.lastName}`,
+                            accountType: testUser.accountType,
+                            phone: testUser.phone,
+                            location: testUser.location,
+                            organization: testUser.organization
+                        }
+                    }
+                });
+                
+                if (error) {
+                    resultsDiv.innerHTML = `<div class="error">Auth signup failed: ${error.message}</div>`;
+                    return;
+                }
+                
+                resultsDiv.innerHTML += `<div class="success">Auth signup successful!</div>`;
+                resultsDiv.innerHTML += `<div class="info">Auth Data:</div>`;
+                resultsDiv.innerHTML += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                
+                // Wait for user to be fully authenticated before creating user record
+                if (data.user) {
+                    resultsDiv.innerHTML += `<div class="info">Waiting for authentication to complete...</div>`;
+                    
+                    // Wait a moment for auth state to update
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    // Check current auth state
+                    const { data: authUser } = await window.supabaseClient.auth.getUser();
+                    
+                    if (authUser.user) {
+                        resultsDiv.innerHTML += `<div class="info">User authenticated, creating user record...</div>`;
+                        
+                        // Set the session to ensure we're authenticated
+                        if (data.session) {
+                            await window.supabaseClient.auth.setSession(data.session);
+                        }
+                        
+                        // Try using the original signup user ID first, fallback to current auth user
+                        const userId = data.user?.id || authUser.user.id;
+                        
+                        resultsDiv.innerHTML += `<div class="info">Using user ID: ${userId}</div>`;
+                        
+                        const { data: userRecord, error: userError } = await window.supabaseClient
+                            .from('users')
+                            .insert([{
+                                id: userId,
+                                email: testUser.email,
+                                firstName: testUser.firstName,
+                                lastName: testUser.lastName,
+                                name: `${testUser.firstName} ${testUser.lastName}`,
+                                accountType: testUser.accountType,
+                                phone: testUser.phone,
+                                location: testUser.location,
+                                organization: testUser.organization,
+                                created_at: new Date().toISOString()
+                            }])
+                            .select();
+                        
+                        if (userError) {
+                            resultsDiv.innerHTML += `<div class="error">User record creation failed: ${userError.message}</div>`;
+                            resultsDiv.innerHTML += `<div class="error">Error details: ${JSON.stringify(userError, null, 2)}</div>`;
+                            
+                            // Show current auth state for debugging
+                            const { data: currentUser } = await window.supabaseClient.auth.getUser();
+                            resultsDiv.innerHTML += `<div class="info">Current auth state:</div>`;
+                            resultsDiv.innerHTML += `<pre>${JSON.stringify(currentUser, null, 2)}</pre>`;
+                        } else {
+                            resultsDiv.innerHTML += `<div class="success">Registration completed successfully!</div>`;
+                            resultsDiv.innerHTML += `<div class="success">User Record:</div>`;
+                            resultsDiv.innerHTML += `<pre>${JSON.stringify(userRecord, null, 2)}</pre>`;
+                        }
+                    } else {
+                        resultsDiv.innerHTML += `<div class="error">User not authenticated after signup</div>`;
+                    }
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">Error testing registration: ${error.message}</div>`;
+            }
+        }
+        
+        async function createUsersTable() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<div class="info">Creating users table...</div>';
+            
+            try {
+                // Note: This would typically be done via Supabase dashboard or SQL editor
+                // For now, we'll just show the SQL that needs to be run
+                const sql = `
+CREATE TABLE IF NOT EXISTS public.users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    firstName VARCHAR(100) NOT NULL,
+    lastName VARCHAR(100) NOT NULL,
+    name VARCHAR(200) NOT NULL,
+    accountType VARCHAR(50) DEFAULT 'seeker',
+    location VARCHAR(255),
+    phone VARCHAR(50),
+    organization VARCHAR(255),
+    currentRole VARCHAR(255),
+    experience TEXT,
+    skills TEXT,
+    languages VARCHAR(255),
+    interests JSONB DEFAULT '[]'::jsonb,
+    bio TEXT,
+    registeredAt TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    isVerified BOOLEAN DEFAULT FALSE,
+    profileComplete BOOLEAN DEFAULT FALSE,
+    status VARCHAR(50) DEFAULT 'active',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Enable Row Level Security
+ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+
+-- Create policies
+CREATE POLICY "Users can view own profile" ON public.users
+    FOR SELECT USING (auth.uid()::text = id::text);
+
+CREATE POLICY "Users can update own profile" ON public.users
+    FOR UPDATE USING (auth.uid()::text = id::text);
+
+CREATE POLICY "Enable insert for authenticated users" ON public.users
+    FOR INSERT WITH CHECK (auth.uid()::text = id::text);
+
+-- Alternative policy for anonymous registration (if needed)
+CREATE POLICY "Allow anonymous registration" ON public.users
+    FOR INSERT WITH CHECK (true);
+
+-- Note: You may want to disable the restrictive insert policy and use this one instead:
+-- DROP POLICY "Enable insert for authenticated users" ON public.users;
+                `;
+                
+                resultsDiv.innerHTML = `
+                    <div class="info">Please run this SQL in your Supabase SQL editor:</div>
+                    <pre>${sql}</pre>
+                    <div class="info">After running the SQL, test the users table again.</div>
+                `;
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

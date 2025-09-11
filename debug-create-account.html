@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Create Account Button</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-2xl font-bold mb-6">Create Account Button Debug Tool</h1>
+        
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-lg font-semibold mb-4">JavaScript Console Output</h2>
+            <div id="console-output" class="bg-gray-900 text-green-400 p-4 rounded font-mono text-sm h-64 overflow-y-auto"></div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-lg font-semibold mb-4">Registration Form Test</h2>
+            <iframe src="registration-form.html" class="w-full h-96 border rounded"></iframe>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-lg font-semibold mb-4">Debug Actions</h2>
+            <div class="space-x-4">
+                <button onclick="checkFormElements()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    Check Form Elements
+                </button>
+                <button onclick="checkEventListeners()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                    Check Event Listeners
+                </button>
+                <button onclick="testButtonClick()" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
+                    Test Button Click
+                </button>
+                <button onclick="clearConsole()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                    Clear Console
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const consoleOutput = document.getElementById('console-output');
+        
+        // Capture console messages
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        function addToConsole(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString();
+            const color = {
+                'log': 'text-green-400',
+                'error': 'text-red-400',
+                'warn': 'text-yellow-400'
+            }[type] || 'text-green-400';
+            
+            const div = document.createElement('div');
+            div.className = color;
+            div.innerHTML = `[${timestamp}] ${message}`;
+            consoleOutput.appendChild(div);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToConsole(args.join(' '), 'log');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToConsole(args.join(' '), 'error');
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addToConsole(args.join(' '), 'warn');
+        };
+        
+        // Capture window errors
+        window.addEventListener('error', function(e) {
+            addToConsole(`ERROR: ${e.message} at ${e.filename}:${e.lineno}`, 'error');
+        });
+        
+        function checkFormElements() {
+            const iframe = document.querySelector('iframe');
+            if (iframe && iframe.contentDocument) {
+                const form = iframe.contentDocument.getElementById('registrationForm');
+                const submitBtn = iframe.contentDocument.querySelector('button[type="submit"]');
+                
+                console.log('Form element:', form ? 'Found' : 'Not found');
+                console.log('Submit button:', submitBtn ? 'Found' : 'Not found');
+                
+                if (submitBtn) {
+                    console.log('Submit button text:', submitBtn.textContent);
+                    console.log('Submit button type:', submitBtn.type);
+                }
+            } else {
+                console.error('Cannot access iframe content');
+            }
+        }
+        
+        function checkEventListeners() {
+            const iframe = document.querySelector('iframe');
+            if (iframe && iframe.contentDocument) {
+                const form = iframe.contentDocument.getElementById('registrationForm');
+                if (form) {
+                    console.log('Form has submit event listener:', form.onsubmit ? 'Yes' : 'No');
+                    
+                    // Check if global functions exist
+                    const win = iframe.contentWindow;
+                    console.log('handleRegistration function exists:', typeof win.handleRegistration === 'function');
+                    console.log('userAuth object exists:', typeof win.userAuth === 'object');
+                    console.log('formValidator object exists:', typeof win.formValidator === 'object');
+                    console.log('errorHandler object exists:', typeof win.errorHandler === 'object');
+                }
+            }
+        }
+        
+        function testButtonClick() {
+            const iframe = document.querySelector('iframe');
+            if (iframe && iframe.contentDocument) {
+                const submitBtn = iframe.contentDocument.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    console.log('Attempting to click submit button...');
+                    submitBtn.click();
+                } else {
+                    console.error('Submit button not found');
+                }
+            }
+        }
+        
+        function clearConsole() {
+            consoleOutput.innerHTML = '';
+        }
+        
+        // Initial check when iframe loads
+        document.querySelector('iframe').addEventListener('load', function() {
+            console.log('Registration form iframe loaded');
+            setTimeout(() => {
+                checkFormElements();
+                checkEventListeners();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

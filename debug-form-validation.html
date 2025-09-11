@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Form Validation - Kajopo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .console-output {
+            background: #1a1a1a;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-2xl font-bold mb-4">Form Validation Debug Tool</h1>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- Registration Form iframe -->
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h2 class="text-lg font-semibold mb-2">Registration Form</h2>
+                <iframe id="registrationFrame" src="registration-form.html" 
+                        class="w-full h-96 border border-gray-300 rounded"></iframe>
+            </div>
+            
+            <!-- Debug Controls -->
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h2 class="text-lg font-semibold mb-2">Debug Controls</h2>
+                <div class="space-y-2 mb-4">
+                    <button onclick="checkFormFields()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full">
+                        Check Form Fields
+                    </button>
+                    <button onclick="checkValidationRules()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 w-full">
+                        Check Validation Rules
+                    </button>
+                    <button onclick="testFormValidation()" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 w-full">
+                        Test Form Validation
+                    </button>
+                    <button onclick="fillTestData()" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 w-full">
+                        Fill Test Data
+                    </button>
+                    <button onclick="clearConsole()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 w-full">
+                        Clear Console
+                    </button>
+                </div>
+                
+                <!-- Console Output -->
+                <div class="console-output p-3 rounded" id="console">
+                    <div>Debug console ready...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const console = document.getElementById('console');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = {
+                'info': '#00ff00',
+                'error': '#ff0000',
+                'warning': '#ffff00',
+                'success': '#00ffff'
+            }[type] || '#00ff00';
+            
+            const div = document.createElement('div');
+            div.style.color = color;
+            div.innerHTML = `[${timestamp}] ${message}`;
+            console.appendChild(div);
+            console.scrollTop = console.scrollHeight;
+        }
+
+        function clearConsole() {
+            document.getElementById('console').innerHTML = '<div>Console cleared...</div>';
+        }
+
+        function getIframeDocument() {
+            const iframe = document.getElementById('registrationFrame');
+            return iframe.contentDocument || iframe.contentWindow.document;
+        }
+
+        function checkFormFields() {
+            try {
+                const doc = getIframeDocument();
+                const form = doc.getElementById('registrationForm');
+                
+                if (!form) {
+                    log('ERROR: Registration form not found!', 'error');
+                    return;
+                }
+                
+                log('Form found successfully', 'success');
+                
+                // Check all form fields
+                const fields = form.querySelectorAll('input, select, textarea');
+                log(`Total form fields found: ${fields.length}`, 'info');
+                
+                fields.forEach(field => {
+                    const name = field.name || field.id || 'unnamed';
+                    const type = field.type || field.tagName.toLowerCase();
+                    const required = field.required ? ' (required)' : '';
+                    const value = field.value || 'empty';
+                    log(`Field: ${name} [${type}]${required} = "${value}"`, 'info');
+                });
+                
+            } catch (error) {
+                log(`ERROR checking form fields: ${error.message}`, 'error');
+            }
+        }
+
+        function checkValidationRules() {
+            try {
+                const doc = getIframeDocument();
+                const win = doc.defaultView || doc.parentWindow;
+                
+                if (win.ValidationRules) {
+                    log('ValidationRules found:', 'success');
+                    const rules = win.ValidationRules.registration;
+                    
+                    for (const [field, fieldRules] of Object.entries(rules)) {
+                        log(`${field}: ${JSON.stringify(fieldRules)}`, 'info');
+                    }
+                } else {
+                    log('ERROR: ValidationRules not found!', 'error');
+                }
+                
+                if (win.formValidator) {
+                    log('FormValidator instance found', 'success');
+                } else {
+                    log('ERROR: FormValidator instance not found!', 'error');
+                }
+                
+            } catch (error) {
+                log(`ERROR checking validation rules: ${error.message}`, 'error');
+            }
+        }
+
+        function testFormValidation() {
+            try {
+                const doc = getIframeDocument();
+                const win = doc.defaultView || doc.parentWindow;
+                const form = doc.getElementById('registrationForm');
+                
+                if (!form || !win.formValidator || !win.ValidationRules) {
+                    log('ERROR: Missing form, validator, or rules!', 'error');
+                    return;
+                }
+                
+                log('Testing form validation...', 'info');
+                
+                // Test validation
+                const isValid = win.formValidator.validateForm(form, win.ValidationRules.registration);
+                log(`Form validation result: ${isValid}`, isValid ? 'success' : 'warning');
+                
+                // Check for error messages
+                const errorElements = form.querySelectorAll('.field-error');
+                log(`Error messages found: ${errorElements.length}`, 'info');
+                
+                errorElements.forEach((error, index) => {
+                    log(`Error ${index + 1}: ${error.textContent}`, 'warning');
+                });
+                
+            } catch (error) {
+                log(`ERROR testing validation: ${error.message}`, 'error');
+            }
+        }
+
+        function fillTestData() {
+            try {
+                const doc = getIframeDocument();
+                const form = doc.getElementById('registrationForm');
+                
+                if (!form) {
+                    log('ERROR: Form not found!', 'error');
+                    return;
+                }
+                
+                // Fill test data
+                const testData = {
+                    accountType: 'seeker',
+                    firstName: 'John',
+                    lastName: 'Doe',
+                    email: 'john.doe@example.com',
+                    phone: '+1234567890',
+                    location: 'New York, USA',
+                    password: 'TestPassword123!',
+                    confirmPassword: 'TestPassword123!',
+                    currentRole: 'Software Developer',
+                    organization: 'Tech Corp',
+                    experience: '2-5'
+                };
+                
+                for (const [name, value] of Object.entries(testData)) {
+                    const field = form.querySelector(`[name="${name}"]`);
+                    if (field) {
+                        if (field.type === 'radio') {
+                            const radio = form.querySelector(`[name="${name}"][value="${value}"]`);
+                            if (radio) radio.checked = true;
+                        } else {
+                            field.value = value;
+                        }
+                        log(`Filled ${name}: ${value}`, 'success');
+                    } else {
+                        log(`Field not found: ${name}`, 'warning');
+                    }
+                }
+                
+                log('Test data filled successfully', 'success');
+                
+            } catch (error) {
+                log(`ERROR filling test data: ${error.message}`, 'error');
+            }
+        }
+
+        // Wait for iframe to load
+        document.getElementById('registrationFrame').onload = function() {
+            log('Registration form loaded', 'success');
+        };
+    </script>
+</body>
+</html>

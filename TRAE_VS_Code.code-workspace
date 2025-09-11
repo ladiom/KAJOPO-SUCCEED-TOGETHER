@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../TRAE_BakWorking/CopilotTailWind"
+		}
+	],
+	"settings": {
+		"workbench.editor.enablePreview": false,
+		"workbench.editor.centeredLayoutAutoResize": true,
+		"workbench.editor.closeEmptyGroups": true,
+		"workbench.editor.customLabels.enabled": true,
+		"liveServer.settings.multiRootWorkspaceName": "TRAE_VS_Code"
+	}
+}

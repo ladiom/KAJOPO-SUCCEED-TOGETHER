@@ -1,0 +1,191 @@
+         <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Kájọpọ̀ Succeed Together</title>
+    <link rel="stylesheet" href="css/themesNew.css">    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'kajopo-blue': '#0ea5e9',
+                        'kajopo-purple': '#8b5cf6',
+                        'kajopo-green': '#10b981',
+                        'kajopo-orange': '#f59e0b'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Override Tailwind with theme variables */
+        body {
+            background-color: var(--bg-primary) !important;
+            color: var(--text-primary) !important;
+        }
+        .bg-white {
+            background-color: var(--bg-tertiary) !important;
+        }
+        .bg-gray-50 {
+            background-color: var(--bg-primary) !important;
+        }
+        .text-gray-900 {
+            color: var(--text-primary) !important;
+        }
+        .text-gray-700 {
+            color: var(--text-secondary) !important;
+        }
+        .text-gray-600 {
+            color: var(--text-secondary) !important;
+        }
+        .text-gray-500 {
+            color: var(--text-tertiary) !important;
+        }
+        .text-indigo-600 {
+            color: var(--color-primary) !important;
+        }
+
+        /* Adjustments for the specific dashboard layout */
+        .sidebar {
+            background-color: var(--card-bg) !important;
+            color: var(--text-secondary) !important;
+            border-right: 1px solid var(--border-primary);
+        }
+        .sidebar a {
+            color: var(--text-secondary);
+        }
+
+        /* Dashboard specific color overrides from the original code */
+        .bg-gray-800 {
+            background-color: var(--color-primary-dark);
+        }
+        .text-gray-300 {
+            color: var(--text-inverse);
+        }
+        .text-white {
+            color: var(--text-inverse) !important;
+        }
+        .text-gray-400 {
+            color: rgba(var(--text-inverse), 0.8) !important;
+        }
+
+        /* Active navigation item uses a theme color */
+        .nav-item.active {
+            background-color: var(--color-primary) !important;
+        }
+        .nav-item.active:hover {
+            background-color: var(--color-primary-dark) !important;
+        }
+        .nav-item {
+            color: var(--text-primary);
+        }
+
+        .border-gray-700 {
+            border-color: var(--border-primary) !important;
+        }
+        
+    </style>
+</head>
+<body class="bg-gray-50 font-sans leading-normal tracking-normal">
+    <nav class="bg-white flex items-center justify-between p-4 shadow-md">
+        <div class="flex items-center space-x-4">
+            <h1 class="text-xl font-bold text-gray-900">Admin Dashboard</h1>
+            <a href="index.html" class="text-gray-600 hover:text-indigo-600 transition-colors font-medium">Back to Main Site</a>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+            <button id="theme-toggle" class="p-2 rounded-full text-gray-700 hover:text-indigo-600 transition-colors" aria-label="Toggle dark mode">
+                <svg id="sun-icon" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                <svg id="moon-icon" class="h-6 w-6 hidden" fill="currentColor" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+            </button>
+            <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition-colors">Logout</button>
+        </div>
+    </nav>
+
+    <div class="flex">
+        <aside class="w-64 sidebar min-h-screen p-6">
+            <nav>
+                <ul>
+                    <li class="mb-2">
+                        <a href="#" id="users-nav" class="nav-item active flex items-center p-3 rounded-lg hover:bg-gray-100 transition-colors">
+                            <svg class="h-5 w-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5m-5 0a2 2 0 100-4m0 4a2 2 0 110-4m-9-2h1m-1 15h1m-1 0a2 2 0 100-4m0 4a2 2 0 110-4m-9-2h1m-1 15h1m-1 0a2 2 0 100-4m0 4a2 2 0 110-4M5 21v-3.5A2.5 2.5 0 017.5 15h9a2.5 2.5 0 012.5 2.5V21"></path>
+                            </svg>
+                            Users
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" id="opportunities-nav" class="nav-item flex items-center p-3 rounded-lg hover:bg-gray-100 transition-colors">
+                            <svg class="h-5 w-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2V6"></path>
+                            </svg>
+                            Opportunities
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <div id="content" class="flex-1 p-8">
+            </div>
+    </div>
+    
+    <script>
+        // Theme-switching logic
+        function setupThemeToggle() {
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const sunIcon = document.getElementById('sun-icon');
+            const moonIcon = document.getElementById('moon-icon');
+            const html = document.documentElement;
+
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    html.setAttribute('data-theme', 'dark');
+                    sunIcon.classList.add('hidden');
+                    moonIcon.classList.remove('hidden');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    html.removeAttribute('data-theme');
+                    sunIcon.classList.remove('hidden');
+                    moonIcon.classList.add('hidden');
+                    localStorage.setItem('theme', 'light');
+                }
+            }
+
+            if (savedTheme) {
+                applyTheme(savedTheme);
+            } else if (prefersDark) {
+                applyTheme('dark');
+            } else {
+                applyTheme('light');
+            }
+
+            if (themeToggleBtn) {
+                themeToggleBtn.addEventListener('click', () => {
+                    const currentTheme = html.getAttribute('data-theme');
+                    if (currentTheme === 'dark') {
+                        applyTheme('light');
+                    } else {
+                        applyTheme('dark');
+                    }
+                });
+            }
+        }
+
+        // Initialize theme manager
+        document.addEventListener('DOMContentLoaded', function() {
+            setupThemeToggle();
+        });
+    </script>
+    <script src="js/admin-dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seed Database with Sample Opportunities</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        button { background: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #45a049; }
+        #results { margin-top: 20px; padding: 15px; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .loading { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    </style>
+</head>
+<body>
+    <h1>🌱 Database Seeding Tool</h1>
+    <p>This will add sample opportunities to your database.</p>
+    
+    <button onclick="seedDatabase()">Add Sample Opportunities</button>
+    <button onclick="clearDatabase()" style="background: #dc3545; margin-left: 10px;">Clear All Opportunities</button>
+    
+    <div id="results"></div>
+    
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script>
+        function showResult(message, type = 'success') {
+            const results = document.getElementById('results');
+            results.innerHTML = message;
+            results.className = type;
+        }
+        
+        async function seedDatabase() {
+            showResult('🌱 Adding sample opportunities to database...', 'loading');
+            
+            const sampleOpportunities = [
+                {
+                    title: 'Community Garden Volunteer',
+                    description: 'Help maintain our community garden and teach sustainable farming practices. Work alongside experienced gardeners to grow fresh produce for local food banks.',
+                    category: 'Environment',
+                    type: 'Volunteer',
+                    location: 'Downtown Community Center, 123 Main St',
+                    organization: 'Green City Initiative',
+                    requirements: 'No experience required, just enthusiasm for gardening! Must be able to work outdoors in various weather conditions.',
+                    time_commitment: '2-4 hours per week, flexible schedule',
+                    contact_email: 'garden@greencity.org',
+                    compensation: 'Volunteer position - fresh produce to take home',
+                    status: 'active'
+                },
+                {
+                    title: 'Youth Mentorship Program',
+                    description: 'Mentor high school students in career development, life skills, and academic success. Guide students through college applications and career planning.',
+                    category: 'Education',
+                    type: 'Mentorship',
+                    location: 'Various High Schools in Metro Area',
+                    organization: 'Future Leaders Foundation',
+                    requirements: 'College degree preferred, background check required. Experience working with youth is a plus.',
+                    time_commitment: '3 hours per week, consistent schedule required',
+                    contact_email: 'mentors@futureleaders.org',
+                    compensation: 'Volunteer position with training provided',
+                    status: 'active'
+                },
+                {
+                    title: 'Food Bank Distribution Assistant',
+                    description: 'Sort donations, pack food boxes, and assist with distribution to families in need. Help organize inventory and maintain clean facilities.',
+                    category: 'Social Services',
+                    type: 'Volunteer',
+                    location: 'Central Food Bank, 456 Oak Avenue',
+                    organization: 'Helping Hands Food Bank',
+                    requirements: 'Ability to lift 25 lbs, reliable transportation. Must be punctual and work well in a team environment.',
+                    time_commitment: '4 hours per shift, weekends preferred',
+                    contact_email: 'volunteers@helpinghands.org',
+                    compensation: 'Volunteer position',
+                    status: 'active'
+                },
+                {
+                    title: 'Digital Marketing Intern',
+                    description: 'Gain hands-on experience in social media management, content creation, and digital marketing campaigns for a growing nonprofit.',
+                    category: 'Marketing',
+                    type: 'Internship',
+                    location: 'Remote with monthly in-person meetings',
+                    organization: 'Tech for Good Nonprofit',
+                    requirements: 'Currently enrolled in college, basic knowledge of social media platforms. Portfolio of previous work preferred.',
+                    time_commitment: '10-15 hours per week, 3-month commitment',
+                    contact_email: 'internships@techforgood.org',
+                    compensation: 'Unpaid internship with college credit available',
+                    status: 'active'
+                },
+                {
+                    title: 'Senior Companion Visitor',
+                    description: 'Provide companionship and social interaction to elderly residents in assisted living facilities. Play games, read, or simply chat.',
+                    category: 'Healthcare',
+                    type: 'Volunteer',
+                    location: 'Sunset Manor Assisted Living',
+                    organization: 'Elder Care Volunteers',
+                    requirements: 'Compassionate personality, good communication skills. Background check and health screening required.',
+                    time_commitment: '2 hours per visit, once or twice weekly',
+                    contact_email: 'companions@eldercare.org',
+                    compensation: 'Volunteer position',
+                    status: 'active'
+                }
+            ];
+            
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from('opportunities')
+                    .insert(sampleOpportunities);
+                    
+                if (error) {
+                    showResult(`❌ Error adding opportunities: ${error.message}`, 'error');
+                } else {
+                    showResult(`✅ Successfully added ${sampleOpportunities.length} sample opportunities to your database!\n\n🎉 Now go check your browse-opportunities.html page - it should display all the opportunities!`, 'success');
+                }
+            } catch (err) {
+                showResult(`❌ Unexpected error: ${err.message}`, 'error');
+            }
+        }
+        
+        async function clearDatabase() {
+            if (!confirm('Are you sure you want to delete ALL opportunities from the database?')) {
+                return;
+            }
+            
+            showResult('🗑️ Clearing all opportunities from database...', 'loading');
+            
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from('opportunities')
+                    .delete()
+                    .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all records
+                    
+                if (error) {
+                    showResult(`❌ Error clearing database: ${error.message}`, 'error');
+                } else {
+                    showResult('✅ Database cleared successfully!', 'success');
+                }
+            } catch (err) {
+                showResult(`❌ Unexpected error: ${err.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

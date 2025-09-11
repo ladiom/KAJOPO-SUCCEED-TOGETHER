@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Setup - Kajopo</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; max-width: 1200px; }
+        .container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .panel { border: 1px solid #ddd; padding: 20px; border-radius: 8px; }
+        .sql-code { background-color: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; white-space: pre-wrap; font-size: 12px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; }
+        button:hover { background: #0056b3; }
+        .danger { background: #dc3545; }
+        .danger:hover { background: #c82333; }
+    </style>
+</head>
+<body>
+    <h1>Kajopo Database Setup</h1>
+    <p>This tool will help you set up the required database tables for the Kajopo application.</p>
+    
+    <div class="container">
+        <div class="panel">
+            <h2>Database Setup</h2>
+            <button onclick="testConnection()">Test Connection</button>
+            <button onclick="checkTables()">Check Tables</button>
+            <button onclick="showCreateSQL()">Show Create SQL</button>
+            <div id="setup-results"></div>
+        </div>
+        
+        <div class="panel">
+            <h2>SQL to Run in Supabase</h2>
+            <p>Copy and paste this SQL into your Supabase SQL Editor:</p>
+            <div id="sql-display" class="sql-code">Click "Show Create SQL" to display the SQL commands.</div>
+        </div>
+    </div>
+    
+    <script>
+        async function testConnection() {
+            const resultsDiv = document.getElementById('setup-results');
+            resultsDiv.innerHTML = '<div class="info">Testing connection...</div>';
+            
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from('opportunities')
+                    .select('count', { count: 'exact', head: true });
+                
+                if (error) {
+                    resultsDiv.innerHTML = `<div class="error">Connection test failed: ${error.message}</div>`;
+                } else {
+                    resultsDiv.innerHTML = '<div class="success">✅ Supabase connection successful!</div>';
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">Connection error: ${error.message}</div>`;
+            }
+        }
+        
+        async function checkTables() {
+            const resultsDiv = document.getElementById('setup-results');
+            resultsDiv.innerHTML = '<div class="info">Checking tables...</div>';
+            
+            const tables = ['users', 'opportunities', 'applications'];
+            let results = [];
+            
+            for (const table of tables) {
+                try {
+                    const { data, error } = await window.supabaseClient
+                        .from(table)
+                        .select('*')
+                        .limit(1);
+                    
+                    if (error) {
+                        if (error.message.includes('does not exist')) {
+                            results.push(`❌ Table '${table}' does not exist`);
+                        } else {
+                            results.push(`⚠️ Table '${table}' error: ${error.message}`);
+                        }
+                    } else {
+                        results.push(`✅ Table '${table}' exists`);
+                    }
+                } catch (error) {
+                    results.push(`❌ Error checking '${table}': ${error.message}`);
+                }
+            }
+            
+            resultsDiv.innerHTML = results.map(result => `<div class="info">${result}</div>`).join('');
+        }
+        
+        function showCreateSQL() {
+            const sqlDisplay = document.getElementById('sql-display');
+            
+            const sql = `-- Kajopo Database Setup SQL
+-- Run this in your Supabase SQL Editor
+
+-- 1. Create users table
+CREATE TABLE IF NOT EXISTS public.users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    firstName VARCHAR(100) NOT NULL,
+    lastName VARCHAR(100) NOT NULL,
+    name VARCHAR(200) NOT NULL,
+    accountType VARCHAR(50) DEFAULT 'seeker',
+    location VARCHAR(255),
+    phone VARCHAR(50),
+    organization VARCHAR(255),
+    currentRole VARCHAR(255),
+    experience TEXT,
+    skills TEXT,
+    languages VARCHAR(255),
+    interests JSONB DEFAULT '[]'::jsonb,
+    bio TEXT,
+    registeredAt TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    isVerified BOOLEAN DEFAULT FALSE,
+    profileComplete BOOLEAN DEFAULT FALSE,
+    status VARCHAR(50) DEFAULT 'active',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 2. Create opportunities table
+CREATE TABLE IF NOT EXISTS public.opportunities (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    category VARCHAR(100) NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    location VARCHAR(255) NOT NULL,
+    organization VARCHAR(255) NOT NULL,
+    requirements TEXT,
+    time_commitment VARCHAR(255),
+    contact_email VARCHAR(255) NOT NULL,
+    compensation VARCHAR(255),
+    deadline DATE,
+    status VARCHAR(50) DEFAULT 'active',
+    provider_id UUID REFERENCES public.users(id),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 3. Create applications table
+CREATE TABLE IF NOT EXISTS public.applications (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    opportunity_id UUID REFERENCES public.opportunities(id) ON DELETE CASCADE,
+    seeker_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
+    status VARCHAR(50) DEFAULT 'pending',
+    application_data JSONB DEFAULT '{}'::jsonb,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 4. Enable Row Level Security
+ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.opportunities ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.applications ENABLE ROW LEVEL SECURITY;
+
+-- 5. Create RLS Policies for users table (drop existing first)
+DROP POLICY IF EXISTS "Users can view own profile" ON public.users;
+CREATE POLICY "Users can view own profile" ON public.users
+    FOR SELECT USING (auth.uid()::text = id::text);
+
+DROP POLICY IF EXISTS "Users can update own profile" ON public.users;
+CREATE POLICY "Users can update own profile" ON public.users
+    FOR UPDATE USING (auth.uid()::text = id::text);
+
+DROP POLICY IF EXISTS "Enable insert for authenticated users" ON public.users;
+CREATE POLICY "Enable insert for authenticated users" ON public.users
+    FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow anonymous registration" ON public.users;
+CREATE POLICY "Allow anonymous registration" ON public.users
+    FOR INSERT WITH CHECK (auth.uid() IS NULL);
+
+-- 6. Create RLS Policies for opportunities table (drop existing first)
+DROP POLICY IF EXISTS "Anyone can view active opportunities" ON public.opportunities;
+CREATE POLICY "Anyone can view active opportunities" ON public.opportunities
+    FOR SELECT USING (status = 'active');
+
+DROP POLICY IF EXISTS "Providers can manage their opportunities" ON public.opportunities;
+CREATE POLICY "Providers can manage their opportunities" ON public.opportunities
+    FOR ALL USING (auth.uid()::text = provider_id::text);
+
+DROP POLICY IF EXISTS "Authenticated users can create opportunities" ON public.opportunities;
+CREATE POLICY "Authenticated users can create opportunities" ON public.opportunities
+    FOR INSERT WITH CHECK (auth.uid()::text = provider_id::text);
+
+-- 7. Create RLS Policies for applications table (drop existing first)
+DROP POLICY IF EXISTS "Users can view their own applications" ON public.applications;
+CREATE POLICY "Users can view their own applications" ON public.applications
+    FOR SELECT USING (auth.uid()::text = seeker_id::text);
+
+DROP POLICY IF EXISTS "Opportunity providers can view applications" ON public.applications;
+CREATE POLICY "Opportunity providers can view applications" ON public.applications
+    FOR SELECT USING (
+        auth.uid()::text IN (
+            SELECT provider_id::text FROM public.opportunities 
+            WHERE id = opportunity_id
+        )
+    );
+
+DROP POLICY IF EXISTS "Authenticated users can create applications" ON public.applications;
+CREATE POLICY "Authenticated users can create applications" ON public.applications
+    FOR INSERT WITH CHECK (auth.uid()::text = seeker_id::text);
+
+DROP POLICY IF EXISTS "Users can update their applications" ON public.applications;
+CREATE POLICY "Users can update their applications" ON public.applications
+    FOR UPDATE USING (auth.uid()::text = seeker_id::text);
+
+-- 8. Create indexes for better performance
+CREATE INDEX IF NOT EXISTS idx_users_email ON public.users(email);
+CREATE INDEX IF NOT EXISTS idx_opportunities_category ON public.opportunities(category);
+CREATE INDEX IF NOT EXISTS idx_opportunities_status ON public.opportunities(status);
+CREATE INDEX IF NOT EXISTS idx_applications_opportunity_id ON public.applications(opportunity_id);
+CREATE INDEX IF NOT EXISTS idx_applications_seeker_id ON public.applications(seeker_id);
+
+-- 9. Create updated_at trigger function
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+-- 10. Create triggers for updated_at (drop existing first)
+DROP TRIGGER IF EXISTS update_users_updated_at ON public.users;
+CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON public.users
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+DROP TRIGGER IF EXISTS update_opportunities_updated_at ON public.opportunities;
+CREATE TRIGGER update_opportunities_updated_at BEFORE UPDATE ON public.opportunities
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+DROP TRIGGER IF EXISTS update_applications_updated_at ON public.applications;
+CREATE TRIGGER update_applications_updated_at BEFORE UPDATE ON public.applications
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Setup complete!
+-- After running this SQL, test your registration form again.`;
+            
+            sqlDisplay.textContent = sql;
+        }
+    </script>
+</body>
+</html>

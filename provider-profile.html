@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opportunity Provider Profile - Kájọpọ̀ Succeed Together</title>
+    <!-- Theme System -->
+    <link rel="stylesheet" href="css/themesNew.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-primary);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--color-primary);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            background: var(--bg-secondary);
+            color: var(--color-primary);
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        /* Theme Toggle Button Styles */
+        .theme-toggle-btn {
+            background: var(--bg-tertiary) !important;
+            border: 1px solid var(--border-primary) !important;
+            color: var(--text-primary) !important;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        .theme-toggle-btn:hover {
+            background: var(--bg-secondary) !important;
+            transform: scale(1.05);
+        }
+
+        .theme-toggle-btn svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--text-primary) !important;
+            fill: none !important;
+            opacity: 1 !important;
+        }
+
+        /* Additional Navigation Visibility Fixes */
+        .nav-links {
+            color: var(--text-primary) !important;
+        }
+
+        .nav-link {
+            color: var(--text-primary) !important;
+        }
+
+        .logo {
+            color: var(--color-primary) !important;
+        }
+
+        /* Ensure user name is visible */
+        #userName {
+            color: var(--text-primary) !important;
+            font-weight: 500;
+        }
+
+        /* Ensure dropdown arrow is visible */
+        .user-btn svg {
+            stroke: var(--text-primary) !important;
+        }
+
+        .user-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+            color: var(--text-primary) !important;
+        }
+
+        .user-btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-inverse);
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border-primary);
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow-lg);
+            min-width: 200px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .dropdown.show {
+            display: block;
+        }
+
+        .dropdown a, .dropdown button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            color: var(--text-primary) !important;
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-size: var(--text-sm);
+        }
+
+        .dropdown a:hover, .dropdown button:hover {
+            background: var(--bg-tertiary) !important;
+            color: var(--color-primary) !important;
+        }
+
+        .dropdown svg {
+            width: 16px;
+            height: 16px;
+            margin-right: 0.5rem;
+            stroke: currentColor;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .profile-header {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .profile-info {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-inverse);
+            font-size: 3rem;
+            font-weight: bold;
+        }
+
+        .profile-details h1 {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-details .role {
+            color: #6b7280;
+            font-size: 1.125rem;
+            margin-bottom: 1rem;
+        }
+
+        .profile-details .location {
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 0.75rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            font-size: 1.25rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card h3 {
+            font-size: 1.125rem;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        /* Contact Information Styling */
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding: 0.5rem 0;
+        }
+
+        .contact-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .contact-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            color: var(--color-primary);
+            flex-shrink: 0;
+        }
+
+        .contact-text {
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* Skills and Experience Styling */
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .skill-tag {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: 1px solid var(--border-primary);
+        }
+
+        .experience-item {
+            margin-bottom: 1.5rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .experience-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .experience-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .experience-company {
+            color: var(--color-primary);
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .experience-date {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .experience-description {
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .avatar-section {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--bg-tertiary, #f8fafc);
+            border-radius: 12px;
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-primary, #3B82F6), #1e40af);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .avatar-info h3 {
+            margin: 0 0 0.5rem 0;
+            color: var(--text-primary, #1a202c);
+            font-size: 1.5rem;
+        }
+
+        .avatar-info p {
+            margin: 0 0 1rem 0;
+            color: var(--text-secondary, #64748b);
+            font-size: 1rem;
+        }
+
+        .upload-btn {
+            background: var(--color-primary, #3B82F6);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+
+        .upload-btn:hover {
+            background: #2563eb;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #00d4ff 0%, #00bcd4 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .profile-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary, #1a202c);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary, #1a202c);
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-primary, #e2e8f0);
+            border-radius: 6px;
+            font-size: 1rem;
+            background: var(--bg-secondary, #ffffff);
+            color: var(--text-primary, #1a202c);
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--color-primary, #3B82F6);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .opportunities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .opportunity-card {
+            background: var(--bg-secondary, #ffffff);
+            border: 1px solid var(--border-primary, #e2e8f0);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .opportunity-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .opportunity-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary, #1a202c);
+            margin-bottom: 0.5rem;
+        }
+
+        .opportunity-type {
+            display: inline-block;
+            background: var(--color-primary, #3B82F6);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .opportunity-description {
+            color: var(--text-secondary, #64748b);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .opportunity-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-secondary, #64748b);
+        }
+
+        .save-btn {
+            background: var(--color-primary, #3B82F6);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            margin-top: 1rem;
+        }
+
+        .save-btn:hover {
+            background: #2563eb;
+        }
+
+        .edit-profile-btn:hover {
+            background: #2563eb !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .opportunities-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <a href="index.html">Kájọpọ̀</a>
+            </div>
+            
+            <!-- Navigation Menu -->
+            <div class="nav-links">
+                <a href="dashboard.html" class="nav-link">Dashboard</a>
+                <a href="create-opportunity.html" class="nav-link">Create New Opportunity</a>
+                <a href="about-us.html" class="nav-link">About Us</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+                
+                <!-- Theme Toggle Button -->
+                <button id="theme-toggle" class="nav-link theme-toggle-btn">
+                    <svg id="sun-icon" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    <svg id="moon-icon" class="h-5 w-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                    </svg>
+                </button>
+            </div>
+                
+            <!-- User Menu -->
+            <div class="user-menu">
+                <!-- User Menu -->
+                <button id="userMenuBtn" class="user-btn">
+                    <div id="userAvatar" class="user-avatar">
+                        <span id="userInitials">MC</span>
+                    </div>
+                    <span id="userName">Michael Chen</span>
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                        
+                <!-- Dropdown Menu -->
+                <div id="userDropdown" class="dropdown">
+                    <a href="index.html">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                        Home
+                    </a>
+                    <a href="dashboard.html">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        Dashboard
+                    </a>
+                    <a href="create-opportunity.html">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Create New Opportunity
+                    </a>
+                    <button id="signOutBtn">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>
+                        Sign Out
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-info">
+                <div class="profile-avatar" id="userAvatar">MC</div>
+                <div class="profile-details">
+                    <h1 id="displayName">Michael Chen</h1>
+                    <div class="role">Opportunity Provider</div>
+                    <div class="location">
+                        <svg class="contact-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        San Francisco, CA
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">Applications Sent</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">8</div>
+                    <div class="stat-label">Matches Found</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">Active Projects</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">95%</div>
+                    <div class="stat-label">Profile Complete</div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Content Grid -->
+        <div class="content-grid">
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- About Section -->
+                <div class="card">
+                    <h2>
+                        <svg class="contact-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h4M9 7h6m-6 4h6m-6 4h6"></path>
+                        </svg>
+                        About Our Organization
+                    </h2>
+                    <p>TechForward Foundation is dedicated to bridging the digital divide and creating meaningful opportunities for underserved communities. We believe in the power of technology and education to transform lives and create lasting positive change.</p>
+                    <p>Our mission is to provide resources, mentorship, and opportunities that empower individuals and communities to thrive in the digital age. We focus on sustainable programs that create long-term impact and foster innovation in social good initiatives.</p>
+                </div>
+
+                <!-- Services Section -->
+                <div class="card">
+                    <h2>
+                        <svg class="contact-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                        Services & Opportunities We Provide
+                    </h2>
+                    <div class="skills-list">
+                        <span class="skill-tag">Technology Training</span>
+                        <span class="skill-tag">Mentorship Programs</span>
+                        <span class="skill-tag">Grant Funding</span>
+                        <span class="skill-tag">Career Development</span>
+                        <span class="skill-tag">Digital Literacy</span>
+                        <span class="skill-tag">Community Outreach</span>
+                        <span class="skill-tag">Educational Resources</span>
+                        <span class="skill-tag">Networking Events</span>
+                        <span class="skill-tag">Skill Workshops</span>
+                        <span class="skill-tag">Project Collaboration</span>
+                    </div>
+                </div>
+
+                <!-- Opportunity Management Section -->
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2>
+                            <svg class="contact-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2V6"></path>
+                            </svg>
+                            Opportunity Management
+                        </h2>
+                        <a href="create-opportunity.html" class="btn-primary" style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px; text-decoration: none;">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                            </svg>
+                            Create New Opportunity
+                        </a>
+                    </div>
+                    
+
+                    
+                    <!-- Current Opportunities List -->
+                    <div id="currentOpportunities">
+                    <div class="experience-item">
+                        <div class="experience-title">Youth Mentorship Program</div>
+                        <div class="experience-company">Technology & Career Development</div>
+                        <div class="experience-date">Applications Due: March 15, 2024</div>
+                        <div class="experience-description">Seeking passionate mentors to guide young adults in technology careers. Includes training workshops, one-on-one mentoring, and career placement assistance.</div>
+                    </div>
+                    <div class="experience-item">
+                        <div class="experience-title">Community Health Initiative</div>
+                        <div class="experience-company">Healthcare & Technology</div>
+                        <div class="experience-date">Applications Due: April 1, 2024</div>
+                        <div class="experience-description">Collaborative project to develop digital health solutions for underserved communities. Looking for developers, healthcare professionals, and community organizers.</div>
+                    </div>
+                    <div class="experience-item">
+                        <div class="experience-title">Environmental Conservation Project</div>
+                        <div class="experience-company">Sustainability & Education</div>
+                        <div class="experience-date">Applications Due: March 30, 2024</div>
+                        <div class="experience-description">Join our team to create educational programs and technology solutions for environmental conservation efforts in local communities.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Contact Information -->
+                <div class="card">
+                    <h2>
+                        <svg class="contact-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                        Contact Information
+                    </h2>
+                    <div class="contact-item">
+                        <svg class="contact-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                        <span class="contact-text">michael.chen@techforward.org</span>
+                    </div>
+                    <div class="contact-item">
+                        <svg class="contact-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                        </svg>
+                        <span class="contact-text">+1 (415) 555-0123</span>
+                    </div>
+                    <div class="contact-item">
+                        <svg class="contact-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <span class="contact-text">San Francisco, CA</span>
+                    </div>
+                    <div class="contact-item">
+                        <svg class="contact-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9"></path>
+                        </svg>
+                        <span class="contact-text">www.techforward.org</span>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            checkUserAuth();
+            updateUserInfo();
+
+            loadProviderOpportunities();
+        });
+
+        function checkUserAuth() {
+            let user = localStorage.getItem('kajopo_current_user');
+            if (!user) {
+                user = localStorage.getItem('kajopo_user');
+            }
+            if (!user) {
+                console.log('No user found, redirecting to signin');
+                window.location.href = 'signin-form.html';
+                return;
+            }
+            
+            // Check if user is a provider
+            const userData = JSON.parse(user);
+            if (userData.accountType !== 'provider') {
+                alert('Access denied. This page is only accessible to opportunity providers.');
+                window.location.href = 'dashboard.html';
+                return;
+            }
+        }
+
+        function updateUserInfo() {
+            let user = localStorage.getItem('kajopo_current_user');
+            if (!user) {
+                user = localStorage.getItem('kajopo_user');
+            }
+            if (user) {
+                const userData = JSON.parse(user);
+                const firstName = userData.firstName || 'Provider';
+                const lastName = userData.lastName || 'User';
+                const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+                
+                document.getElementById('userName').textContent = firstName + ' ' + lastName;
+                document.getElementById('userInitials').textContent = initials;
+                document.getElementById('displayName').textContent = firstName + ' ' + lastName;
+                document.getElementById('userAvatar').textContent = initials;
+            }
+            
+            // Ensure container is visible
+            const container = document.querySelector('.container');
+            if (container) {
+                container.style.display = 'block';
+                container.style.visibility = 'visible';
+            }
+        }
+        
+
+        
+        function loadProviderOpportunities() {
+            let userData = localStorage.getItem('kajopo_current_user');
+            if (!userData) {
+                userData = localStorage.getItem('kajopo_user');
+            }
+            const user = JSON.parse(userData);
+            const opportunities = JSON.parse(localStorage.getItem('kajopo_opportunities') || '[]');
+            const providerOpportunities = opportunities.filter(opp => 
+                opp.providerId === (user.id || user.email)
+            );
+            
+            const container = document.getElementById('currentOpportunities');
+            
+            if (providerOpportunities.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #666;">
+                        <svg width="48" height="48" fill="currentColor" viewBox="0 0 16 16" style="margin-bottom: 16px; opacity: 0.5;">
+                            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                        </svg>
+                        <p>No opportunities created yet.</p>
+                        <p style="font-size: 14px; margin-top: 8px;">Click "Create New Opportunity" to get started.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = providerOpportunities.map(opp => `
+                <div class="experience-item" style="position: relative;">
+                    <div class="experience-title">${opp.title}</div>
+                    <div class="experience-company">${opp.category}${opp.funding ? ' • ' + opp.funding : ''}</div>
+                    <div class="experience-date">Applications Due: ${opp.deadline ? new Date(opp.deadline).toLocaleDateString() : 'No deadline set'}</div>
+                    <div class="experience-description">${opp.description}</div>
+                    <div style="margin-top: 10px; display: flex; gap: 10px;">
+                        <button onclick="editOpportunity('${opp.id}')" style="padding: 5px 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Edit</button>
+                        <button onclick="deleteOpportunity('${opp.id}')" style="padding: 5px 10px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function editOpportunity(id) {
+            alert('Edit functionality will be implemented in a future update.');
+        }
+        
+        function deleteOpportunity(id) {
+            if (confirm('Are you sure you want to delete this opportunity?')) {
+                let opportunities = JSON.parse(localStorage.getItem('kajopo_opportunities') || '[]');
+                opportunities = opportunities.filter(opp => opp.id !== id);
+                localStorage.setItem('kajopo_opportunities', JSON.stringify(opportunities));
+                loadProviderOpportunities();
+                alert('Opportunity deleted successfully.');
+            }
+        }
+        
+        function toggleDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+        }
+        
+        function signOut() {
+            localStorage.removeItem('kajopo_user');
+            localStorage.removeItem('kajopo_user_session');
+            localStorage.removeItem('kajopo_current_user');
+            localStorage.removeItem('userAuthenticated');
+            window.location.href = 'index.html';
+        }
+        
+        // Setup dropdown functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const userBtn = document.querySelector('.user-btn');
+            const dropdown = document.getElementById('userDropdown');
+            const signOutBtn = document.getElementById('signOutBtn');
+            
+            // Toggle dropdown on user button click
+            if (userBtn) {
+                userBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    toggleDropdown();
+                });
+            }
+            
+            // Handle sign out
+            if (signOutBtn) {
+                signOutBtn.addEventListener('click', function() {
+                    signOut();
+                });
+            }
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('userDropdown');
+            const userBtn = document.querySelector('.user-btn');
+            
+            if (userBtn && !userBtn.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+        
+        // Theme-switching logic
+        function setupThemeToggle() {
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const sunIcon = document.getElementById('sun-icon');
+            const moonIcon = document.getElementById('moon-icon');
+            const html = document.documentElement;
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    html.setAttribute('data-theme', 'dark');
+                    sunIcon.classList.add('hidden');
+                    moonIcon.classList.remove('hidden');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    html.removeAttribute('data-theme');
+                    sunIcon.classList.remove('hidden');
+                    moonIcon.classList.add('hidden');
+                    localStorage.setItem('theme', 'light');
+                }
+            }
+            
+            if (savedTheme) {
+                applyTheme(savedTheme);
+            } else if (prefersDark) {
+                applyTheme('dark');
+            } else {
+                applyTheme('light');
+            }
+            
+            if (themeToggleBtn) {
+                themeToggleBtn.addEventListener('click', () => {
+                    const currentTheme = html.getAttribute('data-theme');
+                    if (currentTheme === 'dark') {
+                        applyTheme('light');
+                    } else {
+                        applyTheme('dark');
+                    }
+                });
+            }
+        }
+        
+        // Initialize theme toggle
+        setupThemeToggle();
+    </script>
+    
+
+</body>
+</html>

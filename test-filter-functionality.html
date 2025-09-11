@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filter Functionality Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 1000px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        .warning { background-color: #fff3cd; color: #856404; }
+        .filter-controls {
+            margin: 15px 0;
+        }
+        .filter-controls select, .filter-controls input {
+            margin: 5px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .results {
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            padding: 10px;
+            background: #f9f9f9;
+        }
+        .opportunity-card {
+            background: white;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #6c757d; cursor: not-allowed; }
+        #log {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Filter Functionality Testing</h1>
+        
+        <div id="status" class="status info">
+            <strong>Status:</strong> <span id="statusText">Initializing...</span>
+        </div>
+        
+        <button onclick="runAllFilterTests()">Run All Filter Tests</button>
+        <button onclick="clearLog()">Clear Log</button>
+        
+        <!-- Category Filter Test -->
+        <div class="test-section">
+            <h3>Category Filter Test</h3>
+            <div class="filter-controls">
+                <select id="categoryTest">
+                    <option value="">All Categories</option>
+                </select>
+                <button onclick="testCategoryFilter()">Test Category Filter</button>
+            </div>
+            <div id="categoryResults" class="results"></div>
+        </div>
+        
+        <!-- Type Filter Test -->
+        <div class="test-section">
+            <h3>Type Filter Test</h3>
+            <div class="filter-controls">
+                <select id="typeTest">
+                    <option value="">All Types</option>
+                </select>
+                <button onclick="testTypeFilter()">Test Type Filter</button>
+            </div>
+            <div id="typeResults" class="results"></div>
+        </div>
+        
+        <!-- Location Filter Test -->
+        <div class="test-section">
+            <h3>Location Filter Test</h3>
+            <div class="filter-controls">
+                <select id="locationTest">
+                    <option value="">All Locations</option>
+                </select>
+                <button onclick="testLocationFilter()">Test Location Filter</button>
+            </div>
+            <div id="locationResults" class="results"></div>
+        </div>
+        
+        <!-- Search Filter Test -->
+        <div class="test-section">
+            <h3>Search Filter Test</h3>
+            <div class="filter-controls">
+                <input type="text" id="searchTest" placeholder="Enter search term...">
+                <button onclick="testSearchFilter()">Test Search Filter</button>
+            </div>
+            <div id="searchResults" class="results"></div>
+        </div>
+        
+        <!-- Combined Filter Test -->
+        <div class="test-section">
+            <h3>Combined Filter Test</h3>
+            <div class="filter-controls">
+                <select id="combinedCategory">
+                    <option value="">All Categories</option>
+                </select>
+                <select id="combinedType">
+                    <option value="">All Types</option>
+                </select>
+                <input type="text" id="combinedSearch" placeholder="Search term...">
+                <button onclick="testCombinedFilters()">Test Combined Filters</button>
+            </div>
+            <div id="combinedResults" class="results"></div>
+        </div>
+        
+        <div id="log"></div>
+    </div>
+
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/data-manager.js"></script>
+    <script src="js/opportunities.js"></script>
+    
+    <script>
+        let logElement = document.getElementById('log');
+        let statusElement = document.getElementById('statusText');
+        let allOpportunities = [];
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${type.toUpperCase()}: ${message}\n`;
+            logElement.textContent += logEntry;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(message);
+        }
+        
+        function clearLog() {
+            logElement.textContent = '';
+        }
+        
+        function updateStatus(text, type = 'info') {
+            statusElement.textContent = text;
+            document.getElementById('status').className = `status ${type}`;
+        }
+        
+        function renderOpportunityCard(opportunity) {
+            return `
+                <div class="opportunity-card">
+                    <strong>${opportunity.title}</strong><br>
+                    <small>${opportunity.category} | ${opportunity.type} | ${opportunity.location}</small><br>
+                    <em>${opportunity.organization}</em>
+                </div>
+            `;
+        }
+        
+        function populateFilterDropdowns() {
+            if (!allOpportunities || !Array.isArray(allOpportunities) || allOpportunities.length === 0) return;
+            
+            const categories = [...new Set(allOpportunities.map(opp => opp.category))];
+            const types = [...new Set(allOpportunities.map(opp => opp.type))];
+            const locations = [...new Set(allOpportunities.map(opp => opp.location))];
+            
+            // Populate category dropdowns
+            const categorySelects = ['categoryTest', 'combinedCategory'];
+            categorySelects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                select.innerHTML = '<option value="">All Categories</option>';
+                categories.forEach(cat => {
+                    select.innerHTML += `<option value="${cat}">${cat}</option>`;
+                });
+            });
+            
+            // Populate type dropdowns
+            const typeSelects = ['typeTest', 'combinedType'];
+            typeSelects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                select.innerHTML = '<option value="">All Types</option>';
+                types.forEach(type => {
+                    select.innerHTML += `<option value="${type}">${type}</option>`;
+                });
+            });
+            
+            // Populate location dropdown
+            const locationSelect = document.getElementById('locationTest');
+            locationSelect.innerHTML = '<option value="">All Locations</option>';
+            locations.forEach(loc => {
+                locationSelect.innerHTML += `<option value="${loc}">${loc}</option>`;
+            });
+            
+            log(`Filter dropdowns populated: ${categories.length} categories, ${types.length} types, ${locations.length} locations`);
+        }
+        
+        async function loadOpportunities() {
+            try {
+                log('Loading opportunities from database...');
+                allOpportunities = await window.dbManager.getOpportunities();
+                log(`✓ Loaded ${allOpportunities.length} opportunities`, 'success');
+                
+                if (allOpportunities.length === 0) {
+                    log('⚠ No opportunities found. Please seed the database first.', 'warning');
+                    updateStatus('No data - please seed database', 'warning');
+                    return false;
+                }
+                
+                populateFilterDropdowns();
+                updateStatus('Ready for testing', 'success');
+                return true;
+                
+            } catch (error) {
+                log(`✗ Failed to load opportunities: ${error.message}`, 'error');
+                updateStatus('Failed to load data', 'error');
+                return false;
+            }
+        }
+        
+        function testCategoryFilter() {
+            const selectedCategory = document.getElementById('categoryTest').value;
+            const resultsDiv = document.getElementById('categoryResults');
+            
+            if (!window.filterOpportunities) {
+                resultsDiv.innerHTML = '<div class="error">filterOpportunities function not found</div>';
+                return;
+            }
+            
+            const filtered = window.filterOpportunities(allOpportunities, {
+                category: selectedCategory,
+                type: '',
+                location: '',
+                search: ''
+            });
+            
+            log(`Category filter '${selectedCategory || 'All'}': ${filtered.length} results`);
+            
+            if (filtered.length === 0) {
+                resultsDiv.innerHTML = '<div class="info">No opportunities match this category</div>';
+            } else {
+                resultsDiv.innerHTML = filtered.map(renderOpportunityCard).join('');
+            }
+        }
+        
+        function testTypeFilter() {
+            const selectedType = document.getElementById('typeTest').value;
+            const resultsDiv = document.getElementById('typeResults');
+            
+            if (!window.filterOpportunities) {
+                resultsDiv.innerHTML = '<div class="error">filterOpportunities function not found</div>';
+                return;
+            }
+            
+            const filtered = window.filterOpportunities(allOpportunities, {
+                category: '',
+                type: selectedType,
+                location: '',
+                search: ''
+            });
+            
+            log(`Type filter '${selectedType || 'All'}': ${filtered.length} results`);
+            
+            if (filtered.length === 0) {
+                resultsDiv.innerHTML = '<div class="info">No opportunities match this type</div>';
+            } else {
+                resultsDiv.innerHTML = filtered.map(renderOpportunityCard).join('');
+            }
+        }
+        
+        function testLocationFilter() {
+            const selectedLocation = document.getElementById('locationTest').value;
+            const resultsDiv = document.getElementById('locationResults');
+            
+            if (!window.filterOpportunities) {
+                resultsDiv.innerHTML = '<div class="error">filterOpportunities function not found</div>';
+                return;
+            }
+            
+            const filtered = window.filterOpportunities(allOpportunities, {
+                category: '',
+                type: '',
+                location: selectedLocation,
+                search: ''
+            });
+            
+            log(`Location filter '${selectedLocation || 'All'}': ${filtered.length} results`);
+            
+            if (filtered.length === 0) {
+                resultsDiv.innerHTML = '<div class="info">No opportunities match this location</div>';
+            } else {
+                resultsDiv.innerHTML = filtered.map(renderOpportunityCard).join('');
+            }
+        }
+        
+        function testSearchFilter() {
+            const searchTerm = document.getElementById('searchTest').value;
+            const resultsDiv = document.getElementById('searchResults');
+            
+            if (!window.filterOpportunities) {
+                resultsDiv.innerHTML = '<div class="error">filterOpportunities function not found</div>';
+                return;
+            }
+            
+            const filtered = window.filterOpportunities(allOpportunities, {
+                category: '',
+                type: '',
+                location: '',
+                search: searchTerm
+            });
+            
+            log(`Search filter '${searchTerm}': ${filtered.length} results`);
+            
+            if (filtered.length === 0) {
+                resultsDiv.innerHTML = '<div class="info">No opportunities match this search term</div>';
+            } else {
+                resultsDiv.innerHTML = filtered.map(renderOpportunityCard).join('');
+            }
+        }
+        
+        function testCombinedFilters() {
+            const category = document.getElementById('combinedCategory').value;
+            const type = document.getElementById('combinedType').value;
+            const search = document.getElementById('combinedSearch').value;
+            const resultsDiv = document.getElementById('combinedResults');
+            
+            if (!window.filterOpportunities) {
+                resultsDiv.innerHTML = '<div class="error">filterOpportunities function not found</div>';
+                return;
+            }
+            
+            const filtered = window.filterOpportunities(allOpportunities, {
+                category: category,
+                type: type,
+                location: '',
+                search: search
+            });
+            
+            log(`Combined filters (${category || 'All'}, ${type || 'All'}, '${search}'): ${filtered.length} results`);
+            
+            if (filtered.length === 0) {
+                resultsDiv.innerHTML = '<div class="info">No opportunities match these combined filters</div>';
+            } else {
+                resultsDiv.innerHTML = filtered.map(renderOpportunityCard).join('');
+            }
+        }
+        
+        async function runAllFilterTests() {
+            log('Running comprehensive filter tests...');
+            
+            if (!allOpportunities || !Array.isArray(allOpportunities) || allOpportunities.length === 0) {
+                log('⚠ No data available for testing', 'warning');
+                return;
+            }
+            
+            // Test each filter type
+            log('Testing category filters...');
+            const categories = [...new Set(allOpportunities.map(opp => opp.category))];
+            for (const category of categories) {
+                document.getElementById('categoryTest').value = category;
+                testCategoryFilter();
+            }
+            
+            log('Testing type filters...');
+            const types = [...new Set(allOpportunities.map(opp => opp.type))];
+            for (const type of types) {
+                document.getElementById('typeTest').value = type;
+                testTypeFilter();
+            }
+            
+            log('Testing location filters...');
+            const locations = [...new Set(allOpportunities.map(opp => opp.location))];
+            for (const location of locations) {
+                document.getElementById('locationTest').value = location;
+                testLocationFilter();
+            }
+            
+            log('Testing search functionality...');
+            const searchTerms = ['software', 'marketing', 'data', 'health', 'finance'];
+            for (const term of searchTerms) {
+                document.getElementById('searchTest').value = term;
+                testSearchFilter();
+            }
+            
+            log('✓ All filter tests completed', 'success');
+        }
+        
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', async () => {
+            log('Filter functionality test initialized');
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for scripts
+            
+            try {
+                if (window.supabase && window.dbManager && window.filterOpportunities) {
+                    log('✓ All dependencies loaded successfully', 'success');
+                    await loadOpportunities();
+                } else {
+                    const missing = [];
+                    if (!window.supabase) missing.push('supabase');
+                    if (!window.dbManager) missing.push('dbManager');
+                    if (!window.filterOpportunities) missing.push('filterOpportunities');
+                    throw new Error(`Missing dependencies: ${missing.join(', ')}`);
+                }
+            } catch (error) {
+                log(`✗ Initialization failed: ${error.message}`, 'error');
+                updateStatus('Initialization failed', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Users - Kájọpọ̀ Connect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6">User Registration Debug Tool</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Current localStorage Data -->
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h2 class="text-xl font-semibold mb-4">Current localStorage Data</h2>
+                <button onclick="checkLocalStorage()" class="bg-blue-500 text-white px-4 py-2 rounded mb-4">Refresh Data</button>
+                <div id="localStorageData" class="text-sm bg-gray-100 p-4 rounded overflow-auto max-h-96"></div>
+            </div>
+            
+            <!-- Test User Registration -->
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h2 class="text-xl font-semibold mb-4">Test User Registration</h2>
+                <form id="testUserForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">First Name</label>
+                        <input type="text" id="firstName" value="Test" class="w-full border rounded px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Last Name</label>
+                        <input type="text" id="lastName" value="User" class="w-full border rounded px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Email</label>
+                        <input type="email" id="email" value="test@example.com" class="w-full border rounded px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Account Type</label>
+                        <select id="accountType" class="w-full border rounded px-3 py-2">
+                            <option value="seeker">Opportunity Seeker</option>
+                            <option value="provider">Opportunity Provider</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="w-full bg-green-500 text-white px-4 py-2 rounded">Create Test User</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Admin Panel Simulation -->
+        <div class="bg-white p-6 rounded-lg shadow mt-6">
+            <h2 class="text-xl font-semibold mb-4">Admin Panel User List Simulation</h2>
+            <button onclick="simulateAdminPanel()" class="bg-purple-500 text-white px-4 py-2 rounded mb-4">Load Users (Admin View)</button>
+            <div id="adminUserList" class="overflow-auto max-h-96"></div>
+        </div>
+    </div>
+
+    <script>
+        function generateUserId() {
+            return 'user_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function checkLocalStorage() {
+            const data = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.includes('kajopo') || key.includes('user')) {
+                    try {
+                        data[key] = JSON.parse(localStorage.getItem(key));
+                    } catch (e) {
+                        data[key] = localStorage.getItem(key);
+                    }
+                }
+            }
+            
+            document.getElementById('localStorageData').innerHTML = 
+                '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+        }
+
+        function getRegisteredUsers() {
+            const registeredUsers = [];
+            
+            // Check for users stored with different keys and patterns
+            const allKeys = Object.keys(localStorage);
+            const userKeys = ['kajopo_user', 'userInfo'];
+            
+            // Also check for keys that start with 'kajopo_user_' for multiple users
+            const userPatternKeys = allKeys.filter(key => key.startsWith('kajopo_user'));
+            const allUserKeys = [...new Set([...userKeys, ...userPatternKeys])];
+            
+            allUserKeys.forEach(key => {
+                const userData = localStorage.getItem(key);
+                if (userData) {
+                    try {
+                        const user = JSON.parse(userData);
+                        // Convert to admin dashboard format
+                        const formattedUser = {
+                            id: user.id || `reg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                            firstName: user.firstName || user.name?.split(' ')[0] || 'Unknown',
+                            lastName: user.lastName || user.name?.split(' ')[1] || 'User',
+                            email: user.email || 'No email provided',
+                            accountType: user.accountType || (user.role === 'I Need Help' ? 'seeker' : 'provider'),
+                            organization: user.organization || user.company || 'Not specified',
+                            status: user.isVerified ? 'approved' : 'pending',
+                            registeredDate: user.registeredAt ? new Date(user.registeredAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+                            phone: user.phone || 'Not provided',
+                            location: user.location || 'Not specified'
+                        };
+                        registeredUsers.push(formattedUser);
+                    } catch (e) {
+                        console.warn('Error parsing user data from localStorage:', e);
+                    }
+                }
+            });
+            
+            return registeredUsers;
+        }
+
+        function simulateAdminPanel() {
+            const users = getRegisteredUsers();
+            const listDiv = document.getElementById('adminUserList');
+            
+            if (users.length === 0) {
+                listDiv.innerHTML = '<p class="text-gray-500">No registered users found</p>';
+                return;
+            }
+            
+            let html = '<table class="w-full border-collapse border border-gray-300">';
+            html += '<thead><tr class="bg-gray-100">';
+            html += '<th class="border border-gray-300 px-4 py-2">Name</th>';
+            html += '<th class="border border-gray-300 px-4 py-2">Email</th>';
+            html += '<th class="border border-gray-300 px-4 py-2">Type</th>';
+            html += '<th class="border border-gray-300 px-4 py-2">Status</th>';
+            html += '<th class="border border-gray-300 px-4 py-2">Registered</th>';
+            html += '</tr></thead><tbody>';
+            
+            users.forEach(user => {
+                html += '<tr>';
+                html += `<td class="border border-gray-300 px-4 py-2">${user.firstName} ${user.lastName}</td>`;
+                html += `<td class="border border-gray-300 px-4 py-2">${user.email}</td>`;
+                html += `<td class="border border-gray-300 px-4 py-2">${user.accountType}</td>`;
+                html += `<td class="border border-gray-300 px-4 py-2">${user.status}</td>`;
+                html += `<td class="border border-gray-300 px-4 py-2">${user.registeredDate}</td>`;
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            listDiv.innerHTML = html;
+        }
+
+        document.getElementById('testUserForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const userData = {
+                id: generateUserId(),
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                email: document.getElementById('email').value,
+                accountType: document.getElementById('accountType').value,
+                registeredAt: new Date().toISOString(),
+                isVerified: false,
+                profileComplete: false
+            };
+            
+            // Store user data using the same method as registration-form.html
+            const userKey = `kajopo_user_${userData.id}`;
+            localStorage.setItem(userKey, JSON.stringify(userData));
+            
+            // Also keep the main user key for backward compatibility
+            localStorage.setItem('kajopo_user', JSON.stringify(userData));
+            
+            alert('Test user created successfully!');
+            checkLocalStorage();
+            simulateAdminPanel();
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLocalStorage();
+            simulateAdminPanel();
+        });
+    </script>
+</body>
+</html>

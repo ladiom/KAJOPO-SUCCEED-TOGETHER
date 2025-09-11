@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Opportunities - Kájọpọ̀ Succeed Together</title>
+    <link rel="stylesheet" href="css/themesNew.css">
+    <link rel="stylesheet" href="css/notifications.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'kajopo-blue': '#0ea5e9',
+                        'kajopo-orange': '#f97316',
+                        'kajopo-purple': '#8b5cf6',
+                        'kajopo-green': '#10b981'
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/data-manager.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/opportunities.js"></script>
+    <script src="js/error-handler.js"></script>
+    <style>
+        /* Dark theme overrides for dropdowns and inputs */
+        [data-theme="dark"] #categoryFilter,
+        [data-theme="dark"] #typeFilter,
+        [data-theme="dark"] #locationFilter,
+        [data-theme="dark"] #searchInput {
+            background-color: var(--input-bg) !important;
+            border-color: var(--input-border) !important;
+            color: var(--text-primary) !important;
+        }
+        [data-theme="dark"] #categoryFilter option,
+        [data-theme="dark"] #typeFilter option,
+        [data-theme="dark"] #locationFilter option {
+            background-color: var(--input-bg) !important;
+            color: var(--text-primary) !important;
+        }
+        /* Ensure text is visible in light theme too */
+        #categoryFilter, #typeFilter, #locationFilter, #searchInput {
+            color: #111827 !important;
+        }
+    </style>
+    <script>
+        // Theme-switching logic (consistent with other pages)
+        function applyTheme(theme) {
+            const html = document.documentElement;
+            const sunIcon = document.getElementById('sun-icon');
+            const moonIcon = document.getElementById('moon-icon');
+            if (theme === 'dark') {
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                if (sunIcon) sunIcon.classList.add('hidden');
+                if (moonIcon) moonIcon.classList.remove('hidden');
+            } else {
+                html.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+                if (sunIcon) sunIcon.classList.remove('hidden');
+                if (moonIcon) moonIcon.classList.add('hidden');
+            }
+        }
+        // Run theme logic immediately to prevent FOUC
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (savedTheme) {
+                applyTheme(savedTheme);
+            } else if (prefersDark) {
+                applyTheme('dark');
+            } else {
+                applyTheme('light');
+            }
+        })();
+        function setupThemeToggle() {
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const tooltip = document.getElementById('theme-tooltip');
+            function syncToggleIcon() {
+                const theme = localStorage.getItem('theme') || 'light';
+                applyTheme(theme);
+            }
+            if (themeToggleBtn) {
+                themeToggleBtn.addEventListener('click', () => {
+                    const theme = localStorage.getItem('theme') || 'light';
+                    if (theme === 'dark') {
+                        applyTheme('light');
+                    } else {
+                        applyTheme('dark');
+                    }
+                });
+                // Tooltip show/hide
+                themeToggleBtn.addEventListener('mouseenter', () => {
+                    if (tooltip) tooltip.style.display = 'block';
+                });
+                themeToggleBtn.addEventListener('mouseleave', () => {
+                    if (tooltip) tooltip.style.display = 'none';
+                });
+                themeToggleBtn.addEventListener('focus', () => {
+                    if (tooltip) tooltip.style.display = 'block';
+                });
+                themeToggleBtn.addEventListener('blur', () => {
+                    if (tooltip) tooltip.style.display = 'none';
+                });
+                // Sync icon state on load
+                syncToggleIcon();
+            }
+            // Listen for theme changes in other tabs/windows
+            window.addEventListener('storage', (event) => {
+                if (event.key === 'theme') {
+                    syncToggleIcon();
+                }
+            });
+        }
+
+        // Fixed populateFilterDropdowns function
+        async function populateFilterDropdowns() {
+            try {
+                const dbManager = window.dbManager;
+                if (!dbManager) {
+                    console.error('Database manager not initialized');
+                    return;
+                }
+                // Get unique values from database
+                const [categoriesResult, , locationsResult] = await Promise.all([
+                    dbManager.getUniqueCategories(),
+                    dbManager.getUniqueTypes(),
+                    dbManager.getUniqueLocations()
+                ]);
+                // Populate Categories dropdown
+                const categoryFilter = document.getElementById('categoryFilter');
+                if (categoriesResult.success && categoryFilter) {
+                    categoryFilter.innerHTML = '<option value="all">All Categories</option>';
+                    categoriesResult.data.forEach(category => {
+                        const option = document.createElement('option');
+                        option.value = category;
+                        option.textContent = category;
+                        categoryFilter.appendChild(option);
+                    });
+                }
+                // Add Location dropdown - ensure it's always created and populated
+                let locationFilter = document.getElementById('locationFilter');
+                const filterContainer = document.querySelector('.mb-8.flex');
+                
+                if (locationsResult.success && filterContainer) {
+                    // Remove existing location filter if it exists
+                    if (locationFilter) {
+                        locationFilter.remove();
+                    }
+                    
+                    // Create new location filter
+                    locationFilter = document.createElement('select');
+                    locationFilter.id = 'locationFilter';
+                    locationFilter.className = 'w-full md:w-auto px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white';
+                    locationFilter.innerHTML = '<option value="all">All Regions</option>';
+                    
+                    locationsResult.data.forEach(location => {
+                        const option = document.createElement('option');
+                        option.value = location;
+                        option.textContent = location;
+                        locationFilter.appendChild(option);
+                    });
+                    
+                    // Insert location filter after type filter
+                    const typeFilter = document.getElementById('typeFilter');
+                    if (typeFilter && typeFilter.nextSibling) {
+                        filterContainer.insertBefore(locationFilter, typeFilter.nextSibling);
+                    } else {
+                        filterContainer.appendChild(locationFilter);
+                    }
+                    
+                    console.log('Location filter created with', locationsResult.data.length, 'locations');
+                     
+                     // Re-setup event listeners after creating location filter
+                     setTimeout(() => {
+                         if (typeof setupFilterListeners === 'function') {
+                             setupFilterListeners();
+                         }
+                     }, 50);
+                }
+                // Always update types based on current category
+                updateTypeDropdown();
+            } catch (error) {
+                console.error('Error populating filter dropdowns:', error);
+            }
+        }
+
+        async function updateTypeDropdown() {
+            const dbManager = window.dbManager;
+            const categoryFilter = document.getElementById('categoryFilter');
+            const typeFilter = document.getElementById('typeFilter');
+            const selectedCategory = categoryFilter ? categoryFilter.value : 'all';
+            let filteredTypes = [];
+            
+            if (!dbManager) {
+                console.warn('Database manager not available for updateTypeDropdown');
+                return;
+            }
+            
+            if (!typeFilter) {
+                console.error('Type filter element not found');
+                return;
+            }
+            
+            try {
+                // Fetch all opportunities from Supabase
+                const result = await dbManager.getOpportunities();
+                if (result.success && Array.isArray(result.data)) {
+                    let opps = result.data;
+                    if (selectedCategory && selectedCategory !== 'all') {
+                        const catNorm = selectedCategory.trim().toLowerCase();
+                        opps = opps.filter(opp => (opp.category || '').trim().toLowerCase() === catNorm);
+                    }
+                    filteredTypes = [...new Set(opps.map(opp => opp.type).filter(type => type))];
+                    console.log('Filtered types for dropdown:', filteredTypes);
+                }
+                
+                typeFilter.innerHTML = '<option value="all">All Types</option>';
+                filteredTypes.forEach(type => {
+                    const option = document.createElement('option');
+                    option.value = type;
+                    option.textContent = type;
+                    typeFilter.appendChild(option);
+                });
+                
+                console.log('Type dropdown updated with', filteredTypes.length, 'options');
+            } catch (error) {
+                console.error('Error updating type dropdown:', error);
+            }
+        }
+
+        // Call this function when the page loads
+        document.addEventListener('DOMContentLoaded', async function() {
+            checkUserAuth();
+            setupUserMenuListeners();
+            // Auth logic: show/hide menus based on user
+            const user = checkUserAuth();
+            if (user) {
+                document.getElementById('guestMenu').classList.add('hidden');
+                document.getElementById('authenticatedMenu').classList.remove('hidden');
+                // Show user's name in greeting
+                const greeting = document.getElementById('userGreeting');
+                if (greeting && user.firstName) {
+                    greeting.textContent = `Welcome, ${user.firstName}!`;
+                }
+                // Set user full name in menu button
+                const userNameSpan = document.getElementById('userName');
+                if (userNameSpan && user.firstName && user.lastName) {
+                    userNameSpan.textContent = `${user.firstName} ${user.lastName}`;
+                }
+                // Mobile greeting
+                const mobileGreeting = document.getElementById('mobileUserGreeting');
+                if (mobileGreeting && user.firstName) {
+                    mobileGreeting.textContent = `Welcome, ${user.firstName}!`;
+                }
+            } else {
+                document.getElementById('guestMenu').classList.remove('hidden');
+                document.getElementById('authenticatedMenu').classList.add('hidden');
+            }
+            setupUserMenuListeners();
+            setupThemeToggle();
+            await populateFilterDropdowns();
+            
+            // Initialize using OpportunityManager for unified approach
+            if (typeof opportunityManager === 'undefined') {
+                console.error('OpportunityManager not available');
+                return;
+            }
+            
+            await loadDynamicOpportunities();
+            
+            // Initialize search filter module
+            if (typeof searchFilter !== 'undefined') {
+                searchFilter.init();
+                
+                // Listen for search updates from the search-filter module
+                document.addEventListener('searchUpdated', function(event) {
+                    // Only use the opportunities.js filtering to avoid conflicts
+                    if (typeof filterOpportunities === 'function') {
+                        filterOpportunities();
+                    }
+                });
+            }
+            // Setup filter listeners and logic
+            function getFilterElements() {
+                return {
+                    categoryFilter: document.getElementById('categoryFilter'),
+                    typeFilter: document.getElementById('typeFilter'),
+                    locationFilter: document.getElementById('locationFilter'),
+                    searchInput: document.getElementById('searchInput'),
+                    clearFiltersBtn: document.getElementById('clearFilters')
+                };
+            }
+            async function filterOpportunities() {
+                const categoryFilter = document.getElementById('categoryFilter');
+                const typeFilter = document.getElementById('typeFilter');
+                const locationFilter = document.getElementById('locationFilter');
+                const searchInput = document.getElementById('searchInput');
+                
+                const filters = {
+                    category: categoryFilter ? categoryFilter.value : 'all',
+                    type: typeFilter ? typeFilter.value : 'all',
+                    location: locationFilter ? locationFilter.value : 'all',
+                    search: searchInput ? searchInput.value.trim() : ''
+                };
+                
+                // Use OpportunityManager's unified filtering
+                const filteredOpportunities = await opportunityManager.filterOpportunities(filters);
+                renderOpportunities(filteredOpportunities);
+            }
+            // Setup filter event listeners with dynamic element detection
+            function setupFilterListeners() {
+                const { categoryFilter, typeFilter, locationFilter, searchInput, clearFiltersBtn } = getFilterElements();
+                
+                if (categoryFilter) {
+                    categoryFilter.removeEventListener('change', categoryChangeHandler);
+                    categoryFilter.addEventListener('change', categoryChangeHandler);
+                }
+                if (typeFilter) {
+                    typeFilter.removeEventListener('change', typeChangeHandler);
+                    typeFilter.addEventListener('change', typeChangeHandler);
+                }
+                if (locationFilter) {
+                    locationFilter.removeEventListener('change', locationChangeHandler);
+                    locationFilter.addEventListener('change', locationChangeHandler);
+                }
+                if (searchInput) {
+                    searchInput.removeEventListener('input', searchInputHandler);
+                    searchInput.addEventListener('input', searchInputHandler);
+                }
+                if (clearFiltersBtn) {
+                    clearFiltersBtn.removeEventListener('click', clearFiltersHandler);
+                    clearFiltersBtn.addEventListener('click', clearFiltersHandler);
+                }
+            }
+            
+            // Event handler functions
+            async function categoryChangeHandler() {
+                await updateTypeDropdown();
+                const typeFilter = document.getElementById('typeFilter');
+                if (typeFilter) typeFilter.value = 'all';
+                if (typeof filterOpportunities === 'function') {
+                    await filterOpportunities();
+                }
+            }
+            
+            async function typeChangeHandler() {
+                if (typeof filterOpportunities === 'function') {
+                    await filterOpportunities();
+                }
+            }
+            
+            async function locationChangeHandler() {
+                if (typeof filterOpportunities === 'function') {
+                    await filterOpportunities();
+                }
+            }
+            
+            async function searchInputHandler() {
+                if (typeof filterOpportunities === 'function') {
+                    await filterOpportunities();
+                }
+            }
+            
+            async function clearFiltersHandler() {
+                const categoryFilter = document.getElementById('categoryFilter');
+                const typeFilter = document.getElementById('typeFilter');
+                const locationFilter = document.getElementById('locationFilter');
+                const searchInput = document.getElementById('searchInput');
+                
+                if (categoryFilter) categoryFilter.value = 'all';
+                if (typeFilter) typeFilter.value = 'all';
+                if (locationFilter) locationFilter.value = 'all';
+                if (searchInput) searchInput.value = '';
+                updateTypeDropdown();
+                if (typeof filterOpportunities === 'function') {
+                    await filterOpportunities();
+                }
+            }
+            
+            // Initial setup
+            setupFilterListeners();
+            // Initial population - ensure location filter persists
+            setTimeout(() => {
+                updateTypeDropdown();
+            }, 100);
+            // Initial filtering will be handled by loadDynamicOpportunities
+        });
+
+        // Ensure renderOpportunityCard is defined and returns HTML for a single opportunity
+        function renderOpportunityCard(opp) {
+            return `
+            <div class="bg-white rounded-lg shadow-md p-6 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-xl font-semibold mb-2">${opp.title || ''}</h3>
+                    <p class="text-gray-600 mb-2">${opp.organization || ''}</p>
+                    <div class="flex flex-wrap gap-2 mb-2">
+                        ${(opp.tags || []).map(tag => `<span class='bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs'>${tag}</span>`).join('')}
+                        ${opp.category ? `<span class='bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs'>${opp.category}</span>` : ''}
+                        ${opp.type ? `<span class='bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs'>${opp.type}</span>` : ''}
+                    </div>
+                    <div class="mb-2 text-sm text-gray-500">${opp.location || ''}</div>
+                    <p class="text-gray-700 mb-4">${opp.description || ''}</p>
+                </div>
+                <div class="mt-4 flex justify-between items-center">
+                    <div class="text-xs text-gray-400">
+                        Deadline: ${opp.deadline || 'N/A'}<br>
+                        Duration: ${opp.duration || 'N/A'}
+                    </div>
+                    <a href="application-form.html" class="bg-kajopo-blue text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">Apply Now</a>
+                </div>
+            </div>
+            `;
+        }
+
+        // Update renderOpportunities to use the correct container id
+        function renderOpportunities(opps) {
+            const oppList = document.getElementById('opportunitiesContainer');
+            const countSpan = document.getElementById('opportunityCount');
+            const loadingMsg = document.getElementById('loadingMsg');
+            if (loadingMsg) loadingMsg.style.display = 'none';
+            if (countSpan) countSpan.textContent = opps.length;
+            if (!oppList) return;
+            oppList.innerHTML = '';
+            if (!opps || opps.length === 0) {
+                oppList.innerHTML = '<div class="text-gray-500">No opportunities found.</div>';
+                return;
+            }
+            opps.forEach(opp => {
+                oppList.insertAdjacentHTML('beforeend', renderOpportunityCard(opp));
+            });
+        }
+        
+        function goToProfile() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (currentUser) {
+                const isSeeker = currentUser.accountType === 'seeker' || currentUser.role === 'I Need Help';
+                
+                if (isSeeker) {
+                    // Redirect to seeker profile
+                    window.location.href = 'seeker-profile.html';
+                } else {
+                    // Redirect to provider profile
+                    window.location.href = 'provider-profile.html';
+                }
+            } else {
+                // Fallback to seeker profile if no user data
+                window.location.href = 'seeker-profile.html';
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen" style="background-color: var(--bg-primary); color: var(--text-primary);">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="Index.html" class="flex-shrink-0 flex items-center">
+                        <span class="text-2xl font-bold text-kajopo-blue">Kájọpọ̀</span>
+                    </a>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="Index.html" class="text-gray-700 hover:text-kajopo-blue px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                    <a href="browse-opportunities.html" class="text-kajopo-blue px-3 py-2 rounded-md text-sm font-medium border-b-2 border-kajopo-blue">Opportunities</a>
+                    <a href="about-us.html" class="text-gray-700 hover:text-kajopo-blue px-3 py-2 rounded-md text-sm font-medium">About</a>
+                    <a href="contact.html" class="text-gray-700 hover:text-kajopo-blue px-3 py-2 rounded-md text-sm font-medium">Contact</a>
+                    
+                    <!-- Theme Toggle -->
+                    <button id="theme-toggle" style="position:fixed;top:1rem;right:1rem;z-index:1001;" class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors shadow-lg border border-gray-300" aria-label="Toggle Light/Dark Mode" tabindex="0">
+                        <svg id="sun-icon" class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+                        </svg>
+                        <svg id="moon-icon" class="w-5 h-5 text-gray-700 hidden" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                        </svg>
+                        <span id="theme-tooltip" style="display:none;position:absolute;top:110%;left:50%;transform:translateX(-50%);white-space:nowrap;background:#222;color:#fff;padding:4px 12px;border-radius:6px;font-size:0.95rem;box-shadow:0 2px 8px #0003;z-index:1002;">Toggle Light/Dark Mode</span>
+                    </button>
+                    
+                    <!-- User Menu -->
+                    <div id="userMenu" class="relative">
+                        <!-- Guest Menu -->
+                        <div id="guestMenu" class="flex items-center space-x-4">
+                            <a href="signin-form.html" class="text-gray-700 hover:text-kajopo-blue px-3 py-2 rounded-md text-sm font-medium">Sign In</a>
+                            <a href="registration-form.html" class="bg-kajopo-blue text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors">Sign Up</a>
+                        </div>
+                        
+                        <!-- Authenticated User Menu -->
+                        <div id="authenticatedMenu" class="hidden flex items-center space-x-4">
+                            <span id="userGreeting" class="text-gray-700 text-sm">Welcome!</span>
+                            <div class="relative">
+                                <button id="userMenuBtn" class="flex items-center space-x-2 text-gray-700 hover:text-kajopo-blue">
+                                    <span id="userName" class="font-medium"></span>
+                                    <style>
+                                    #userMenuBtn { cursor: pointer; }
+                                    </style>
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </button>
+                                <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                                    <a href="Index.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><span class="inline-block w-5 text-center mr-2">🏠</span>Home</a>
+                                    <a href="dashboard.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><span class="inline-block w-5 text-center mr-2">📊</span>Dashboard</a>
+                                    <a href="browse-opportunities.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><span class="inline-block w-5 text-center mr-2">🔍</span>Browse Opportunities</a>
+                                    <a href="#" onclick="goToProfile()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><span class="inline-block w-5 text-center mr-2">👤</span>Profile</a>
+                                    <a href="messaging.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><span class="inline-block w-5 text-center mr-2">💬</span>Messages</a>
+                                    <button id="signOutBtn" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><span class="inline-block w-5 text-center mr-2">🚪</span>Sign Out</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-700 hover:text-kajopo-blue focus:outline-none focus:text-kajopo-blue">
+                        <svg class=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\">
+                            <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M4 6h16M4 12h16M4 18h16\"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Navigation -->
+    <div id="mobile-menu" class="hidden md:hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
+                <a href="Index.html" class="text-gray-700 hover:text-kajopo-blue block px-3 py-2 rounded-md text-base font-medium">Home</a>
+                <a href="browse-opportunities.html" class="text-kajopo-blue block px-3 py-2 rounded-md text-base font-medium bg-blue-50">Opportunities</a>
+                <a href="about-us.html" class="text-gray-700 hover:text-kajopo-blue block px-3 py-2 rounded-md text-base font-medium">About</a>
+                <a href="contact.html" class="text-gray-700 hover:text-kajopo-blue block px-3 py-2 rounded-md text-base font-medium">Contact</a>
+                
+                <!-- Mobile User Menu -->
+                <div id="mobileGuestMenu" class="pt-4 border-t">
+                    <a href="signin-form.html" class="text-gray-700 hover:text-kajopo-blue block px-3 py-2 rounded-md text-base font-medium">Sign In</a>
+                    <a href="registration-form.html" class="text-kajopo-blue block px-3 py-2 rounded-md text-base font-medium">Sign Up</a>
+                </div>
+                
+                <div id="mobileAuthenticatedMenu" class="hidden pt-4 border-t">
+                    <span id="mobileUserGreeting" class="text-gray-700 block px-3 py-2 text-base font-medium">Welcome!</span>
+                    <a href="dashboard.html" class="text-gray-700 hover:text-kajopo-blue block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
+                    <a href="#" onclick="goToProfile()" class="text-gray-700 hover:text-kajopo-blue block px-3 py-2 rounded-md text-base font-medium">Profile</a>
+                    <a href="messaging.html" class="text-gray-700 hover:text-kajopo-blue block px-3 py-2 rounded-md text-base font-medium">Messages</a>
+                    <button id="mobileSignOutBtn" class="text-gray-700 hover:text-kajopo-blue block w-full text-left px-3 py-2 rounded-md text-base font-medium">Sign Out</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+    <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-4">All Opportunities</h1>
+            <p class="text-gray-600">Discover meaningful opportunities to make a difference in your community.</p>
+        </div>
+
+        <!-- Filters -->
+    <div class="mb-8 flex flex-wrap gap-4">
+            <select id="categoryFilter" class="w-full md:w-auto px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white">
+                <option value="all">All Categories</option>
+            </select>
+            <select id="typeFilter" class="w-full md:w-auto px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white">
+                <option value="all">All Types</option>
+            </select>
+            <input type="text" id="searchInput" placeholder="Search opportunities..." class="flex-1 md:flex-none md:w-64 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white">
+            <button id="clearFilters" class="px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                Clear Filters
+            </button>
+        </div>
+
+        <!-- Add a span to show the number of filtered opportunities -->
+    <div class="mb-4 text-gray-700 text-lg">
+      <span id="opportunityCount">0</span> opportunities found
+    </div>
+
+        <!-- Results Count -->
+    <div class="mb-6">
+            <p id="loadingMsg" class="text-gray-600">Loading opportunities...</p>
+        </div>
+
+        <!-- Opportunities Grid -->
+    <div id="opportunitiesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Opportunities will be loaded here dynamically -->
+        </div>
+
+        <!-- Load More Button -->
+    <div class="mt-12 text-center">
+            <button id="loadMoreBtn" class="hidden bg-kajopo-blue text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                Load More Opportunities
+            </button>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="col-span-1 md:col-span-2">
+                    <h3 class="text-2xl font-bold mb-4">Kájọpọ̀</h3>
+                    <p class="text-gray-300 mb-4">Connecting communities through meaningful opportunities. Together, we succeed.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-300 hover:text-white transition-colors">
+                            <svg class=\"w-6 h-6\" fill=\"currentColor\" viewBox=\"0 0 24 24\">
+                                <path d=\"M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z\"></path>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-white transition-colors">
+                            <svg class=\"w-6 h-6\" fill=\"currentColor\" viewBox=\"0 0 24 24\">
+                                <path d=\"M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z\"></path>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-white transition-colors">
+                            <svg class=\"w-6 h-6\" fill=\"currentColor\" viewBox=\"0 0 24 24\">
+                                <path d=\"M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z\"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="Index.html" class="text-gray-300 hover:text-white transition-colors">Home</a></li>
+                        <li><a href="browse-opportunities.html" class="text-gray-300 hover:text-white transition-colors">Opportunities</a></li>
+                        <li><a href="about-us.html" class="text-gray-300 hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="contact.html" class="text-gray-300 hover:text-white transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Help Center</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Terms of Service</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Community Guidelines</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center">
+                <p class="text-gray-300">&copy; 2024 Kájọpọ̀. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+        <!-- Mobile Navigation Script -->
+        <script src="js/mobile-nav.js"></script>
+        <script>
+            // Ensure theme switch and user menu work after all DOM is loaded
+            document.addEventListener('DOMContentLoaded', function() {
+                setupThemeToggle();
+                setupUserMenuListeners();
+            });
+        </script>
+</body>
+</html>
