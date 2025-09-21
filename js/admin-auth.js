@@ -237,11 +237,12 @@ class AdminAuth {
                 throw new Error('Database connection not available');
             }
     
-            // Query admin_users table - Fixed query
+            // Query users table for admin users - Updated for unified auth
             const { data, error } = await window.dbManager.supabase
-                .from('admin_users')
+                .from('users')
                 .select('*')
                 .eq('email', email)
+                .eq('account_type', 'admin')
                 .single();
     
             if (error) {

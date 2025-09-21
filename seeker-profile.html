@@ -748,16 +748,63 @@
             }
         });
 
+        // Authentication check
+        function checkUserAuth() {
+            // Check for current authentication system (kajopo_session)
+            const sessionData = localStorage.getItem('kajopo_session');
+            let userIsAuthenticated = false;
+            let currentUser = null;
+            
+            if (sessionData) {
+                try {
+                    const parsed = JSON.parse(sessionData);
+                    userIsAuthenticated = parsed.user && parsed.user.id;
+                    currentUser = parsed.user;
+                } catch (error) {
+                    console.error('Error parsing session data:', error);
+                }
+            }
+            
+            // Fallback to old system for compatibility
+            if (!userIsAuthenticated) {
+                const userData = localStorage.getItem('kajopo_current_user') || localStorage.getItem('kajopo_user');
+                if (userData) {
+                    try {
+                        currentUser = JSON.parse(userData);
+                        userIsAuthenticated = true;
+                    } catch (error) {
+                        console.error('Error parsing user data:', error);
+                    }
+                }
+            }
+            
+            // Check if user is authenticated
+            if (!userIsAuthenticated || !currentUser) {
+                console.log('No user found, redirecting to sign in');
+                window.location.href = 'signin-form.html';
+                return false;
+            }
+            
+            // Check if user is a seeker
+            const isSeeker = currentUser.accountType === 'seeker' || currentUser.role === 'I Need Help';
+            if (!isSeeker) {
+                console.log('User is not a seeker, redirecting to appropriate profile');
+                if (currentUser.accountType === 'provider' || currentUser.role === 'I Can Help') {
+                    window.location.href = 'provider-profile.html';
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
+                return false;
+            }
+            
+            return true;
+        }
+
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             // Check authentication
-            let userData = localStorage.getItem('kajopo_current_user');
-            if (!userData) {
-                userData = localStorage.getItem('kajopo_user');
-            }
-            if (!userData) {
-                window.location.href = 'signin-form.html';
-                return;
+            if (!checkUserAuth()) {
+                return; // Stop execution if not authenticated
             }
             
             // Initialize theme
@@ -809,7 +856,9 @@
         }
         
         function goToProfile() {
-            const currentUser = JSON.parse(localStorage.getItem('kajopo_current_user') || localStorage.getItem('kajopo_user'));
+            let userData = localStorage.getItem('kajopo_session') || localStorage.getItem('kajopo_current_user') || localStorage.getItem('kajopo_user');
+            const sessionData = JSON.parse(userData);
+            const currentUser = sessionData.user || sessionData;
             if (currentUser) {
                 const isSeeker = currentUser.accountType === 'seeker' || currentUser.role === 'I Need Help';
                 

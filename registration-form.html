@@ -338,6 +338,18 @@
         // formValidator is available globally
         
         document.addEventListener('DOMContentLoaded', function() {
+            // Check URL parameters and redirect to specific forms
+            const urlParams = new URLSearchParams(window.location.search);
+            const type = urlParams.get('type');
+            
+            if (type === 'seeker') {
+                window.location.href = 'seeker-registration.html';
+                return;
+            } else if (type === 'provider') {
+                window.location.href = 'provider-registration.html';
+                return;
+            }
+            
             setupFormValidation();
             setupEventListeners();
         });

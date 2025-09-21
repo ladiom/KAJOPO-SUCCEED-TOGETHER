@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>White Text Test - Dark Theme</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/dark-theme.css">
+    <style>
+        .test-section {
+            background-color: #1F2937;
+            padding: 2rem;
+            margin: 1rem 0;
+            border-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Theme Toggle Button -->
+    <button id="theme-toggle" style="position:fixed;top:1rem;right:1rem;z-index:1001;" 
+            class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors shadow-lg border border-gray-300" 
+            aria-label="Toggle Light/Dark Mode" tabindex="0">
+        <svg id="sun-icon" class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+        </svg>
+        <svg id="moon-icon" class="w-5 h-5 text-gray-700 hidden" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+        </svg>
+    </button>
+
+    <!-- Test Content -->
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-6">White Text Visibility Test</h1>
+        
+        <!-- Test different text color classes -->
+        <div class="test-section">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Text Color Classes Test</h2>
+            <p class="text-gray-900 mb-2">This is text-gray-900 (should be white in dark mode)</p>
+            <p class="text-gray-800 mb-2">This is text-gray-800 (should be white in dark mode)</p>
+            <p class="text-gray-700 mb-2">This is text-gray-700 (should be white in dark mode)</p>
+            <p class="text-gray-600 mb-2">This is text-gray-600 (should be white in dark mode)</p>
+            <p class="text-gray-500 mb-2">This is text-gray-500 (should be white in dark mode)</p>
+            <p class="text-gray-400 mb-2">This is text-gray-400 (should be white in dark mode)</p>
+        </div>
+
+        <!-- Test different HTML elements -->
+        <div class="test-section">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">HTML Elements Test</h2>
+            <h1 class="text-2xl text-gray-900 mb-2">H1 Heading (should be white)</h1>
+            <h2 class="text-xl text-gray-800 mb-2">H2 Heading (should be white)</h2>
+            <h3 class="text-lg text-gray-700 mb-2">H3 Heading (should be white)</h3>
+            <p class="text-gray-600 mb-2">Paragraph text (should be white)</p>
+            <span class="text-gray-500">Span text (should be white)</span>
+            <div class="text-gray-400 mt-2">Div text (should be white)</div>
+        </div>
+
+        <!-- Test navigation elements -->
+        <div class="test-section">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Navigation Test</h2>
+            <nav class="flex space-x-4">
+                <a href="#" class="text-gray-700 hover:text-gray-900">Link 1 (should be white)</a>
+                <a href="#" class="text-gray-600 hover:text-gray-800">Link 2 (should be white)</a>
+                <span class="text-gray-500">Nav span (should be white)</span>
+            </nav>
+        </div>
+
+        <!-- Test buttons -->
+        <div class="test-section">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Button Test</h2>
+            <button class="bg-blue-600 text-white px-4 py-2 rounded mr-2">Blue Button</button>
+            <button class="bg-green-600 text-white px-4 py-2 rounded mr-2">Green Button</button>
+            <button class="bg-gray-600 text-white px-4 py-2 rounded">Gray Button</button>
+        </div>
+
+        <!-- Test cards -->
+        <div class="test-section">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Card Test</h2>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Card Title (should be white)</h3>
+                <p class="text-gray-700 mb-2">Card description text (should be white)</p>
+                <span class="text-gray-600">Card span text (should be white)</span>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="test-section">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Instructions</h2>
+            <p class="text-gray-600 mb-2">1. Click the theme toggle button (moon/sun icon) in the top-right corner</p>
+            <p class="text-gray-600 mb-2">2. All text should turn white when dark mode is active</p>
+            <p class="text-gray-600 mb-2">3. Check the browser console for any theme-related messages</p>
+        </div>
+    </div>
+
+    <!-- Theme Management Script -->
+    <script src="js/theme-utils.js"></script>
+</body>
+</html>
+

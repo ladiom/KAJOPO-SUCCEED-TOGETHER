@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join as Provider - Kájọpọ̀ Succeed Together</title>
+    <!-- Theme System -->
+    <link rel="stylesheet" href="css/themesNew.css">
+    <link rel="stylesheet" href="css/notifications.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/mobile-nav.js"></script>
+    <script src="js/error-handler.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Override Tailwind with theme variables */
+        body {
+            background-color: var(--bg-primary) !important;
+            color: var(--text-primary) !important;
+        }
+        .bg-gray-50 {
+            background-color: var(--bg-primary) !important;
+        }
+        .bg-white {
+            background-color: var(--card-bg) !important;
+        }
+        .text-gray-900 {
+            color: var(--text-primary) !important;
+        }
+        .text-gray-700 {
+            color: var(--text-secondary) !important;
+        }
+        .text-gray-600 {
+            color: var(--text-secondary) !important;
+        }
+        .text-gray-500 {
+            color: var(--text-tertiary) !important;
+        }
+        .border-gray-200 {
+            border-color: var(--border-primary) !important;
+        }
+        .border-gray-300 {
+            border-color: var(--border-primary) !important;
+        }
+        /* Ensure input fields have dark text on white background */
+        input[type="text"], input[type="email"], input[type="password"], input[type="tel"], textarea, select {
+            background-color: white !important;
+            color: #111827 !important; /* dark gray-900 */
+        }
+        input[type="text"]::placeholder, input[type="email"]::placeholder, input[type="password"]::placeholder, input[type="tel"]::placeholder, textarea::placeholder {
+            color: #6b7280 !important; /* gray-500 */
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <a href="index.html" class="flex items-center">
+                        <div>
+                            <h1 class="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">Kájọpọ̀</h1>
+                            <p class="text-sm text-gray-500 italic">Succeed Together</p>
+                        </div>
+                    </a>
+                </div>
+                
+                <!-- Navigation Menu -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="about-us.html" class="text-gray-600 hover:text-cyan-600 transition-colors font-medium">About Us</a>
+                    <a href="contact.html" class="text-gray-600 hover:text-cyan-600 transition-colors font-medium">Contact</a>
+                </nav>
+                
+                <div class="flex space-x-4 items-center">
+                    <!-- Theme Toggle Button -->
+                    <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors shadow-sm border border-gray-300" aria-label="Toggle Light/Dark Mode" tabindex="0">
+                        <svg id="sun-icon" class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zM5.05 6.464L4.343 5.757a1 1 0 00-1.414 1.414l.707.707a1 1 0 001.414-1.414zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM5.05 13.536l-.707.707a1 1 0 001.414 1.414l.707-.707a1 1 0 00-1.414-1.414zM10 17a1 1 0 01-1-1v-1a1 1 0 112 0v1a1 1 0 01-1 1z" clip-rule="evenodd"></path>
+                        </svg>
+                        <svg id="moon-icon" class="w-5 h-5 text-gray-700 hidden" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                        </svg>
+                    </button>
+                    <a href="signin-form.html" class="text-cyan-600 hover:text-cyan-700 px-4 py-2 rounded-lg transition-colors">
+                        Already have an account? Sign In
+                    </a>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-button" class="text-gray-600 hover:text-gray-900 focus:outline-none focus:text-gray-900">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <!-- Header -->
+            <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-green-50 to-emerald-50">
+                <div class="flex items-center space-x-3 mb-2">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">Join as Solution Provider</h1>
+                        <p class="text-gray-600">Offer opportunities, resources, and support to help others succeed</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Registration Form -->
+            <form id="providerRegistrationForm" class="p-6 space-y-6">
+                <!-- Hidden account type -->
+                <input type="hidden" name="accountType" value="provider">
+
+                <!-- Personal Information -->
+                <div class="space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Personal Information</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
+                            <input type="text" id="firstName" name="firstName" required class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                        </div>
+                        <div>
+                            <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
+                            <input type="text" id="lastName" name="lastName" required class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
+                        <input type="email" id="email" name="email" required class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                    </div>
+
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                    </div>
+
+                    <div>
+                        <label for="location" class="block text-sm font-medium text-gray-700 mb-1">Location *</label>
+                        <input type="text" id="location" name="location" required placeholder="City, Country" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                    </div>
+                </div>
+
+                <!-- Account Security -->
+                <div class="space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Account Security</h2>
+                    
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password *</label>
+                        <input type="password" id="password" name="password" required minlength="8" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                        <p class="text-xs text-gray-500 mt-1">Must be at least 8 characters long</p>
+                    </div>
+
+                    <div>
+                        <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password *</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" required minlength="8" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                    </div>
+                </div>
+
+                <!-- Organization Information -->
+                <div class="space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Organization Information</h2>
+                    
+                    <div>
+                        <label for="organizationName" class="block text-sm font-medium text-gray-700 mb-1">Organization/Company Name *</label>
+                        <input type="text" id="organizationName" name="organizationName" required placeholder="Your organization name" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                    </div>
+
+                    <div>
+                        <label for="orgType" class="block text-sm font-medium text-gray-700 mb-1">Organization Type *</label>
+                        <select id="orgType" name="orgType" required class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                            <option value="">Select organization type</option>
+                            <option value="nonprofit">Non-profit Organization</option>
+                            <option value="ngo">NGO</option>
+                            <option value="government">Government Agency</option>
+                            <option value="corporate">Corporate/For-profit</option>
+                            <option value="educational">Educational Institution</option>
+                            <option value="healthcare">Healthcare Organization</option>
+                            <option value="community">Community Group</option>
+                            <option value="startup">Startup</option>
+                            <option value="social-enterprise">Social Enterprise</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="yearsInBusiness" class="block text-sm font-medium text-gray-700 mb-1">Years in Business *</label>
+                        <select id="yearsInBusiness" name="yearsInBusiness" required class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                            <option value="">Select years in business</option>
+                            <option value="0">Less than 1 year</option>
+                            <option value="1">1 year</option>
+                            <option value="2">2 years</option>
+                            <option value="3">3 years</option>
+                            <option value="4">4 years</option>
+                            <option value="5">5 years</option>
+                            <option value="6">6 years</option>
+                            <option value="7">7 years</option>
+                            <option value="8">8 years</option>
+                            <option value="9">9 years</option>
+                            <option value="10">10+ years</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- What You Offer -->
+                <div class="space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">What Do You Offer?</h2>
+                    <p class="text-sm text-gray-600">Help us understand what opportunities and support you can provide:</p>
+                    
+                    <div>
+                        <label for="focusAreas" class="block text-sm font-medium text-gray-700 mb-1">Focus Areas *</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="focusAreas" value="education" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">Education</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="focusAreas" value="healthcare" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">Healthcare</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="focusAreas" value="technology" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">Technology</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="focusAreas" value="environment" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">Environment</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="focusAreas" value="social-justice" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">Social Justice</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="focusAreas" value="economic-development" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">Economic Development</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="targetBeneficiaries" class="block text-sm font-medium text-gray-700 mb-1">Who Do You Serve?</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="targetBeneficiaries" value="youth" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">Youth</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="targetBeneficiaries" value="women" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">Women</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="targetBeneficiaries" value="rural-communities" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">Rural Communities</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="targetBeneficiaries" value="refugees" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">Refugees</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="targetBeneficiaries" value="elderly" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">Elderly</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="targetBeneficiaries" value="small-businesses" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">Small Businesses</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="collaborationInterest" class="block text-sm font-medium text-gray-700 mb-1">What Can You Offer?</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="collaborationInterest" value="job-opportunities" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">Job Opportunities</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="collaborationInterest" value="volunteer-positions" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">Volunteer Positions</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="collaborationInterest" value="mentorship" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">Mentorship</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="collaborationInterest" value="training-programs" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">Training Programs</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="collaborationInterest" value="funding" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">Funding & Grants</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="collaborationInterest" value="resources" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">Resources & Support</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Areas of Impact -->
+                <div class="space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Areas of Impact</h2>
+                    <p class="text-sm text-gray-600">Select the impact areas you work in or support (check all that apply):</p>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" name="interests" value="healthcare" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                            <span class="text-sm text-gray-700">Healthcare</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" name="interests" value="education" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                            <span class="text-sm text-gray-700">Education</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" name="interests" value="environment" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                            <span class="text-sm text-gray-700">Environment</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" name="interests" value="poverty" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                            <span class="text-sm text-gray-700">Poverty Alleviation</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" name="interests" value="technology" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                            <span class="text-sm text-gray-700">Technology</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" name="interests" value="human-rights" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                            <span class="text-sm text-gray-700">Human Rights</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" name="interests" value="economic-development" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                            <span class="text-sm text-gray-700">Economic Development</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" name="interests" value="disaster-relief" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                            <span class="text-sm text-gray-700">Disaster Relief</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" name="interests" value="community-development" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                            <span class="text-sm text-gray-700">Community Development</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Additional Information -->
+                <div class="space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Additional Information</h2>
+                    
+                    <div>
+                        <label for="languages" class="block text-sm font-medium text-gray-700 mb-1">Languages Spoken</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="languages" value="english" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">English</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="languages" value="french" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">French</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="languages" value="spanish" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">Spanish</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="languages" value="arabic" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">Arabic</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="languages" value="portuguese" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">Portuguese</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="languages" value="other" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">Other</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="preferredLanguages" class="block text-sm font-medium text-gray-700 mb-1">Preferred Communication Languages</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="preferredLanguages" value="english" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">English</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="preferredLanguages" value="french" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">French</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="preferredLanguages" value="spanish" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">Spanish</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="preferredLanguages" value="arabic" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">Arabic</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="linkedin" class="block text-sm font-medium text-gray-700 mb-1">LinkedIn Profile (Optional)</label>
+                        <input type="url" id="linkedin" name="linkedin" placeholder="https://linkedin.com/company/yourcompany" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                    </div>
+
+                    <div>
+                        <label for="website" class="block text-sm font-medium text-gray-700 mb-1">Organization Website (Optional)</label>
+                        <input type="url" id="website" name="website" placeholder="https://yourorganization.com" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                    </div>
+
+                    <div>
+                        <label for="bio" class="block text-sm font-medium text-gray-700 mb-1">About Your Organization</label>
+                        <textarea id="bio" name="bio" rows="3" placeholder="Tell us about your organization's mission, values, and the impact you want to make. What makes you unique?" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"></textarea>
+                    </div>
+                </div>
+
+                <!-- Terms and Conditions -->
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <input type="checkbox" id="terms" name="terms" required class="mt-1 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                        <label for="terms" class="ml-2 text-sm text-gray-700">
+                            I agree to the <a href="#" class="text-green-600 hover:text-green-500">Terms of Service</a> and <a href="#" class="text-green-600 hover:text-green-500">Privacy Policy</a> *
+                        </label>
+                    </div>
+
+                    <div class="flex items-start">
+                        <input type="checkbox" id="newsletter" name="newsletter" class="mt-1 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                        <label for="newsletter" class="ml-2 text-sm text-gray-700">
+                            I would like to receive updates about new opportunities and platform features
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4 pt-6 border-t border-gray-200">
+                    <button type="button" onclick="history.back()" class="w-full sm:w-auto px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" class="w-full sm:w-auto px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors font-medium">
+                        Join as Provider
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Alternative Registration Link -->
+        <div class="text-center mt-6">
+            <p class="text-gray-600">
+                Looking for opportunities instead? 
+                <a href="seeker-registration.html" class="text-blue-600 hover:text-blue-500 font-medium">Join as a Seeker</a>
+            </p>
+            <p class="text-gray-600 mt-2">
+                Already have an account? 
+                <a href="signin-form.html" class="text-green-600 hover:text-green-500 font-medium">Sign in here</a>
+            </p>
+        </div>
+    </main>
+
+    <!-- JavaScript Modules -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/data-manager.js"></script>
+    <script src="js/form-validation.js"></script>
+    <script src="js/auth.js"></script>
+    
+    <script>
+        // Initialize components (using global instances)
+        // dataManager is available as window.dbManager
+        // userAuth is available globally
+        // formValidator is available globally
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            setupFormValidation();
+            setupEventListeners();
+        });
+
+        function setupFormValidation() {
+            const form = document.getElementById('providerRegistrationForm');
+            
+            // Setup enhanced form validation
+            formValidator.setupRealTimeValidation(form, ValidationRules.registration);
+        }
+
+        function setupEventListeners() {
+            const form = document.getElementById('providerRegistrationForm');
+            
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                if (!formValidator.validateForm(form, ValidationRules.registration)) {
+                    return;
+                }
+                
+                const formData = new FormData(form);
+                const userData = Object.fromEntries(formData.entries());
+                
+                // Process array fields
+                userData.focusAreas = Array.from(form.querySelectorAll('input[name="focusAreas"]:checked')).map(cb => cb.value);
+                userData.targetBeneficiaries = Array.from(form.querySelectorAll('input[name="targetBeneficiaries"]:checked')).map(cb => cb.value);
+                userData.collaborationInterest = Array.from(form.querySelectorAll('input[name="collaborationInterest"]:checked')).map(cb => cb.value);
+                userData.languages = Array.from(form.querySelectorAll('input[name="languages"]:checked')).map(cb => cb.value);
+                userData.preferredLanguages = Array.from(form.querySelectorAll('input[name="preferredLanguages"]:checked')).map(cb => cb.value);
+                
+                // Set account type
+                userData.accountType = 'provider';
+                
+                // Map field names to match database schema
+                userData.first_name = userData.firstName;
+                userData.last_name = userData.lastName;
+                userData.organization_name = userData.organizationName;
+                userData.org_type = userData.orgType;
+                userData.years_in_business = parseInt(userData.yearsInBusiness) || 0;
+                userData.registration_status = 'registered';
+                
+                try {
+                    // Show loading state
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.textContent;
+                    submitBtn.textContent = 'Creating Account...';
+                    submitBtn.disabled = true;
+                    
+                    // Register user
+                    const result = await window.dbManager.registerUser(userData);
+                    
+                    if (result.success) {
+                        // Show success message
+                        if (typeof errorHandler !== 'undefined') {
+                            errorHandler.showSuccess('Account created successfully! Welcome to Kájọpọ̀!');
+                        }
+                        
+                        // Redirect to dashboard after a short delay
+                        setTimeout(() => {
+                            window.location.href = 'dashboard.html';
+                        }, 2000);
+                    } else {
+                        throw new Error(result.error || 'Registration failed');
+                    }
+                } catch (error) {
+                    console.error('Registration error:', error);
+                    if (typeof errorHandler !== 'undefined') {
+                        errorHandler.showError('Registration failed: ' + error.message);
+                    }
+                } finally {
+                    // Reset button state
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                }
+            });
+        }
+    </script>
+</body>
+</html>

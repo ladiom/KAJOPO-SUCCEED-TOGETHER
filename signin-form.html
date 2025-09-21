@@ -141,20 +141,6 @@
                 </button>
             </form>
 
-            <!-- Demo Login Options -->
-            <div class="px-6 pb-6">
-                <div class="border-t border-gray-200 pt-6">
-                    <p class="text-sm text-gray-900 text-center mb-4">Demo Login Options:</p>
-                    <div class="space-y-2">
-                        <button id="demoSeeker" class="w-full bg-green-100 text-green-800 px-4 py-2 rounded-md hover:bg-green-200 transition-colors text-sm">
-                            Demo: Opportunity Seeker
-                        </button>
-                        <button id="demoProvider" class="w-full bg-purple-100 text-purple-800 px-4 py-2 rounded-md hover:bg-purple-200 transition-colors text-sm">
-                            Demo: Opportunity Provider
-                        </button>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- Register Link -->
@@ -167,37 +153,120 @@
     </main>
 
     <!-- Include JavaScript modules -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/supabase-config.js"></script>
-    <script src="js/mobile-nav.js"></script>
+    <script>
+        // Try to load Supabase with fallback
+        const supabaseSources = [
+            'https://unpkg.com/@supabase/supabase-js@2.38.4/dist/main/index.js',
+            'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/main/index.js',
+            'https://cdn.skypack.dev/@supabase/supabase-js@2.38.4',
+            'https://unpkg.com/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js',
+            'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js'
+        ];
+        
+        let currentSource = 0;
+        
+        function loadSupabase() {
+            if (currentSource >= supabaseSources.length) {
+                console.warn('All Supabase CDN sources failed, using mock implementation');
+                const mockScript = document.createElement('script');
+                mockScript.src = 'js/supabase-mock.js';
+                mockScript.onload = function() {
+                    console.log('Mock Supabase loaded for signin form');
+                };
+                document.head.appendChild(mockScript);
+                return;
+            }
+            
+            const script = document.createElement('script');
+            script.src = supabaseSources[currentSource];
+            script.onload = function() {
+                if (typeof supabase === 'undefined') {
+                    currentSource++;
+                    loadSupabase();
+                }
+            };
+            script.onerror = function() {
+                currentSource++;
+                loadSupabase();
+            };
+            document.head.appendChild(script);
+        }
+        
+        loadSupabase();
+        
+        // Load supabase-config.js after Supabase is loaded
+        function loadConfig() {
+            const configScript = document.createElement('script');
+            configScript.src = 'js/supabase-config.js?v=2';
+            configScript.onload = function() {
+                console.log('Supabase config loaded for signin form');
+            };
+            configScript.onerror = function() {
+                console.error('Failed to load supabase-config.js');
+            };
+            document.head.appendChild(configScript);
+        }
+        
+        // Load config after a delay to ensure Supabase is ready
+        setTimeout(loadConfig, 1000);
+    </script>
     <script src="js/error-handler.js"></script>
     <script src="js/data-manager.js"></script>
     <script src="js/form-validation.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/admin-auth.js"></script>
+        <script src="js/supabase-auth.js?v=2"></script>
+    <script src="js/mobile-nav.js"></script>
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Wait for all scripts to load and initialize
+            setTimeout(() => {
+                checkAuthSystem();
+            }, 3000);
+            
             setupEventListeners();
             setupFormValidation();
         });
 
+        function checkAuthSystem() {
+            if (!window.supabaseAuth) {
+                console.error('Supabase auth not available');
+                showAuthError();
+            } else if (!window.supabaseAuth.isSupabaseReady()) {
+                console.warn('Supabase not ready, waiting...');
+                // Wait a bit more for Supabase to initialize
+                setTimeout(() => {
+                    if (!window.supabaseAuth.isSupabaseReady()) {
+                        showAuthError();
+                    } else {
+                        console.log('✓ Authentication system ready');
+                    }
+                }, 1000);
+            } else {
+                console.log('✓ Authentication system ready');
+            }
+        }
+
+        function showAuthError() {
+            // Show error notification
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+            errorDiv.innerHTML = `
+                <div class="flex items-center">
+                    <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Authentication system is not available. Please refresh the page and try again.
+                </div>
+            `;
+            document.body.appendChild(errorDiv);
+        }
+
         function setupEventListeners() {
             const form = document.getElementById('signinForm');
-            const demoSeekerBtn = document.getElementById('demoSeeker');
-            const demoProviderBtn = document.getElementById('demoProvider');
             
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
                 handleSignIn();
-            });
-
-            demoSeekerBtn.addEventListener('click', function() {
-                loginDemoUser('seeker');
-            });
-
-            demoProviderBtn.addEventListener('click', function() {
-                loginDemoUser('provider');
             });
         }
         
@@ -231,46 +300,58 @@
                     return;
                 }
 
-                // Check if this is an admin email
-                const isAdminEmail = email.includes('admin') || email.endsWith('@kajopo.com');
-                
-                let loginResult;
-                if (isAdminEmail && typeof window.adminAuth !== 'undefined') {
-                    // Try admin authentication first
-                    loginResult = await window.adminAuth.login(email, password, rememberMe);
-                    
-                    if (loginResult.success) {
-                        // Show success message
-                        if (typeof errorHandler !== 'undefined') {
-                            errorHandler.showSuccess('Admin login successful! Redirecting to dashboard...');
-                        }
-                        
-                        // Redirect to admin dashboard
-                        setTimeout(() => {
-                            window.location.href = 'admin-dashboard.html';
-                        }, 1000);
-                        return;
-                    }
+                // Check if Supabase Auth is available
+                if (!window.supabaseAuth) {
+                    throw new Error('Authentication system not loaded. Please refresh the page.');
                 }
                 
-                // Fall back to regular user authentication
-                loginResult = await userAuth.login(email, password, rememberMe);
+                // Check if Supabase is ready
+                if (!window.supabaseAuth.isSupabaseReady()) {
+                    throw new Error('Authentication system is not available. Please refresh the page and try again.');
+                }
+                
+                // Use Supabase Auth - let it determine account type
+                const loginResult = await window.supabaseAuth.signIn(email, password);
                 
                 if (loginResult.success) {
+                    // Show success message based on account type
+                    const accountType = loginResult.accountType;
+                    let message = 'Login successful!';
+                    let redirectUrl = 'dashboard.html';
+                    
+                    if (accountType === 'admin') {
+                        message = 'Admin login successful! Redirecting to admin dashboard...';
+                        redirectUrl = 'admin-dashboard.html';
+                    } else if (accountType === 'provider') {
+                        message = 'Provider login successful! Redirecting to dashboard...';
+                    } else if (accountType === 'seeker') {
+                        message = 'Seeker login successful! Redirecting to dashboard...';
+                    }
+                    
+                    if (typeof errorHandler !== 'undefined') {
+                        errorHandler.showSuccess(message);
+                    }
+                    
                     // Handle return URL if present
                     const urlParams = new URLSearchParams(window.location.search);
                     const returnUrl = urlParams.get('returnUrl');
                     
-                    // Small delay to show success message
+                    // Redirect after showing success message
                     setTimeout(() => {
                         if (returnUrl && returnUrl.startsWith('/')) {
                             window.location.href = returnUrl;
                         } else {
-                            window.location.href = 'dashboard.html';
+                            window.location.href = redirectUrl;
                         }
                     }, 1000);
+                } else {
+                    // Show error message
+                    if (typeof errorHandler !== 'undefined') {
+                        errorHandler.showError(loginResult.error || 'Login failed');
+                    }
                 }
-                // Error handling is done in the auth.js file
+                
+
             } catch (error) {
                 console.error('Login error:', error);
                 errorHandler.handleError(error, 'Sign in');
@@ -329,9 +410,13 @@
             }, 1500);
         }
 
-        // Demo function to clear login (for testing)
+        
+        // Function to clear login (for testing)
         function clearLogin() {
-            localStorage.removeItem('kajopo_user');
+            localStorage.removeItem('kajopo_session');
+            if (window.supabaseAuth) {
+                window.supabaseAuth.signOut();
+            }
             alert('Login cleared. You can now test the authentication flow again.');
         }
     </script>

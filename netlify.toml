@@ -77,3 +77,15 @@
 # Deploy preview settings
 [context.deploy-preview]
   command = "echo 'Deploy preview'"
+
+[build]
+  publish = "."
+  command = "echo 'No build step required for static site'"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

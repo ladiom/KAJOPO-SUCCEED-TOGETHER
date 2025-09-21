@@ -37,6 +37,21 @@
         .text-indigo-600 {
             color: var(--color-primary) !important;
         }
+        
+        /* Dark mode input styling */
+        [data-theme="dark"] input[type="text"],
+        [data-theme="dark"] input[type="email"],
+        [data-theme="dark"] input[type="tel"],
+        [data-theme="dark"] textarea {
+            background-color: var(--bg-tertiary) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--text-tertiary) !important;
+        }
+        
+        [data-theme="dark"] input::placeholder,
+        [data-theme="dark"] textarea::placeholder {
+            color: var(--text-tertiary) !important;
+        }
     </style>
 </head>
 <body>
@@ -120,22 +135,22 @@
                 <div>
                     <label for="fullName" class="block text-sm font-medium text-gray-700">Full Name</label>
                     <input type="text" id="fullName" name="fullName" required 
-                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white text-gray-900 dark:bg-gray-700 dark:text-white dark:border-gray-600">
                 </div>
                 <div>
                     <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
                     <input type="email" id="email" name="email" required 
-                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white text-gray-900 dark:bg-gray-700 dark:text-white dark:border-gray-600">
                 </div>
                 <div>
                     <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number (Optional)</label>
                     <input type="tel" id="phone" name="phone"
-                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white text-gray-900 dark:bg-gray-700 dark:text-white dark:border-gray-600">
                 </div>
                 <div>
                     <label for="message" class="block text-sm font-medium text-gray-700">Why are you a good fit?</label>
                     <textarea id="message" name="message" rows="5" required 
-                              class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                              class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white text-gray-900 dark:bg-gray-700 dark:text-white dark:border-gray-600"></textarea>
                 </div>
                 <div>
                     <button type="submit" 
@@ -148,20 +163,72 @@
     </main>
 
     <script src="js/auth.js"></script>
+    <script src="js/data-manager.js"></script>
     <script>
         // Check authentication state
         function checkUserAuth() {
-            const userIsAuthenticated = localStorage.getItem('userAuthenticated') === 'true';
+            // Check for current authentication system (kajopo_session)
+            const sessionData = localStorage.getItem('kajopo_session');
+            let userIsAuthenticated = false;
+            let currentUser = null;
+            
+            if (sessionData) {
+                try {
+                    const parsed = JSON.parse(sessionData);
+                    userIsAuthenticated = parsed.user && parsed.user.id;
+                    currentUser = parsed.user;
+                } catch (error) {
+                    console.error('Error parsing session data:', error);
+                }
+            }
+            
+            // Fallback to old system for compatibility
+            if (!userIsAuthenticated) {
+                userIsAuthenticated = localStorage.getItem('userAuthenticated') === 'true';
+                if (userIsAuthenticated) {
+                    const userInfo = localStorage.getItem('userInfo');
+                    if (userInfo) {
+                        try {
+                            currentUser = JSON.parse(userInfo);
+                        } catch (error) {
+                            console.error('Error parsing user info:', error);
+                        }
+                    }
+                }
+            }
+            
             const userMenu = document.getElementById('userMenu');
             const guestMenu = document.getElementById('guestMenu');
             
-            if (userIsAuthenticated) {
+            if (userIsAuthenticated && currentUser) {
                 if (userMenu) userMenu.classList.remove('hidden');
                 if (guestMenu) guestMenu.classList.add('hidden');
+                
+                // Update user info in the menu
+                const userName = document.getElementById('userName');
+                const userInitials = document.getElementById('userInitials');
+                
+                if (userName) {
+                    const fullName = currentUser.firstName && currentUser.lastName 
+                        ? `${currentUser.firstName} ${currentUser.lastName}` 
+                        : (currentUser.name || currentUser.email || 'User');
+                    userName.textContent = fullName;
+                }
+                
+                if (userInitials) {
+                    const initials = currentUser.firstName && currentUser.lastName
+                        ? `${currentUser.firstName[0]}${currentUser.lastName[0]}`.toUpperCase()
+                        : (currentUser.email ? currentUser.email[0].toUpperCase() : 'U');
+                    userInitials.textContent = initials;
+                }
             } else {
-                if (userMenu) userMenu.classList.add('hidden');
-                if (guestMenu) guestMenu.classList.remove('hidden');
+                // User not authenticated, redirect to sign in
+                console.log('User not authenticated, redirecting to sign in');
+                window.location.href = 'signin-form.html?returnUrl=' + encodeURIComponent(window.location.href);
+                return false;
             }
+            
+            return true;
         }
 
         // Setup user menu event listeners
@@ -185,8 +252,15 @@
 
             if (signOutBtn) {
                 signOutBtn.addEventListener('click', function() {
+                    // Clear current authentication system
+                    localStorage.removeItem('kajopo_session');
+                    
+                    // Clear old authentication system for compatibility
                     localStorage.removeItem('userAuthenticated');
                     localStorage.removeItem('userInfo');
+                    localStorage.removeItem('currentUser');
+                    
+                    // Redirect to home page
                     window.location.href = 'index.html';
                 });
             }
@@ -237,8 +311,37 @@
         }
 
         function goToProfile() {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            if (currentUser) {
+            // Check current authentication system first
+            const sessionData = localStorage.getItem('kajopo_session');
+            let currentUser = null;
+            
+            if (sessionData) {
+                try {
+                    const parsed = JSON.parse(sessionData);
+                    currentUser = parsed.user;
+                } catch (error) {
+                    console.error('Error parsing session data:', error);
+                }
+            }
+            
+            // Fallback to old system
+            if (!currentUser) {
+                const userInfo = localStorage.getItem('userInfo');
+                if (userInfo) {
+                    try {
+                        currentUser = JSON.parse(userInfo);
+                    } catch (error) {
+                        console.error('Error parsing user info:', error);
+                    }
+                }
+            }
+            
+            // Additional fallback
+            if (!currentUser) {
+                currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            }
+            
+            if (currentUser && currentUser.accountType) {
                 const isSeeker = currentUser.accountType === 'seeker' || currentUser.role === 'I Need Help';
                 
                 if (isSeeker) {
@@ -254,10 +357,189 @@
             }
         }
 
+        // Handle form submission
+        function handleApplicationSubmit(event) {
+            event.preventDefault();
+            
+            // Check if user is authenticated using current system
+            const sessionData = localStorage.getItem('kajopo_session');
+            let userIsAuthenticated = false;
+            let currentUser = null;
+            
+            if (sessionData) {
+                try {
+                    const parsed = JSON.parse(sessionData);
+                    userIsAuthenticated = parsed.user && parsed.user.id;
+                    currentUser = parsed.user;
+                } catch (error) {
+                    console.error('Error parsing session data:', error);
+                }
+            }
+            
+            // Fallback to old system for compatibility
+            if (!userIsAuthenticated) {
+                userIsAuthenticated = localStorage.getItem('userAuthenticated') === 'true';
+                if (userIsAuthenticated) {
+                    const userInfo = localStorage.getItem('userInfo');
+                    if (userInfo) {
+                        try {
+                            currentUser = JSON.parse(userInfo);
+                        } catch (error) {
+                            console.error('Error parsing user info:', error);
+                        }
+                    }
+                }
+            }
+            
+            if (!userIsAuthenticated) {
+                alert('Please sign in to submit an application.');
+                window.location.href = 'signin-form.html';
+                return;
+            }
+            
+            // Get form data
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            const applicationData = {
+                full_name: formData.get('fullName'),
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                message: formData.get('message'),
+                opportunity_id: new URLSearchParams(window.location.search).get('opportunity_id') || null
+            };
+            
+            // Validate required fields
+            if (!applicationData.full_name || !applicationData.email || !applicationData.message) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            // Submit application
+            submitApplicationToDatabase(applicationData);
+        }
+        
+        // Submit application to database
+        async function submitApplicationToDatabase(applicationData) {
+            try {
+                // Show loading state
+                const submitBtn = document.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'Submitting...';
+                submitBtn.disabled = true;
+                
+                // Wait for database manager to be available
+                let attempts = 0;
+                const maxAttempts = 50; // 5 seconds max wait
+                
+                while (!window.dbManager && attempts < maxAttempts) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
+                
+                if (!window.dbManager) {
+                    throw new Error('Database manager not available');
+                }
+                
+                // Ensure database manager is initialized
+                const isInitialized = await window.dbManager.ensureInitialized();
+                if (!isInitialized) {
+                    throw new Error('Database connection failed');
+                }
+                
+            // Debug: Log application data
+            console.log('Submitting application with data:', applicationData);
+            
+            // Submit application
+            const result = await window.dbManager.submitApplication(
+                applicationData.opportunity_id,
+                applicationData.full_name,
+                applicationData.email,
+                applicationData.phone,
+                applicationData.message
+            );
+            
+            // Debug: Log result
+            console.log('Application submission result:', result);
+                
+                if (result.success) {
+                    alert('Application submitted successfully! Thank you for your interest.');
+                    // Reset form
+                    document.getElementById('applicationForm').reset();
+                    // Redirect to home page
+                    window.location.href = 'index.html';
+                } else {
+                    console.error('Application submission failed:', result.error);
+                    alert('Error submitting application: ' + (result.error || 'Please try again.'));
+                }
+            } catch (error) {
+                console.error('Application submission error:', error);
+                alert('Error submitting application: ' + error.message);
+            } finally {
+                // Reset button state
+                const submitBtn = document.querySelector('button[type="submit"]');
+                submitBtn.textContent = 'Submit Application';
+                submitBtn.disabled = false;
+            }
+        }
+
+        // Pre-fill form with user data
+        function prefillForm() {
+            const sessionData = localStorage.getItem('kajopo_session');
+            let currentUser = null;
+            
+            if (sessionData) {
+                try {
+                    const parsed = JSON.parse(sessionData);
+                    currentUser = parsed.user;
+                } catch (error) {
+                    console.error('Error parsing session data:', error);
+                }
+            }
+            
+            // Fallback to old system
+            if (!currentUser) {
+                const userInfo = localStorage.getItem('userInfo');
+                if (userInfo) {
+                    try {
+                        currentUser = JSON.parse(userInfo);
+                    } catch (error) {
+                        console.error('Error parsing user info:', error);
+                    }
+                }
+            }
+            
+            if (currentUser) {
+                // Pre-fill email
+                const emailField = document.getElementById('email');
+                if (emailField && currentUser.email) {
+                    emailField.value = currentUser.email;
+                }
+                
+                // Pre-fill name if available
+                const nameField = document.getElementById('fullName');
+                if (nameField && currentUser.firstName && currentUser.lastName) {
+                    nameField.value = `${currentUser.firstName} ${currentUser.lastName}`;
+                } else if (nameField && currentUser.name) {
+                    nameField.value = currentUser.name;
+                }
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
-            checkUserAuth();
+            if (!checkUserAuth()) {
+                return; // Stop execution if not authenticated
+            }
+            
             setupUserMenuListeners();
             setupThemeToggle();
+            prefillForm();
+            
+            // Add form submission handler
+            const applicationForm = document.getElementById('applicationForm');
+            if (applicationForm) {
+                applicationForm.addEventListener('submit', handleApplicationSubmit);
+            }
         });
     </script>
 </body>

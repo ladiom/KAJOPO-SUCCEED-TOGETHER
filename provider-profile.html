@@ -850,41 +850,80 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            checkUserAuth();
+            if (!checkUserAuth()) {
+                return; // Stop execution if not authenticated
+            }
+            
             updateUserInfo();
-
             loadProviderOpportunities();
         });
 
         function checkUserAuth() {
-            let user = localStorage.getItem('kajopo_current_user');
-            if (!user) {
-                user = localStorage.getItem('kajopo_user');
+            // Check for current authentication system (kajopo_session)
+            const sessionData = localStorage.getItem('kajopo_session');
+            let userIsAuthenticated = false;
+            let currentUser = null;
+            
+            if (sessionData) {
+                try {
+                    const parsed = JSON.parse(sessionData);
+                    userIsAuthenticated = parsed.user && parsed.user.id;
+                    currentUser = parsed.user;
+                } catch (error) {
+                    console.error('Error parsing session data:', error);
+                }
             }
-            if (!user) {
-                console.log('No user found, redirecting to signin');
+            
+            // Fallback to old system for compatibility
+            if (!userIsAuthenticated) {
+                const userData = localStorage.getItem('kajopo_current_user') || localStorage.getItem('kajopo_user');
+                if (userData) {
+                    try {
+                        currentUser = JSON.parse(userData);
+                        userIsAuthenticated = true;
+                    } catch (error) {
+                        console.error('Error parsing user data:', error);
+                    }
+                }
+            }
+            
+            // Check if user is authenticated
+            if (!userIsAuthenticated || !currentUser) {
+                console.log('No user found, redirecting to sign in');
                 window.location.href = 'signin-form.html';
-                return;
+                return false;
             }
             
             // Check if user is a provider
-            const userData = JSON.parse(user);
-            if (userData.accountType !== 'provider') {
-                alert('Access denied. This page is only accessible to opportunity providers.');
-                window.location.href = 'dashboard.html';
-                return;
+            const isProvider = currentUser.accountType === 'provider' || currentUser.role === 'I Can Help';
+            if (!isProvider) {
+                console.log('User is not a provider, redirecting to appropriate profile');
+                if (currentUser.accountType === 'seeker' || currentUser.role === 'I Need Help') {
+                    window.location.href = 'seeker-profile.html';
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
+                return false;
             }
+            
+            return true;
         }
 
         function updateUserInfo() {
-            let user = localStorage.getItem('kajopo_current_user');
-            if (!user) {
-                user = localStorage.getItem('kajopo_user');
+            let userData = localStorage.getItem('kajopo_session') || localStorage.getItem('kajopo_current_user') || localStorage.getItem('kajopo_user');
+            if (!userData) return;
+            
+            const sessionData = JSON.parse(userData);
+            let user = sessionData.user || sessionData;
+            
+            // If user is a string, parse it; if it's already an object, use it directly
+            if (typeof user === 'string') {
+                user = JSON.parse(user);
             }
+            
             if (user) {
-                const userData = JSON.parse(user);
-                const firstName = userData.firstName || 'Provider';
-                const lastName = userData.lastName || 'User';
+                const firstName = user.firstName || 'Provider';
+                const lastName = user.lastName || 'User';
                 const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
                 
                 document.getElementById('userName').textContent = firstName + ' ' + lastName;
@@ -904,11 +943,17 @@
 
         
         function loadProviderOpportunities() {
-            let userData = localStorage.getItem('kajopo_current_user');
-            if (!userData) {
-                userData = localStorage.getItem('kajopo_user');
+            let userData = localStorage.getItem('kajopo_session') || localStorage.getItem('kajopo_current_user') || localStorage.getItem('kajopo_user');
+            if (!userData) return;
+            
+            const sessionData = JSON.parse(userData);
+            let user = sessionData.user || sessionData;
+            
+            // If user is a string, parse it; if it's already an object, use it directly
+            if (typeof user === 'string') {
+                user = JSON.parse(user);
             }
-            const user = JSON.parse(userData);
+            
             const opportunities = JSON.parse(localStorage.getItem('kajopo_opportunities') || '[]');
             const providerOpportunities = opportunities.filter(opp => 
                 opp.providerId === (user.id || user.email)

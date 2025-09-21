@@ -23,7 +23,10 @@
     </script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/themesNew.css">
-    <script src="js/admin-auth.js?v=1"></script>
+ <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/data-manager.js"></script>
+    <script src="js/supabase-auth.js"></script>
     <style>
         /* Admin Login Page - Adjustments for better contrast */
         body {
@@ -65,6 +68,17 @@
 
         .bg-indigo-600 {
             background-color: var(--color-primary);
+        }
+        
+        /* Fix input text visibility */
+        input[type="email"],
+        input[type="password"] {
+            color: #000000 !important;
+        }
+        
+        input[type="email"]::placeholder,
+        input[type="password"]::placeholder {
+            color: #6b7280 !important;
         }
     </style>
 </head>
@@ -164,10 +178,112 @@
             }
         }
         
-        // Initialize theme manager
+        // Admin Login Form Handler
+        async function handleAdminLogin(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const email = form.email.value;
+            const password = form.password.value;
+            const submitButton = form.querySelector('button[type="submit"]');
+            
+            // Show loading state
+            submitButton.disabled = true;
+            submitButton.textContent = 'Signing in...';
+            
+            try {
+                // Check if supabase auth is available
+                if (!window.supabaseAuth) {
+                    throw new Error('Authentication system not loaded. Please refresh the page.');
+                }
+                
+                // Use the supabase authentication system to login
+                const result = await window.supabaseAuth.signIn(email, password);
+                
+                if (result.success) {
+                    // Verify user is actually an admin
+                    if (result.user.accountType === 'admin' || result.user.isAdmin) {
+                        // Redirect to admin dashboard
+                        window.location.href = 'admin-dashboard.html';
+                    } else {
+                        // Sign out the user since they're not admin
+                        await window.supabaseAuth.signOut();
+                        throw new Error('Access denied: Admin privileges required');
+                    }
+                } else {
+                    throw new Error(result.error || 'Login failed');
+                }
+            } catch (error) {
+                // Show error message
+                let errorDiv = document.getElementById('error-message');
+                if (!errorDiv) {
+                    errorDiv = document.createElement('div');
+                    errorDiv.id = 'error-message';
+                    errorDiv.className = 'mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded';
+                    form.appendChild(errorDiv);
+                }
+                errorDiv.textContent = error.message;
+                
+                // Reset button
+                submitButton.disabled = false;
+                submitButton.textContent = 'Sign in';
+            }
+        }
+        
+        // Initialize theme and form handler
         document.addEventListener('DOMContentLoaded', function() {
             setupThemeToggle();
+            
+            // Add form submission handler
+            const adminForm = document.getElementById('adminLoginForm');
+            if (adminForm) {
+                adminForm.addEventListener('submit', handleAdminLogin);
+            }
         });
     </script>
-</body>
+    <script>
+    // Enhanced debugging for unified admin login
+    console.log('=== UNIFIED ADMIN LOGIN DEBUG START ===');
+    console.log('1. Supabase library loaded:', typeof window.supabase !== 'undefined');
+    console.log('2. Supabase client available:', typeof window.supabaseClient !== 'undefined');
+    console.log('3. Database manager available:', typeof window.dbManager !== 'undefined');
+    console.log('4. Unified auth available:', typeof window.unifiedAuth !== 'undefined');
+    
+    // Test database connection and admin user query from unified users table
+    if (window.dbManager) {
+        window.dbManager.ensureInitialized().then(async (initialized) => {
+            console.log('5. Database initialized:', initialized);
+            
+            if (initialized) {
+                try {
+                    // Test query to unified users table for admin users
+                    const { data, error } = await window.dbManager.supabase
+                        .from('users')
+                        .select('id, email, password_hash, role, accountType')
+                        .eq('accountType', 'admin');
+                    
+                    console.log('6. Admin users query result:', { data, error });
+                    
+                    if (data && data.length > 0) {
+                        console.log('7. Found admin users:', data.map(user => ({
+                            email: user.email,
+                            hasPassword: !!user.password_hash,
+                            role: user.role,
+                            accountType: user.accountType
+                        })));
+                    } else {
+                        console.log('7. No admin users found in unified table');
+                    }
+                } catch (err) {
+                    console.error('6. Database query failed:', err);
+                }
+            }
+        });
+    } else {
+        console.error('Database manager not available!');
+    }
+    
+    console.log('=== UNIFIED ADMIN LOGIN DEBUG END ===');
+    </script>
+    </body>
 </html>
