@@ -1,7 +1,10 @@
-# Netlify configuration for Kájọpọ̀ Connect
 [build]
   # No build command needed for static site
   publish = "."
+  command = "echo 'No build step required for static site'"
+
+[build.environment]
+  NODE_VERSION = "18"
 
 # Redirect rules for SPA-like behavior
 [[redirects]]
@@ -44,6 +47,12 @@
   from = "/kajopo-connect/*"
   to = "/"
   status = 301
+
+# Catch-all redirect for SPA behavior
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
 
 # Headers for security
 [[headers]]
