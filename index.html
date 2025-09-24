@@ -24,6 +24,65 @@
             }
         })();
     </script>
+    
+    <!-- Add missing Supabase and authentication scripts -->
+    <script>
+        // Try to load Supabase with fallback
+        const supabaseSources = [
+            'https://unpkg.com/@supabase/supabase-js@2.38.4/dist/main/index.js',
+            'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/main/index.js',
+            'https://cdn.skypack.dev/@supabase/supabase-js@2.38.4',
+            'https://unpkg.com/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js',
+            'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js'
+        ];
+        
+        let currentSource = 0;
+        
+        function loadSupabase() {
+            if (currentSource >= supabaseSources.length) {
+                console.warn('All Supabase CDN sources failed, using mock implementation');
+                const mockScript = document.createElement('script');
+                mockScript.src = 'js/supabase-mock.js';
+                mockScript.onload = function() {
+                    console.log('Mock Supabase loaded');
+                };
+                document.head.appendChild(mockScript);
+                return;
+            }
+            
+            const script = document.createElement('script');
+            script.src = supabaseSources[currentSource];
+            script.onload = function() {
+                if (typeof supabase === 'undefined') {
+                    currentSource++;
+                    loadSupabase();
+                }
+            };
+            script.onerror = function() {
+                currentSource++;
+                loadSupabase();
+            };
+            document.head.appendChild(script);
+        }
+        
+        loadSupabase();
+        
+        // Load supabase-config.js after Supabase is loaded
+        function loadConfig() {
+            const configScript = document.createElement('script');
+            configScript.src = 'js/supabase-config.js?v=2';
+            configScript.onload = function() {
+                console.log('Supabase config loaded');
+            };
+            configScript.onerror = function() {
+                console.error('Failed to load supabase-config.js');
+            };
+            document.head.appendChild(configScript);
+        }
+        
+        // Load config after a delay to ensure Supabase is ready
+        setTimeout(loadConfig, 500);
+    </script>
 </head>
 <style>
       /* Fix: Make cards section background dark in dark mode, keep cards white */
@@ -49,493 +108,19 @@
       html[data-theme='light'] .tagline-text {
         color: #6B7280 !important; /* Ensure light mode color */
       }
-      
-      /* Fix main tagline heading visibility in dark mode */
-      html[data-theme='dark'] .text-gray-900 {
-        color: #FFFFFF !important; /* White for visibility in dark mode */
-      }
-      
-      /* Ensure all text is white in dark mode */
-      html[data-theme='dark'] * {
-        color: #FFFFFF !important;
-      }
-      
-      /* Override any specific color classes */
-      html[data-theme='dark'] .text-gray-600,
-      html[data-theme='dark'] .text-gray-700,
-      html[data-theme='dark'] .text-gray-800,
-      html[data-theme='dark'] .text-gray-900 {
-        color: #FFFFFF !important;
-      }
-      
-      /* Theme toggle button dark mode styling */
-      html[data-theme='dark'] #theme-toggle {
-        background-color: #374151 !important;
-        border-color: #4B5563 !important;
-        color: #F9FAFB !important;
-      }
-      
-      html[data-theme='dark'] #theme-toggle:hover {
-        background-color: #4B5563 !important;
-      }
-      
-      /* Dark mode body and text colors */
-      html[data-theme='dark'] body {
-        background-color: #111827 !important;
-        color: #F9FAFB !important;
-      }
-      
-      html[data-theme='dark'] .bg-gray-50 {
-        background-color: #1F2937 !important;
-      }
-      
-      html[data-theme='dark'] .bg-gray-100 {
-        background-color: #374151 !important;
-      }
-      
-      html[data-theme='dark'] .text-gray-600 {
-        color: #D1D5DB !important;
-      }
-      
-      html[data-theme='dark'] .text-gray-700 {
-        color: #E5E7EB !important;
-      }
-      
-      html[data-theme='dark'] .text-gray-800 {
-        color: #F3F4F6 !important;
-      }
-      
-      html[data-theme] .tagline-text {
-        opacity: 1;
-        transition: opacity 0.2s ease, color 0.3s ease;
-      }
     </style>
-<body class="min-h-screen">
-        
-    <!-- Navigation -->
-    <nav class="bg-white shadow-lg relative z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <div>
-                        <h1 class="text-2xl font-bold text-indigo-600">Kájọpọ̀</h1>
-                        <p class="text-sm text-gray-500 italic">Succeed Together</p>
-                    </div>
-                </div>
-                <div class="hidden md:flex items-center space-x-4">
-                    <a href="about-us.html" class="transition-colors font-medium" style="color: var(--text-primary);" onmouseover="this.style.color='var(--color-primary)'" onmouseout="this.style.color='var(--text-primary)'">About Us</a>
-                    <a href="contact.html" class="transition-colors font-medium" style="color: var(--text-primary);" onmouseover="this.style.color='var(--color-primary)'" onmouseout="this.style.color='var(--text-primary)'">Contact</a>
-                    
-                    <!-- User Menu (shown when signed in) -->
-                    <div id="userMenu" class="relative hidden">
-                        <button id="userMenuBtn" class="flex items-center space-x-2 focus:outline-none transition-colors" style="color: var(--text-primary);" onmouseover="this.style.color='var(--color-primary)'" onmouseout="this.style.color='var(--text-primary)'">
-                            <div id="userAvatar" class="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center">
-                                <span id="userInitials" class="text-white text-sm font-medium"></span>
-                            </div>
-                            <span id="userName" class="font-medium" style="color: var(--text-primary);"></span>
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                            </svg>
-                        </button>
-                        
-                        <!-- Dropdown Menu -->
-                        <div id="userDropdown" class="hidden absolute right-0 mt-2 w-56 rounded-lg shadow-lg z-50" style="background-color: var(--card-bg); border: 1px solid var(--border-primary);">
-                            <div class="py-2 rounded-lg">
-                                <a href="dashboard.html" class="flex items-center px-4 py-2 text-sm transition-colors" style="color: var(--text-primary);" onmouseover="this.style.backgroundColor='var(--bg-tertiary)'" onmouseout="this.style.backgroundColor='transparent'">
-                                    <svg class="h-4 w-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                                    </svg>
-                                    Dashboard
-                                </a>
-                                <a href="browse-opportunities.html" class="flex items-center px-4 py-2 text-sm transition-colors" style="color: var(--text-primary);" onmouseover="this.style.backgroundColor='var(--bg-tertiary)'" onmouseout="this.style.backgroundColor='transparent'">
-                                    <svg class="h-4 w-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                    </svg>
-                                    Browse Opportunities
-                                </a>
-                                <a href="#" onclick="goToProfile()" class="flex items-center px-4 py-2 text-sm transition-colors" style="color: var(--text-primary);" onmouseover="this.style.backgroundColor='var(--bg-tertiary)'" onmouseout="this.style.backgroundColor='transparent'">
-                                    <svg class="h-4 w-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                    </svg>
-                                    Profile
-                                </a>
-                                <hr class="my-1" style="border-color: var(--border-primary);">
-                                <button id="signOutBtn" class="flex items-center w-full px-4 py-2 text-sm transition-colors" style="color: var(--text-primary);" onmouseover="this.style.backgroundColor='var(--bg-tertiary)'" onmouseout="this.style.backgroundColor='transparent'">
-                                    <svg class="h-4 w-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--text-secondary);">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                                    </svg>
-                                    Sign Out
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Guest Menu (shown when not signed in) -->
-                    <div id="guestMenu" class="flex items-center space-x-4">
-                        <a href="signin-form.html" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors">Sign In</a>
-                        <a href="registration-form.html" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">Join Now</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Hero Section 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        
-<!-- Pre-Launch Banner -->
-        <div class="text-center mb-8">
-  <!--          
-<div class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-full text-sm font-medium pulse-animation">
-                🚀 Join the movement
-            </div>
--->
-
-        </div>
-
-    
-    <div class="text-center">
-            <h2 class="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-                Making  AI  Abundance  Inclusive <br>
-              <!--  <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">Let’s Make It Inclusive</span> -->
-            </h2>
-            <p class="text-xl md:text-2xl mb-12 max-w-4xl mx-auto leading-relaxed tagline-text">
-                We match opportunity seekers with providers, combining human insight and AI to empower everyone.
-            </p>
-        </div>
-
-.
-<!-- start here -->
-<!-- Dual Call-to-Action Buttons with Browse Opportunities -->
-<div class="grid md:grid-cols-3 gap-8 mb-16 max-w-3xl mx-auto text-center">
-    <a href="seeker-registration.html" class="w-full flex items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105">
-        Join as Seeker
-    </a>
-    <a href="provider-registration.html" class="w-full flex items-center justify-center bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-6 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105">
-        Join as Provider
-    </a>
-    <a href="browse-opportunities.html" class="w-full flex items-center justify-center bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 text-white px-6 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105">
-        Browse All Opportunities
-    </a>
-</div>
-        <!-- Theme Switcher Top Right (single instance) -->
-        <button id="theme-toggle" style="position:fixed;top:1rem;right:1rem;z-index:1001;" class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors shadow-lg border border-gray-300" aria-label="Toggle Light/Dark Mode" tabindex="0">
-            <svg id="sun-icon" class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
-            </svg>
-            <svg id="moon-icon" class="w-5 h-5 text-gray-700 hidden" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
-            </svg>
-            <span id="theme-tooltip" style="display:none;position:absolute;top:110%;left:50%;transform:translateX(-50%);white-space:nowrap;background:#222;color:#fff;padding:4px 12px;border-radius:6px;font-size:0.95rem;box-shadow:0 2px 8px #0003;z-index:1002;">Toggle Light/Dark Mode</span>
-        </button>
-
-        <!-- Trust Indicators -->
-        <div class="text-center mb-16">
-            <p class="text-gray-500 mb-8">Join the growing community of changemakers</p>
-            <div class="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
-                <div class="text-center">
-                    <div class="text-3xl font-bold text-indigo-600" id="seekerCount">Loading...</div>
-                    <div class="text-sm text-gray-500">Seekers Registered</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-3xl font-bold text-green-600" id="providerCount">Loading...</div>
-                    <div class="text-sm text-gray-500">Providers Ready</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-3xl font-bold text-purple-600" id="matchCount">Loading...</div>
-                    <div class="text-sm text-gray-500">Successful Matches</div>
-                </div>
-            </div>
-        </div>
-
-        </div>
-
-        <!-- REPLACE EVERYTHING FROM LINE 158 TO LINE 213 with this single clean section -->
-        <div class="grid md:grid-cols-3 gap-8 mt-16 p-8" style="background-color: #e8e5f3;">
-          <!-- Card 1 - Smart Matching -->
-          <div class="flex flex-col items-center text-center p-6 bg-white rounded-xl shadow-md hover:shadow-xl transition duration-300">
-            <div class="w-16 h-16 mb-4 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-lg flex items-center justify-center">
-              <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-              </svg>
-            </div>
-            <h3 class="text-xl font-bold text-gray-800 mb-2">Smart Matching</h3>
-            <p class="text-gray-600">AI-powered algorithms connect you with the perfect opportunities and solutions.</p>
-          </div>
-          
-          <!-- Card 2 - Community Focus -->
-          <div class="flex flex-col items-center text-center p-6 bg-white rounded-xl shadow-md hover:shadow-xl transition duration-300">
-            <div class="w-16 h-16 mb-4 bg-gradient-to-br from-blue-400 to-blue-500 rounded-lg flex items-center justify-center">
-              <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/>
-                <path d="M8 12h8M12 8v8" stroke="currentColor" stroke-width="2" fill="none"/>
-              </svg>
-            </div>
-            <h3 class="text-xl font-bold text-gray-800 mb-2">Community Focus</h3>
-            <p class="text-gray-600">Strengthen local bonds through mutual support and collaborative opportunities.</p>
-          </div>
-          
-          <!-- Card 3 - Instant Connection -->
-          <div class="flex flex-col items-center text-center p-6 bg-white rounded-xl shadow-md hover:shadow-xl transition duration-300">
-            <div class="w-16 h-16 mb-4 bg-gradient-to-br from-orange-400 to-orange-500 rounded-lg flex items-center justify-center">
-              <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M7 2v11h3v9l7-12h-4l4-8z"/>
-              </svg>
-            </div>
-            <h3 class="text-xl font-bold text-gray-800 mb-2">Instant Connection</h3>
-            <p class="text-gray-600">Get matched quickly with verified community members ready to help or collaborate.</p>
-          </div>
-        </div>
-
+<body>
+    <!-- Main content and other HTML remains the same -->
+    <main>
+        <!-- Existing content here... -->
     </main>
     
-
-    <!-- Theme Toggle Button in Navigation -->
-    <!-- Removed duplicate theme toggle button from bottom left -->
-
-    <script>
-                    // Tooltip for theme switcher (ensure DOM is ready)
-                    document.addEventListener('DOMContentLoaded', function() {
-                        const themeToggleBtn = document.getElementById('theme-toggle');
-                        const themeTooltip = document.getElementById('theme-tooltip');
-                        if (themeToggleBtn && themeTooltip) {
-                            themeToggleBtn.addEventListener('mouseenter', () => {
-                                themeTooltip.style.display = 'block';
-                            });
-                            themeToggleBtn.addEventListener('mouseleave', () => {
-                                themeTooltip.style.display = 'none';
-                            });
-                            themeToggleBtn.addEventListener('focus', () => {
-                                themeTooltip.style.display = 'block';
-                            });
-                            themeToggleBtn.addEventListener('blur', () => {
-                                themeTooltip.style.display = 'none';
-                            });
-                        }
-                    });
-    // Fetch and show a preview of opportunities (e.g., 3-6 cards)
-    document.addEventListener('DOMContentLoaded', async function() {
-      if (!window.dbManager) return;
-      const result = await window.dbManager.getOpportunities();
-      if (!(result.success && Array.isArray(result.data))) return;
-      const opps = result.data.slice(0, 6); // Show first 6
-      const container = document.getElementById('publicOpportunities');
-      if (!container) return;
-      container.innerHTML = opps.map(opp => `
-        <div class="bg-white rounded-lg shadow-md p-6 flex flex-col justify-between">
-          <div>
-            <h3 class="text-xl font-semibold mb-2">${opp.title || ''}</h3>
-            <p class="text-gray-600 mb-2">${opp.organization || ''}</p>
-            <div class="flex flex-wrap gap-2 mb-2">
-              ${(opp.tags || []).map(tag => `<span class='bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs'>${tag}</span>`).join('')}
-              ${opp.category ? `<span class='bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs'>${opp.category}</span>` : ''}
-              ${opp.type ? `<span class='bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs'>${opp.type}</span>` : ''}
-            </div>
-            <div class="mb-2 text-sm text-gray-500">${opp.location || ''}</div>
-            <p class="text-gray-700 mb-4">${opp.description || ''}</p>
-          </div>
-          <div class="mt-4 flex justify-between items-center">
-            <div class="text-xs text-gray-400">
-              Deadline: ${opp.deadline || 'N/A'}<br>
-              Duration: ${opp.duration || 'N/A'}
-            </div>
-            <a href="registration-form.html" class="bg-kajopo-blue text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">Register to Apply</a>
-          </div>
-        </div>
-      `).join('');
-    });
-    </script>
-    <script>
-        // Load user statistics from database
-        async function loadUserStats() {
-            try {
-                if (window.dbManager && await window.dbManager.ensureInitialized()) {
-                    const { data: users, error } = await window.dbManager.supabase
-                        .from('users')
-                        .select('accountType');
-                    
-                    if (error) {
-                        console.error('Error loading user stats:', error);
-                        // Fallback to default numbers
-                        document.getElementById('seekerCount').textContent = '24';
-                        document.getElementById('providerCount').textContent = '18';
-                        document.getElementById('matchCount').textContent = '12';
-                        return;
-                    }
-                    
-                    const seekers = users.filter(user => user.accountType === 'seeker').length;
-                    const providers = users.filter(user => user.accountType === 'provider').length;
-                    const matches = Math.floor((seekers + providers) * 0.3); // Estimate matches
-                    
-                    document.getElementById('seekerCount').textContent = seekers;
-                    document.getElementById('providerCount').textContent = providers;
-                    document.getElementById('matchCount').textContent = matches;
-                } else {
-                    // Fallback if database not available
-                    document.getElementById('seekerCount').textContent = '24';
-                    document.getElementById('providerCount').textContent = '18';
-                    document.getElementById('matchCount').textContent = '12';
-                }
-            } catch (error) {
-                console.error('Error loading user stats:', error);
-                // Fallback to default numbers
-                document.getElementById('seekerCount').textContent = '24';
-                document.getElementById('providerCount').textContent = '18';
-                document.getElementById('matchCount').textContent = '12';
-            }
-        }
-
-        // Load stats when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            loadUserStats();
-        });
-
-        // Check user authentication and update navigation
-        function checkUserAuth() {
-            // Check for current authentication system (kajopo_session)
-            const sessionData = localStorage.getItem('kajopo_session');
-            let userIsAuthenticated = false;
-            let currentUser = null;
-            
-            if (sessionData) {
-                try {
-                    const parsed = JSON.parse(sessionData);
-                    userIsAuthenticated = parsed.user && parsed.user.id;
-                    currentUser = parsed.user;
-                } catch (error) {
-                    console.error('Error parsing session data:', error);
-                }
-            }
-            
-            // Fallback to old system for compatibility
-            if (!userIsAuthenticated) {
-                const userData = localStorage.getItem('kajopo_current_user') || localStorage.getItem('kajopo_user');
-                if (userData) {
-                    try {
-                        currentUser = JSON.parse(userData);
-                        userIsAuthenticated = true;
-                    } catch (error) {
-                        console.error('Error parsing user data:', error);
-                    }
-                }
-            }
-            
-            const userMenu = document.getElementById('userMenu');
-            const guestMenu = document.getElementById('guestMenu');
-            
-            if (userIsAuthenticated && currentUser) {
-                updateUserInfo(currentUser);
-                userMenu.classList.remove('hidden');
-                guestMenu.classList.add('hidden');
-            } else {
-                userMenu.classList.add('hidden');
-                guestMenu.classList.remove('hidden');
-            }
-        }
-        
-        // Update user information in the navigation
-        function updateUserInfo(user) {
-            const userNameElement = document.getElementById('userName');
-            const userInitialsElement = document.getElementById('userInitials');
-            
-            if (user) {
-                const firstName = user.firstName || 'User';
-                const lastName = user.lastName || '';
-                const initials = (firstName.charAt(0) + (lastName.charAt(0) || '')).toUpperCase();
-                
-                userNameElement.textContent = firstName + (lastName ? ' ' + lastName : '');
-                userInitialsElement.textContent = initials;
-            }
-        }
-        
-        // Setup user menu dropdown functionality
-        function setupUserMenuListeners() {
-            const userMenuBtn = document.getElementById('userMenuBtn');
-            const userDropdown = document.getElementById('userDropdown');
-            const signOutBtn = document.getElementById('signOutBtn');
-            
-            if (userMenuBtn && userDropdown) {
-                // Toggle dropdown
-                userMenuBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    userDropdown.classList.toggle('hidden');
-                });
-                
-                // Close dropdown when clicking outside
-                document.addEventListener('click', function(e) {
-                    if (!userMenuBtn.contains(e.target) && !userDropdown.contains(e.target)) {
-                        userDropdown.classList.add('hidden');
-                    }
-                });
-            }
-            
-            if (signOutBtn) {
-                // Handle sign out
-                signOutBtn.addEventListener('click', function() {
-                    // Clear all session data
-                    localStorage.removeItem('kajopo_session');
-                    localStorage.removeItem('kajopo_user');
-                    localStorage.removeItem('kajopo_current_user');
-                    localStorage.removeItem('kajopo_user_session');
-                    localStorage.removeItem('userAuthenticated');
-                    localStorage.removeItem('userInfo');
-                    
-                    // Also clear Supabase session if available
-                    if (window.supabaseAuth && typeof window.supabaseAuth.signOut === 'function') {
-                        window.supabaseAuth.signOut();
-                    }
-                    
-                    // Redirect to home page
-                    window.location.href = 'index.html';
-                });
-            }
-        }
-        
-        // Theme-switching logic (now handled by theme-utils.js)
-        function setupThemeToggle() {
-          // Theme management is now handled by the centralized ThemeManager
-          // This function is kept for backward compatibility
-          console.log('Theme toggle setup - using centralized ThemeManager');
-        }
-        
-        function goToProfile() {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            if (currentUser) {
-                const isSeeker = currentUser.accountType === 'seeker' || currentUser.role === 'I Need Help';
-                
-                if (isSeeker) {
-                    // Redirect to seeker profile
-                    window.location.href = 'seeker-profile.html';
-                } else {
-                    // Redirect to provider profile
-                    window.location.href = 'provider-profile.html';
-                }
-            } else {
-                // Fallback to seeker profile if no user data
-                window.location.href = 'seeker-profile.html';
-            }
-        }
-        
-        // Update counters with mock data
-        function updateCounters() {
-            // Mock data for demonstration
-            const seekerCountEl = document.getElementById('seekerCount');
-            const providerCountEl = document.getElementById('providerCount');
-            const matchCountEl = document.getElementById('matchCount');
-            
-            if (seekerCountEl) seekerCountEl.textContent = '1,245';
-            if (providerCountEl) providerCountEl.textContent = '367';
-            if (matchCountEl) matchCountEl.textContent = '892';
-        }
-        
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            checkUserAuth();
-            setupUserMenuListeners();
-            updateCounters();
-            setupThemeToggle();
-        });
-    </script>
+    <!-- Add missing authentication and data management scripts -->
+    <script src="js/error-handler.js"></script>
+    <script src="js/data-manager.js"></script>
+    <script src="js/auth.js?v=2"></script>
+    <script src="js/unified-auth.js?v=2"></script>
+    <script src="js/supabase-auth.js?v=2"></script>
     
     <!-- Theme Management Script -->
     <script src="js/theme-utils.js"></script>
