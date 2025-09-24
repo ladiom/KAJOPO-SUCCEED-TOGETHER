@@ -126,8 +126,11 @@
                     console.error('Database manager not initialized');
                     return;
                 }
+                console.log('dbManager found:', dbManager);
+                console.log('getUniqueCategories method:', typeof dbManager.getUniqueCategories);
+                console.log('Available methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(dbManager)));
                 // Get unique values from database
-                const [categoriesResult, , locationsResult] = await Promise.all([
+                const [categoriesResult, typesResult, locationsResult] = await Promise.all([
                     dbManager.getUniqueCategories(),
                     dbManager.getUniqueTypes(),
                     dbManager.getUniqueLocations()
@@ -234,45 +237,106 @@
             }
         }
 
+        // Check user authentication and update navigation
+        function checkUserAuth() {
+            // Check for current authentication system (kajopo_session)
+            const sessionData = localStorage.getItem('kajopo_session');
+            let userIsAuthenticated = false;
+            let currentUser = null;
+            
+            if (sessionData) {
+                try {
+                    const parsed = JSON.parse(sessionData);
+                    userIsAuthenticated = parsed.user && parsed.user.id;
+                    currentUser = parsed.user;
+                } catch (error) {
+                    console.error('Error parsing session data:', error);
+                }
+            }
+            
+            // Fallback to old system for compatibility
+            if (!userIsAuthenticated) {
+                const userData = localStorage.getItem('kajopo_current_user') || localStorage.getItem('kajopo_user');
+                if (userData) {
+                    try {
+                        currentUser = JSON.parse(userData);
+                        userIsAuthenticated = true;
+                    } catch (error) {
+                        console.error('Error parsing user data:', error);
+                    }
+                }
+            }
+            
+            return currentUser;
+        }
+
         // Call this function when the page loads
         document.addEventListener('DOMContentLoaded', async function() {
-            checkUserAuth();
             setupUserMenuListeners();
             // Auth logic: show/hide menus based on user
             const user = checkUserAuth();
             if (user) {
                 document.getElementById('guestMenu').classList.add('hidden');
                 document.getElementById('authenticatedMenu').classList.remove('hidden');
+                
+                // Handle both old and new user data structures
+                let firstName = user.firstName || '';
+                let lastName = user.lastName || '';
+                let fullName = '';
+                
+                if (firstName && lastName) {
+                    fullName = `${firstName} ${lastName}`;
+                } else if (user.name) {
+                    fullName = user.name;
+                    const names = user.name.split(' ');
+                    firstName = names[0] || '';
+                    lastName = names[1] || '';
+                } else if (user.email) {
+                    fullName = user.email;
+                    firstName = user.email.split('@')[0];
+                }
+                
                 // Show user's name in greeting
                 const greeting = document.getElementById('userGreeting');
-                if (greeting && user.firstName) {
-                    greeting.textContent = `Welcome, ${user.firstName}!`;
+                if (greeting && firstName) {
+                    greeting.textContent = `Welcome, ${firstName}!`;
                 }
+                
                 // Set user full name in menu button
                 const userNameSpan = document.getElementById('userName');
-                if (userNameSpan && user.firstName && user.lastName) {
-                    userNameSpan.textContent = `${user.firstName} ${user.lastName}`;
+                if (userNameSpan && fullName) {
+                    userNameSpan.textContent = fullName;
                 }
+                
                 // Mobile greeting
                 const mobileGreeting = document.getElementById('mobileUserGreeting');
-                if (mobileGreeting && user.firstName) {
-                    mobileGreeting.textContent = `Welcome, ${user.firstName}!`;
+                if (mobileGreeting && firstName) {
+                    mobileGreeting.textContent = `Welcome, ${firstName}!`;
                 }
             } else {
                 document.getElementById('guestMenu').classList.remove('hidden');
                 document.getElementById('authenticatedMenu').classList.add('hidden');
             }
-            setupUserMenuListeners();
+            
             setupThemeToggle();
             await populateFilterDropdowns();
             
-            // Initialize using OpportunityManager for unified approach
-            if (typeof opportunityManager === 'undefined') {
-                console.error('OpportunityManager not available');
+            // Initialize OpportunityManager
+            if (typeof OpportunityManager === 'undefined') {
+                console.error('OpportunityManager class not available');
                 return;
             }
             
+            // Create global opportunityManager instance
+            window.opportunityManager = new OpportunityManager();
+            console.log('OpportunityManager initialized');
+            
             await loadDynamicOpportunities();
+            
+            // Setup Apply Now button functionality
+            if (typeof setupApplyNowButtons === 'function') {
+                setupApplyNowButtons();
+            }
             
             // Initialize search filter module
             if (typeof searchFilter !== 'undefined') {
@@ -305,12 +369,15 @@
                 const filters = {
                     category: categoryFilter ? categoryFilter.value : 'all',
                     type: typeFilter ? typeFilter.value : 'all',
-                    location: locationFilter ? locationFilter.value : 'all',
+                    region: locationFilter ? locationFilter.value : 'all',
                     search: searchInput ? searchInput.value.trim() : ''
                 };
                 
+                console.log('Filtering with:', filters);
+                
                 // Use OpportunityManager's unified filtering
                 const filteredOpportunities = await opportunityManager.filterOpportunities(filters);
+                console.log('Filtered opportunities:', filteredOpportunities);
                 renderOpportunities(filteredOpportunities);
             }
             // Setup filter event listeners with dynamic element detection
@@ -341,33 +408,30 @@
             
             // Event handler functions
             async function categoryChangeHandler() {
+                console.log('Category changed');
                 await updateTypeDropdown();
                 const typeFilter = document.getElementById('typeFilter');
                 if (typeFilter) typeFilter.value = 'all';
-                if (typeof filterOpportunities === 'function') {
-                    await filterOpportunities();
-                }
+                await filterOpportunities();
             }
             
             async function typeChangeHandler() {
-                if (typeof filterOpportunities === 'function') {
-                    await filterOpportunities();
-                }
+                console.log('Type changed');
+                await filterOpportunities();
             }
             
             async function locationChangeHandler() {
-                if (typeof filterOpportunities === 'function') {
-                    await filterOpportunities();
-                }
+                console.log('Location changed');
+                await filterOpportunities();
             }
             
             async function searchInputHandler() {
-                if (typeof filterOpportunities === 'function') {
-                    await filterOpportunities();
-                }
+                console.log('Search input changed');
+                await filterOpportunities();
             }
             
             async function clearFiltersHandler() {
+                console.log('Clear filters clicked');
                 const categoryFilter = document.getElementById('categoryFilter');
                 const typeFilter = document.getElementById('typeFilter');
                 const locationFilter = document.getElementById('locationFilter');
@@ -378,9 +442,7 @@
                 if (locationFilter) locationFilter.value = 'all';
                 if (searchInput) searchInput.value = '';
                 updateTypeDropdown();
-                if (typeof filterOpportunities === 'function') {
-                    await filterOpportunities();
-                }
+                await filterOpportunities();
             }
             
             // Initial setup
@@ -412,7 +474,8 @@
                         Deadline: ${opp.deadline || 'N/A'}<br>
                         Duration: ${opp.duration || 'N/A'}
                     </div>
-                    <a href="application-form.html" class="bg-kajopo-blue text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">Apply Now</a>
+                    <button class="apply-now-btn bg-kajopo-blue text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors" 
+                            data-opportunity-id="${opp.id}">Apply Now</button>
                 </div>
             </div>
             `;
@@ -437,7 +500,8 @@
         }
         
         function goToProfile() {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            // Use the same authentication check as the rest of the page
+            const currentUser = checkUserAuth();
             if (currentUser) {
                 const isSeeker = currentUser.accountType === 'seeker' || currentUser.role === 'I Need Help';
                 
@@ -451,6 +515,55 @@
             } else {
                 // Fallback to seeker profile if no user data
                 window.location.href = 'seeker-profile.html';
+            }
+        }
+
+        // Custom setupUserMenuListeners that uses current authentication system
+        function setupUserMenuListeners() {
+            const userMenuBtn = document.getElementById('userMenuBtn');
+            const userDropdown = document.getElementById('userDropdown');
+            const signOutBtn = document.getElementById('signOutBtn');
+            const mobileSignOutBtn = document.getElementById('mobileSignOutBtn');
+
+            if (userMenuBtn && userDropdown) {
+                userMenuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    userDropdown.classList.toggle('hidden');
+                });
+
+                document.addEventListener('click', function() {
+                    userDropdown.classList.add('hidden');
+                });
+
+                userDropdown.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
+
+            function handleSignOut() {
+                // Clear all session data
+                localStorage.removeItem('kajopo_session');
+                localStorage.removeItem('kajopo_current_user');
+                localStorage.removeItem('kajopo_user');
+                localStorage.removeItem('kajopo_user_session');
+                localStorage.removeItem('userAuthenticated');
+                localStorage.removeItem('userInfo');
+                
+                // Also clear Supabase session if available
+                if (window.supabaseAuth && typeof window.supabaseAuth.signOut === 'function') {
+                    window.supabaseAuth.signOut();
+                }
+                
+                // Redirect to home page
+                window.location.href = 'index.html';
+            }
+
+            if (signOutBtn) {
+                signOutBtn.addEventListener('click', handleSignOut);
+            }
+            
+            if (mobileSignOutBtn) {
+                mobileSignOutBtn.addEventListener('click', handleSignOut);
             }
         }
     </script>

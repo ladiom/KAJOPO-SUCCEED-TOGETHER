@@ -1,3 +1,5 @@
+# Netlify configuration for Kájọpọ̀ Connect
+
 [build]
   # No build command needed for static site
   publish = "."

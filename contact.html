@@ -98,16 +98,75 @@
     <script>
         // Check authentication state
         function checkUserAuth() {
-            const userIsAuthenticated = localStorage.getItem('userAuthenticated') === 'true';
+            // Check for current authentication system (kajopo_session)
+            const sessionData = localStorage.getItem('kajopo_session');
+            let userIsAuthenticated = false;
+            let currentUser = null;
+            
+            if (sessionData) {
+                try {
+                    const parsed = JSON.parse(sessionData);
+                    userIsAuthenticated = parsed.user && parsed.user.id;
+                    currentUser = parsed.user;
+                } catch (error) {
+                    console.error('Error parsing session data:', error);
+                }
+            }
+            
+            // Fallback to old system for compatibility
+            if (!userIsAuthenticated) {
+                const userData = localStorage.getItem('kajopo_current_user') || localStorage.getItem('kajopo_user');
+                if (userData) {
+                    try {
+                        currentUser = JSON.parse(userData);
+                        userIsAuthenticated = true;
+                    } catch (error) {
+                        console.error('Error parsing user data:', error);
+                    }
+                }
+            }
+            
             const userMenu = document.getElementById('userMenu');
             const guestMenu = document.getElementById('guestMenu');
             
-            if (userIsAuthenticated) {
+            if (userIsAuthenticated && currentUser) {
+                updateUserInfo(currentUser);
                 if (userMenu) userMenu.classList.remove('hidden');
                 if (guestMenu) guestMenu.classList.add('hidden');
             } else {
                 if (userMenu) userMenu.classList.add('hidden');
                 if (guestMenu) guestMenu.classList.remove('hidden');
+            }
+        }
+        
+        // Update user information in the navigation
+        function updateUserInfo(user) {
+            const userNameElement = document.getElementById('userName');
+            const greetingElement = document.getElementById('userGreeting');
+            
+            // Handle both old and new user data structures
+            let firstName = user.firstName || '';
+            let lastName = user.lastName || '';
+            let fullName = '';
+            
+            if (firstName && lastName) {
+                fullName = `${firstName} ${lastName}`;
+            } else if (user.name) {
+                fullName = user.name;
+                const names = user.name.split(' ');
+                firstName = names[0] || '';
+                lastName = names[1] || '';
+            } else if (user.email) {
+                fullName = user.email;
+                firstName = user.email.split('@')[0];
+            }
+            
+            if (userNameElement && fullName) {
+                userNameElement.textContent = fullName;
+            }
+            
+            if (greetingElement && firstName) {
+                greetingElement.textContent = `Welcome, ${firstName}!`;
             }
         }
 
@@ -132,8 +191,21 @@
 
             if (signOutBtn) {
                 signOutBtn.addEventListener('click', function() {
+                    // Clear all session data
+                    localStorage.removeItem('kajopo_session');
+                    localStorage.removeItem('kajopo_user');
+                    localStorage.removeItem('kajopo_user_session');
+                    localStorage.removeItem('kajopo_current_user');
                     localStorage.removeItem('userAuthenticated');
                     localStorage.removeItem('userInfo');
+                    localStorage.removeItem('currentUser');
+                    
+                    // Also clear Supabase session if available
+                    if (window.supabaseAuth && typeof window.supabaseAuth.signOut === 'function') {
+                        window.supabaseAuth.signOut();
+                    }
+                    
+                    // Redirect to home page
                     window.location.href = 'index.html';
                 });
             }

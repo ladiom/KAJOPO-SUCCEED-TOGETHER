@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Users Count</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Test Users Count</h1>
+    <div id="results"></div>
+    
+    <script>
+        // Initialize Supabase
+        const supabaseUrl = 'https://wklvqccyzmwmnfalqnik.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrbHZxY2N5em13bW5mYWxxbmlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ1NzQ4NzAsImV4cCI6MjA1MDE1MDg3MH0.8QZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZqZq';
+        
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        
+        async function testUsersCount() {
+            const resultsDiv = document.getElementById('results');
+            
+            try {
+                console.log('Testing users count...');
+                
+                // Test 1: Count all users
+                const { count: totalCount, error: countError } = await supabase
+                    .from('users')
+                    .select('*', { count: 'exact', head: true });
+                
+                if (countError) {
+                    console.error('Count error:', countError);
+                    resultsDiv.innerHTML += `<p style="color: red;">Count Error: ${countError.message}</p>`;
+                } else {
+                    console.log('Total users count:', totalCount);
+                    resultsDiv.innerHTML += `<p style="color: green;">Total users count: ${totalCount}</p>`;
+                }
+                
+                // Test 2: Get all users
+                const { data: users, error: usersError } = await supabase
+                    .from('users')
+                    .select('*');
+                
+                if (usersError) {
+                    console.error('Users error:', usersError);
+                    resultsDiv.innerHTML += `<p style="color: red;">Users Error: ${usersError.message}</p>`;
+                } else {
+                    console.log('Users data:', users);
+                    resultsDiv.innerHTML += `<p style="color: green;">Users retrieved: ${users ? users.length : 0}</p>`;
+                    
+                    if (users && users.length > 0) {
+                        resultsDiv.innerHTML += '<h3>User Details:</h3><ul>';
+                        users.forEach((user, index) => {
+                            resultsDiv.innerHTML += `<li>User ${index + 1}: ${user.email} (${user.account_type || user.accountType || 'no type'})</li>`;
+                        });
+                        resultsDiv.innerHTML += '</ul>';
+                    }
+                }
+                
+                // Test 3: Check RLS policies
+                const { data: policies, error: policiesError } = await supabase
+                    .rpc('get_policies', { table_name: 'users' });
+                
+                if (policiesError) {
+                    console.log('Policies check failed (expected):', policiesError.message);
+                    resultsDiv.innerHTML += `<p style="color: orange;">Policies check failed (this is normal): ${policiesError.message}</p>`;
+                } else {
+                    console.log('Policies:', policies);
+                    resultsDiv.innerHTML += `<p style="color: green;">Policies: ${JSON.stringify(policies)}</p>`;
+                }
+                
+            } catch (error) {
+                console.error('Test error:', error);
+                resultsDiv.innerHTML += `<p style="color: red;">Test Error: ${error.message}</p>`;
+            }
+        }
+        
+        // Run the test when page loads
+        testUsersCount();
+    </script>
+</body>
+</html>
+

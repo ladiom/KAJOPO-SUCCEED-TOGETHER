@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Toggle Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/dark-theme.css">
+    <style>
+        /* Additional test styles */
+        .test-card {
+            background-color: white;
+            border: 1px solid #e5e7eb;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Theme Toggle Button -->
+    <button id="theme-toggle" style="position:fixed;top:1rem;right:1rem;z-index:1001;" 
+            class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors shadow-lg border border-gray-300" 
+            aria-label="Toggle Light/Dark Mode" tabindex="0">
+        <svg id="sun-icon" class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+        </svg>
+        <svg id="moon-icon" class="w-5 h-5 text-gray-700 hidden" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+        </svg>
+    </button>
+
+    <!-- Test Content -->
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-6">Theme Toggle Test Page</h1>
+        
+        <div class="test-card">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Test Card 1</h2>
+            <p class="text-gray-600 mb-4">This is a test card to verify dark theme styling.</p>
+            <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Test Button</button>
+        </div>
+
+        <div class="test-card">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Test Card 2</h2>
+            <p class="text-gray-600 mb-4">Another test card with different content.</p>
+            <input type="text" placeholder="Test input field" class="w-full p-2 border border-gray-300 rounded">
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-lg mt-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Current Theme Status</h3>
+            <p class="text-gray-600">Current theme: <span id="current-theme">Loading...</span></p>
+            <p class="text-gray-600">Saved theme: <span id="saved-theme">Loading...</span></p>
+            <p class="text-gray-600">System preference: <span id="system-preference">Loading...</span></p>
+        </div>
+    </div>
+
+    <!-- Theme Management Script -->
+    <script src="js/theme-utils.js"></script>
+    
+    <script>
+        // Update theme status display
+        function updateThemeStatus() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const savedTheme = localStorage.getItem('theme') || 'none';
+            const systemPreference = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            
+            document.getElementById('current-theme').textContent = currentTheme;
+            document.getElementById('saved-theme').textContent = savedTheme;
+            document.getElementById('system-preference').textContent = systemPreference;
+        }
+
+        // Update status when theme changes
+        document.addEventListener('DOMContentLoaded', () => {
+            updateThemeStatus();
+            
+            // Listen for theme changes
+            const observer = new MutationObserver(() => {
+                updateThemeStatus();
+            });
+            
+            observer.observe(document.documentElement, {
+                attributes: true,
+                attributeFilter: ['data-theme']
+            });
+        });
+    </script>
+</body>
+</html>
+

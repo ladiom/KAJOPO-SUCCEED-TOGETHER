@@ -459,7 +459,7 @@ function setupApplyNowButtons() {
             }
             
             // Redirect to application form
-            window.location.href = `application-form.html?opportunity=${opportunityId}`;
+            window.location.href = `application-form.html?opportunity_id=${opportunityId}`;
         }
     });
 }

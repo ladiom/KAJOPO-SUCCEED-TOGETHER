@@ -182,7 +182,7 @@
                 return false;
             }
             
-            const isAdmin = (currentUser.accountType || currentUser.account_type) === 'admin' || currentUser.isAdmin || currentUser.role === 'admin';
+            const isAdmin = currentUser.accountType === 'admin' || currentUser.isAdmin || currentUser.role === 'admin';
             if (!isAdmin) {
                 console.log('User is not admin, redirecting to admin login');
                 alert('Access denied. Admin privileges required.');
@@ -227,7 +227,7 @@
                     .from('applications')
                     .select(`
                         *,
-                        opportunities!applications_opportunity_id_fkey (
+                        opportunities (
                             title,
                             organization,
                             type,
@@ -242,10 +242,6 @@
                 
                 const apps = applications || [];
                 console.log(`Found ${apps.length} applications`);
-                
-                // Store in global variables
-                allApplications = apps;
-                filteredApplications = [...apps];
                 
                 // Calculate stats
                 const totalApplications = apps.length;
@@ -267,11 +263,8 @@
                 document.getElementById('rejected-applications').textContent = rejectedApplications;
                 document.getElementById('weekly-applications').textContent = weeklyApplications;
                 
-                // Setup search and filter
-                setupSearchAndFilter();
-                
                 // Render table
-                renderApplicationsTable(filteredApplications);
+                renderApplicationsTable(apps);
                 
             } catch (error) {
                 console.error('Error loading applications:', error);
@@ -293,7 +286,7 @@
             tbody.innerHTML = applications.map(app => `
                 <tr>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-gray-900">${app.full_name || (app.first_name && app.last_name ? `${app.first_name} ${app.last_name}` : 'N/A')}</div>
+                        <div class="text-sm font-medium text-gray-900">${app.full_name || 'N/A'}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="text-sm text-gray-500">${app.email || 'N/A'}</div>
@@ -341,18 +334,13 @@
                 
                 const usersList = users || [];
                 console.log(`Found ${usersList.length} users`);
-                console.log('Users data:', usersList);
-                
-                // Store in global variables
-                allUsers = usersList;
-                filteredUsers = [...usersList];
                 
                 // Calculate stats
                 const totalUsers = usersList.length;
-                const seekers = usersList.filter(user => (user.account_type || user.accountType) === 'seeker').length;
-                const providers = usersList.filter(user => (user.account_type || user.accountType) === 'provider').length;
-                const admins = usersList.filter(user => (user.account_type || user.accountType) === 'admin').length;
-                const confirmed = usersList.filter(user => user.verified || user.isverified || user.email_confirmed_at).length;
+                const seekers = usersList.filter(user => user.accountType === 'seeker').length;
+                const providers = usersList.filter(user => user.accountType === 'provider').length;
+                const admins = usersList.filter(user => user.accountType === 'admin').length;
+                const confirmed = usersList.filter(user => user.isverified || user.email_confirmed_at).length;
                 const pending = totalUsers - confirmed;
                 
                 // Update stats cards
@@ -363,11 +351,8 @@
                 document.getElementById('confirmed').textContent = confirmed;
                 document.getElementById('pending').textContent = pending;
                 
-                // Setup search and filter
-                setupSearchAndFilter();
-                
                 // Render table
-                renderUsersTable(filteredUsers);
+                renderUsersTable(usersList);
                 
             } catch (error) {
                 console.error('Error loading users:', error);
@@ -386,27 +371,19 @@
                 return;
             }
 
-            tbody.innerHTML = users.map(user => {
-                const userAccountType = user.account_type || user.accountType;
-                const fullName = user.first_name && user.last_name ? 
-                    `${user.first_name} ${user.last_name}` : 
-                    (user.firstName && user.lastName ? 
-                        `${user.firstName} ${user.lastName}` : 
-                        (user.name || user.email || 'N/A'));
-                
-                return `
+            tbody.innerHTML = users.map(user => `
                 <tr>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-gray-900">${fullName}</div>
+                        <div class="text-sm font-medium text-gray-900">${user.firstName || ''} ${user.lastName || ''}</div>
                         <div class="text-sm text-gray-500">${user.email}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            userAccountType === 'admin' ? 'bg-red-100 text-red-800' :
-                            userAccountType === 'provider' ? 'bg-purple-100 text-purple-800' :
+                            user.accountType === 'admin' ? 'bg-red-100 text-red-800' :
+                            user.accountType === 'provider' ? 'bg-purple-100 text-purple-800' :
                             'bg-green-100 text-green-800'
                         }">
-                            ${userAccountType || 'seeker'}
+                            ${user.accountType || 'seeker'}
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -423,11 +400,18 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <button onclick="viewUser('${user.id}')" class="text-kajopo-blue hover:text-kajopo-purple mr-3">View</button>
-                        <button onclick="editUser('${user.id}')" class="text-green-600 hover:text-green-900 mr-3">Edit</button>
-                        <button onclick="deleteUser('${user.id}')" class="text-red-600 hover:text-red-900">Delete</button>
+                        <div class="inline-flex items-center space-x-2">
+                            <select id="user-status-${user.id}" data-original="${user.isverified || user.email_confirmed_at ? 'confirmed' : 'pending'}" onchange="onUserStatusChange('${user.id}')" class="text-sm border border-gray-300 rounded px-2 py-1 bg-white text-gray-900 dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                                <option value="pending" ${!user.isverified && !user.email_confirmed_at ? 'selected' : ''}>Pending</option>
+                                <option value="confirmed" ${user.isverified || user.email_confirmed_at ? 'selected' : ''}>Confirmed</option>
+                                <option value="suspended">Suspended</option>
+                            </select>
+                            <button onclick="saveUserStatus('${user.id}')" class="text-green-600 hover:text-green-900 text-xs px-2 py-1 border border-green-300 rounded hidden" id="save-user-${user.id}">Save</button>
+                            <button onclick="cancelUserStatus('${user.id}')" class="text-gray-600 hover:text-gray-900 text-xs px-2 py-1 border border-gray-300 rounded hidden" id="cancel-user-${user.id}">Cancel</button>
+                        </div>
                     </td>
-                </tr>`;
-            }).join('');
+                </tr>
+            `).join('');
         }
         
         // Load users view
@@ -465,36 +449,6 @@
                         </div>
                     </div>
 
-                    <!-- Search and Filter -->
-                    <div class="bg-white rounded-lg shadow mb-6 p-4">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex-1 max-w-md">
-                                <div class="relative">
-                                    <input type="text" id="user-search" placeholder="Search users by name, email..." 
-                                           class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-kajopo-blue focus:border-kajopo-blue bg-white text-gray-900 dark:bg-gray-700 dark:text-white dark:border-gray-600">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <svg class="h-5 w-5 text-gray-400 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex items-center space-x-4">
-                                <select id="user-status-filter" class="px-3 py-2 border border-gray-300 rounded-md focus:ring-kajopo-blue focus:border-kajopo-blue bg-white text-gray-900 dark:bg-gray-700 dark:text-white dark:border-gray-600">
-                                    <option value="all">All Status</option>
-                                    <option value="confirmed">Confirmed</option>
-                                    <option value="pending">Pending</option>
-                                </select>
-                                <select id="user-type-filter" class="px-3 py-2 border border-gray-300 rounded-md focus:ring-kajopo-blue focus:border-kajopo-blue bg-white text-gray-900 dark:bg-gray-700 dark:text-white dark:border-gray-600">
-                                    <option value="all">All Types</option>
-                                    <option value="seeker">Seeker</option>
-                                    <option value="provider">Provider</option>
-                                    <option value="admin">Admin</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Users Table -->
                     <div class="bg-white rounded-lg shadow overflow-hidden">
                         <div class="px-6 py-4 border-b border-gray-200">
@@ -504,38 +458,10 @@
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none" data-sort="name">
-                                            <div class="flex items-center space-x-1">
-                                                <span>User</span>
-                                                <svg class="w-4 h-4 sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
-                                                </svg>
-                                            </div>
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none" data-sort="accountType">
-                                            <div class="flex items-center space-x-1">
-                                                <span>Type</span>
-                                                <svg class="w-4 h-4 sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
-                                                </svg>
-                                            </div>
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none" data-sort="status">
-                                            <div class="flex items-center space-x-1">
-                                                <span>Status</span>
-                                                <svg class="w-4 h-4 sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
-                                                </svg>
-                                            </div>
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none" data-sort="created_at">
-                                            <div class="flex items-center space-x-1">
-                                                <span>Joined</span>
-                                                <svg class="w-4 h-4 sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
-                                                </svg>
-                                            </div>
-                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                     </tr>
                                 </thead>
@@ -571,10 +497,6 @@
                 const opps = opportunities || [];
                 console.log(`Found ${opps.length} opportunities`);
                 
-                // Store in global variables
-                allOpportunities = opps;
-                filteredOpportunities = [...opps];
-                
                 // Calculate stats
                 const totalOpportunities = opps.length;
                 const paidOpportunities = opps.filter(opp => opp.type === 'Paid' || opp.type === 'paid').length;
@@ -595,11 +517,8 @@
                 document.getElementById('active-opportunities').textContent = activeOpportunities;
                 document.getElementById('weekly-opportunities').textContent = thisWeek;
                 
-                // Setup search and filter
-                setupSearchAndFilter();
-                
                 // Render table
-                renderOpportunitiesTable(filteredOpportunities);
+                renderOpportunitiesTable(opps);
                 
             } catch (error) {
                 console.error('Error loading opportunities:', error);
@@ -696,37 +615,6 @@
                         </div>
                     </div>
 
-                    <!-- Search and Filter -->
-                    <div class="bg-white rounded-lg shadow mb-6 p-4">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex-1 max-w-md">
-                                <div class="relative">
-                                    <input type="text" id="opportunity-search" placeholder="Search opportunities by title, organization..." 
-                                           class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-kajopo-blue focus:border-kajopo-blue bg-white text-gray-900 dark:bg-gray-700 dark:text-white dark:border-gray-600">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <svg class="h-5 w-5 text-gray-400 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex items-center space-x-4">
-                                <select id="opportunity-status-filter" class="px-3 py-2 border border-gray-300 rounded-md focus:ring-kajopo-blue focus:border-kajopo-blue bg-white text-gray-900 dark:bg-gray-700 dark:text-white dark:border-gray-600">
-                                    <option value="all">All Status</option>
-                                    <option value="active">Active</option>
-                                    <option value="inactive">Inactive</option>
-                                    <option value="paused">Paused</option>
-                                    <option value="completed">Completed</option>
-                                </select>
-                                <select id="opportunity-type-filter" class="px-3 py-2 border border-gray-300 rounded-md focus:ring-kajopo-blue focus:border-kajopo-blue bg-white text-gray-900 dark:bg-gray-700 dark:text-white dark:border-gray-600">
-                                    <option value="all">All Types</option>
-                                    <option value="paid">Paid</option>
-                                    <option value="volunteer">Volunteer</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Opportunities Table -->
                     <div class="bg-white rounded-lg shadow overflow-hidden">
                         <div class="px-6 py-4 border-b border-gray-200">
@@ -736,46 +624,11 @@
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none" data-sort="title">
-                                            <div class="flex items-center space-x-1">
-                                                <span>Opportunity</span>
-                                                <svg class="w-4 h-4 sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
-                                                </svg>
-                                            </div>
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none" data-sort="type">
-                                            <div class="flex items-center space-x-1">
-                                                <span>Type</span>
-                                                <svg class="w-4 h-4 sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
-                                                </svg>
-                                            </div>
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none" data-sort="category">
-                                            <div class="flex items-center space-x-1">
-                                                <span>Category</span>
-                                                <svg class="w-4 h-4 sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
-                                                </svg>
-                                            </div>
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none" data-sort="status">
-                                            <div class="flex items-center space-x-1">
-                                                <span>Status</span>
-                                                <svg class="w-4 h-4 sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
-                                                </svg>
-                                            </div>
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none" data-sort="created_at">
-                                            <div class="flex items-center space-x-1">
-                                                <span>Created</span>
-                                                <svg class="w-4 h-4 sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
-                                                </svg>
-                                            </div>
-                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Opportunity</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                     </tr>
                                 </thead>
@@ -825,36 +678,6 @@
                         </div>
                     </div>
 
-                    <!-- Search and Filter -->
-                    <div class="bg-white rounded-lg shadow mb-6 p-4">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex-1 max-w-md">
-                                <div class="relative">
-                                    <input type="text" id="application-search" placeholder="Search applications by name, email, opportunity..." 
-                                           class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-kajopo-blue focus:border-kajopo-blue bg-white text-gray-900 dark:bg-gray-700 dark:text-white dark:border-gray-600">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <svg class="h-5 w-5 text-gray-400 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex items-center space-x-4">
-                                <select id="application-status-filter" class="px-3 py-2 border border-gray-300 rounded-md focus:ring-kajopo-blue focus:border-kajopo-blue bg-white text-gray-900 dark:bg-gray-700 dark:text-white dark:border-gray-600">
-                                    <option value="all">All Status</option>
-                                    <option value="pending">Pending</option>
-                                    <option value="approved">Approved</option>
-                                    <option value="rejected">Rejected</option>
-                                </select>
-                                <select id="application-type-filter" class="px-3 py-2 border border-gray-300 rounded-md focus:ring-kajopo-blue focus:border-kajopo-blue bg-white text-gray-900 dark:bg-gray-700 dark:text-white dark:border-gray-600">
-                                    <option value="all">All Types</option>
-                                    <option value="paid">Paid</option>
-                                    <option value="volunteer">Volunteer</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Applications Table -->
                     <div class="bg-white rounded-lg shadow overflow-hidden">
                         <div class="px-6 py-4 border-b border-gray-200">
@@ -864,40 +687,12 @@
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none" data-sort="full_name">
-                                            <div class="flex items-center space-x-1">
-                                                <span>Applicant</span>
-                                                <svg class="w-4 h-4 sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
-                                                </svg>
-                                            </div>
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none" data-sort="email">
-                                            <div class="flex items-center space-x-1">
-                                                <span>Email</span>
-                                                <svg class="w-4 h-4 sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
-                                                </svg>
-                                            </div>
-                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applicant</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Opportunity</th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Organization</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none" data-sort="status">
-                                            <div class="flex items-center space-x-1">
-                                                <span>Status</span>
-                                                <svg class="w-4 h-4 sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
-                                                </svg>
-                                            </div>
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none" data-sort="created_at">
-                                            <div class="flex items-center space-x-1">
-                                                <span>Applied</span>
-                                                <svg class="w-4 h-4 sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
-                                                </svg>
-                                            </div>
-                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applied</th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                     </tr>
                                 </thead>
@@ -923,7 +718,7 @@
                     .from('applications')
                     .select(`
                         *,
-                        opportunities!applications_opportunity_id_fkey (
+                        opportunities (
                             title,
                             organization,
                             type,
@@ -1286,268 +1081,6 @@ Created: ${opportunity.created_at ? new Date(opportunity.created_at).toLocaleStr
             });
         }
         
-        // Global variables for search and sort
-        let allUsers = [];
-        let filteredUsers = [];
-        let allOpportunities = [];
-        let filteredOpportunities = [];
-        let allApplications = [];
-        let filteredApplications = [];
-        let currentSortColumn = null;
-        let currentSortDirection = 'asc';
-
-        // Search and filter functions
-        function setupSearchAndFilter() {
-            // Users search and filter
-            const userSearch = document.getElementById('user-search');
-            const userStatusFilter = document.getElementById('user-status-filter');
-            const userTypeFilter = document.getElementById('user-type-filter');
-
-            if (userSearch) {
-                userSearch.addEventListener('input', () => filterUsers());
-            }
-            if (userStatusFilter) {
-                userStatusFilter.addEventListener('change', () => filterUsers());
-            }
-            if (userTypeFilter) {
-                userTypeFilter.addEventListener('change', () => filterUsers());
-            }
-
-            // Opportunities search and filter
-            const opportunitySearch = document.getElementById('opportunity-search');
-            const opportunityStatusFilter = document.getElementById('opportunity-status-filter');
-            const opportunityTypeFilter = document.getElementById('opportunity-type-filter');
-
-            if (opportunitySearch) {
-                opportunitySearch.addEventListener('input', () => filterOpportunities());
-            }
-            if (opportunityStatusFilter) {
-                opportunityStatusFilter.addEventListener('change', () => filterOpportunities());
-            }
-            if (opportunityTypeFilter) {
-                opportunityTypeFilter.addEventListener('change', () => filterOpportunities());
-            }
-
-            // Applications search and filter
-            const applicationSearch = document.getElementById('application-search');
-            const applicationStatusFilter = document.getElementById('application-status-filter');
-            const applicationTypeFilter = document.getElementById('application-type-filter');
-
-            if (applicationSearch) {
-                applicationSearch.addEventListener('input', () => filterApplications());
-            }
-            if (applicationStatusFilter) {
-                applicationStatusFilter.addEventListener('change', () => filterApplications());
-            }
-            if (applicationTypeFilter) {
-                applicationTypeFilter.addEventListener('change', () => filterApplications());
-            }
-
-            // Sort functionality
-            document.querySelectorAll('[data-sort]').forEach(header => {
-                header.addEventListener('click', (e) => {
-                    const column = e.currentTarget.dataset.sort;
-                    const currentView = document.querySelector('.tab-content:not(.hidden)').id;
-                    
-                    if (currentView === 'users') {
-                        sortUsers(column);
-                    } else if (currentView === 'opportunities') {
-                        sortOpportunities(column);
-                    } else if (currentView === 'applications') {
-                        sortApplications(column);
-                    }
-                });
-            });
-        }
-
-        function filterUsers() {
-            const searchTerm = document.getElementById('user-search')?.value.toLowerCase() || '';
-            const statusFilter = document.getElementById('user-status-filter')?.value || 'all';
-            const typeFilter = document.getElementById('user-type-filter')?.value || 'all';
-
-            filteredUsers = allUsers.filter(user => {
-                const matchesSearch = !searchTerm || 
-                    (user.firstName && user.firstName.toLowerCase().includes(searchTerm)) ||
-                    (user.lastName && user.lastName.toLowerCase().includes(searchTerm)) ||
-                    (user.email && user.email.toLowerCase().includes(searchTerm));
-
-                const matchesStatus = statusFilter === 'all' || 
-                    (statusFilter === 'confirmed' && (user.isverified || user.email_confirmed_at)) ||
-                    (statusFilter === 'pending' && !user.isverified && !user.email_confirmed_at);
-
-                const matchesType = typeFilter === 'all' || user.accountType === typeFilter;
-
-                return matchesSearch && matchesStatus && matchesType;
-            });
-
-            renderUsersTable(filteredUsers);
-        }
-
-        function filterOpportunities() {
-            const searchTerm = document.getElementById('opportunity-search')?.value.toLowerCase() || '';
-            const statusFilter = document.getElementById('opportunity-status-filter')?.value || 'all';
-            const typeFilter = document.getElementById('opportunity-type-filter')?.value || 'all';
-
-            filteredOpportunities = allOpportunities.filter(opp => {
-                const matchesSearch = !searchTerm || 
-                    (opp.title && opp.title.toLowerCase().includes(searchTerm)) ||
-                    (opp.organization && opp.organization.toLowerCase().includes(searchTerm));
-
-                const matchesStatus = statusFilter === 'all' || opp.status === statusFilter;
-
-                const matchesType = typeFilter === 'all' || opp.type === typeFilter;
-
-                return matchesSearch && matchesStatus && matchesType;
-            });
-
-            renderOpportunitiesTable(filteredOpportunities);
-        }
-
-        function filterApplications() {
-            const searchTerm = document.getElementById('application-search')?.value.toLowerCase() || '';
-            const statusFilter = document.getElementById('application-status-filter')?.value || 'all';
-            const typeFilter = document.getElementById('application-type-filter')?.value || 'all';
-
-            filteredApplications = allApplications.filter(app => {
-                const matchesSearch = !searchTerm || 
-                    (app.full_name && app.full_name.toLowerCase().includes(searchTerm)) ||
-                    (app.email && app.email.toLowerCase().includes(searchTerm)) ||
-                    (app.opportunities?.title && app.opportunities.title.toLowerCase().includes(searchTerm));
-
-                const matchesStatus = statusFilter === 'all' || app.status === statusFilter;
-
-                const matchesType = typeFilter === 'all' || app.opportunities?.type === typeFilter;
-
-                return matchesSearch && matchesStatus && matchesType;
-            });
-
-            renderApplicationsTable(filteredApplications);
-        }
-
-        function sortUsers(column) {
-            if (currentSortColumn === column) {
-                currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
-            } else {
-                currentSortColumn = column;
-                currentSortDirection = 'asc';
-            }
-
-            filteredUsers.sort((a, b) => {
-                let aValue, bValue;
-
-                switch (column) {
-                    case 'name':
-                        aValue = `${a.firstName || ''} ${a.lastName || ''}`.trim();
-                        bValue = `${b.firstName || ''} ${b.lastName || ''}`.trim();
-                        break;
-                    case 'accountType':
-                        aValue = a.accountType || '';
-                        bValue = b.accountType || '';
-                        break;
-                    case 'status':
-                        aValue = a.isverified || a.email_confirmed_at ? 'confirmed' : 'pending';
-                        bValue = b.isverified || b.email_confirmed_at ? 'confirmed' : 'pending';
-                        break;
-                    case 'created_at':
-                        aValue = new Date(a.created_at || 0);
-                        bValue = new Date(b.created_at || 0);
-                        break;
-                    default:
-                        return 0;
-                }
-
-                if (aValue < bValue) return currentSortDirection === 'asc' ? -1 : 1;
-                if (aValue > bValue) return currentSortDirection === 'asc' ? 1 : -1;
-                return 0;
-            });
-
-            renderUsersTable(filteredUsers);
-        }
-
-        function sortOpportunities(column) {
-            if (currentSortColumn === column) {
-                currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
-            } else {
-                currentSortColumn = column;
-                currentSortDirection = 'asc';
-            }
-
-            filteredOpportunities.sort((a, b) => {
-                let aValue, bValue;
-
-                switch (column) {
-                    case 'title':
-                        aValue = a.title || '';
-                        bValue = b.title || '';
-                        break;
-                    case 'type':
-                        aValue = a.type || '';
-                        bValue = b.type || '';
-                        break;
-                    case 'category':
-                        aValue = a.category || '';
-                        bValue = b.category || '';
-                        break;
-                    case 'status':
-                        aValue = a.status || '';
-                        bValue = b.status || '';
-                        break;
-                    case 'created_at':
-                        aValue = new Date(a.created_at || 0);
-                        bValue = new Date(b.created_at || 0);
-                        break;
-                    default:
-                        return 0;
-                }
-
-                if (aValue < bValue) return currentSortDirection === 'asc' ? -1 : 1;
-                if (aValue > bValue) return currentSortDirection === 'asc' ? 1 : -1;
-                return 0;
-            });
-
-            renderOpportunitiesTable(filteredOpportunities);
-        }
-
-        function sortApplications(column) {
-            if (currentSortColumn === column) {
-                currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
-            } else {
-                currentSortColumn = column;
-                currentSortDirection = 'asc';
-            }
-
-            filteredApplications.sort((a, b) => {
-                let aValue, bValue;
-
-                switch (column) {
-                    case 'full_name':
-                        aValue = a.full_name || '';
-                        bValue = b.full_name || '';
-                        break;
-                    case 'email':
-                        aValue = a.email || '';
-                        bValue = b.email || '';
-                        break;
-                    case 'status':
-                        aValue = a.status || '';
-                        bValue = b.status || '';
-                        break;
-                    case 'created_at':
-                        aValue = new Date(a.created_at || 0);
-                        bValue = new Date(b.created_at || 0);
-                        break;
-                    default:
-                        return 0;
-                }
-
-                if (aValue < bValue) return currentSortDirection === 'asc' ? -1 : 1;
-                if (aValue > bValue) return currentSortDirection === 'asc' ? 1 : -1;
-                return 0;
-            });
-
-            renderApplicationsTable(filteredApplications);
-        }
-
         // Initialize dashboard
         async function initializeDashboard() {
             try {
@@ -1583,8 +1116,8 @@ Created: ${opportunity.created_at ? new Date(opportunity.created_at).toLocaleStr
                 setupThemeToggle();
                 setupLogout();
                 
-                // Load default view (users)
-                switchView('users');
+                // Load default view (applications)
+                switchView('applications');
                 
                 console.log('✅ Dashboard initialized successfully');
                 

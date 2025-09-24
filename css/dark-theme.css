@@ -1,0 +1,266 @@
+/* Dark Theme CSS - Comprehensive dark mode styles */
+/* Include this file in all pages for consistent dark theme support */
+
+/* Dark theme base styles */
+html[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+html[data-theme='dark'] body {
+  background-color: #111827 !important;
+  color: #FFFFFF !important;
+}
+
+/* Ensure all text elements are white for maximum visibility */
+html[data-theme='dark'] * {
+  color: #FFFFFF !important;
+}
+
+/* Navigation and header */
+html[data-theme='dark'] nav {
+  background-color: #1F2937 !important;
+  border-bottom: 1px solid #374151 !important;
+}
+
+html[data-theme='dark'] .bg-white {
+  background-color: #1F2937 !important;
+}
+
+/* Text colors - All white for maximum visibility */
+html[data-theme='dark'] .text-gray-900,
+html[data-theme='dark'] .text-gray-800,
+html[data-theme='dark'] .text-gray-700,
+html[data-theme='dark'] .text-gray-600,
+html[data-theme='dark'] .text-gray-500,
+html[data-theme='dark'] .text-gray-400,
+html[data-theme='dark'] .text-gray-300,
+html[data-theme='dark'] .text-gray-200,
+html[data-theme='dark'] .text-gray-100 {
+  color: #FFFFFF !important;
+}
+
+/* Specific text elements that need white color */
+html[data-theme='dark'] h1,
+html[data-theme='dark'] h2,
+html[data-theme='dark'] h3,
+html[data-theme='dark'] h4,
+html[data-theme='dark'] h5,
+html[data-theme='dark'] h6 {
+  color: #FFFFFF !important;
+}
+
+html[data-theme='dark'] p,
+html[data-theme='dark'] span,
+html[data-theme='dark'] div,
+html[data-theme='dark'] label {
+  color: #FFFFFF !important;
+}
+
+/* Navigation text */
+html[data-theme='dark'] nav a,
+html[data-theme='dark'] nav span,
+html[data-theme='dark'] nav div {
+  color: #FFFFFF !important;
+}
+
+/* Button text */
+html[data-theme='dark'] button {
+  color: #FFFFFF !important;
+}
+
+html[data-theme='dark'] .btn,
+html[data-theme='dark'] .button {
+  color: #FFFFFF !important;
+}
+
+/* Background colors */
+html[data-theme='dark'] .bg-gray-50 {
+  background-color: #1F2937 !important;
+}
+
+html[data-theme='dark'] .bg-gray-100 {
+  background-color: #374151 !important;
+}
+
+html[data-theme='dark'] .bg-gray-200 {
+  background-color: #4B5563 !important;
+}
+
+html[data-theme='dark'] .bg-gray-300 {
+  background-color: #6B7280 !important;
+}
+
+/* Cards and containers */
+html[data-theme='dark'] .bg-white {
+  background-color: #1F2937 !important;
+  border-color: #374151 !important;
+}
+
+html[data-theme='dark'] .shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Buttons */
+html[data-theme='dark'] .bg-blue-600 {
+  background-color: #3B82F6 !important;
+}
+
+html[data-theme='dark'] .bg-blue-600:hover {
+  background-color: #2563EB !important;
+}
+
+html[data-theme='dark'] .bg-green-600 {
+  background-color: #10B981 !important;
+}
+
+html[data-theme='dark'] .bg-green-600:hover {
+  background-color: #059669 !important;
+}
+
+/* Theme toggle button */
+html[data-theme='dark'] #theme-toggle {
+  background-color: #374151 !important;
+  border-color: #4B5563 !important;
+  color: #F9FAFB !important;
+}
+
+html[data-theme='dark'] #theme-toggle:hover {
+  background-color: #4B5563 !important;
+}
+
+/* Form elements */
+html[data-theme='dark'] input[type="text"],
+html[data-theme='dark'] input[type="email"],
+html[data-theme='dark'] input[type="password"],
+html[data-theme='dark'] textarea,
+html[data-theme='dark'] select {
+  background-color: #374151 !important;
+  border-color: #4B5563 !important;
+  color: #F9FAFB !important;
+}
+
+html[data-theme='dark'] input[type="text"]:focus,
+html[data-theme='dark'] input[type="email"]:focus,
+html[data-theme='dark'] input[type="password"]:focus,
+html[data-theme='dark'] textarea:focus,
+html[data-theme='dark'] select:focus {
+  border-color: #3B82F6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Links */
+html[data-theme='dark'] a {
+  color: #60A5FA !important;
+}
+
+html[data-theme='dark'] a:hover {
+  color: #93C5FD !important;
+}
+
+/* Borders */
+html[data-theme='dark'] .border-gray-200 {
+  border-color: #374151 !important;
+}
+
+html[data-theme='dark'] .border-gray-300 {
+  border-color: #4B5563 !important;
+}
+
+/* Special sections */
+html[data-theme='dark'] .cards-section-bg {
+  background-color: #181f2a !important;
+}
+
+html[data-theme='dark'] .cards-section-bg .bg-white {
+  background-color: #fff !important;
+  color: #222 !important;
+}
+
+/* Tagline and headings */
+html[data-theme='dark'] .tagline-text {
+  color: #FFFFFF !important;
+}
+
+/* Hero section text */
+html[data-theme='dark'] .hero-title,
+html[data-theme='dark'] .hero-subtitle,
+html[data-theme='dark'] .hero-description {
+  color: #FFFFFF !important;
+}
+
+/* Main headings and titles */
+html[data-theme='dark'] .main-title,
+html[data-theme='dark'] .page-title,
+html[data-theme='dark'] .section-title {
+  color: #FFFFFF !important;
+}
+
+/* Card text content */
+html[data-theme='dark'] .card-title,
+html[data-theme='dark'] .card-text,
+html[data-theme='dark'] .card-description {
+  color: #FFFFFF !important;
+}
+
+/* Statistics and metrics text */
+html[data-theme='dark'] .stat-number,
+html[data-theme='dark'] .stat-label,
+html[data-theme='dark'] .metric-text {
+  color: #FFFFFF !important;
+}
+
+/* Override any inline styles that might set text color */
+html[data-theme='dark'] [style*="color"] {
+  color: #FFFFFF !important;
+}
+
+/* Tables */
+html[data-theme='dark'] table {
+  background-color: #1F2937 !important;
+  color: #F9FAFB !important;
+}
+
+html[data-theme='dark'] th {
+  background-color: #374151 !important;
+  color: #F9FAFB !important;
+}
+
+html[data-theme='dark'] td {
+  background-color: #1F2937 !important;
+  color: #F9FAFB !important;
+  border-color: #374151 !important;
+}
+
+/* Modals and overlays */
+html[data-theme='dark'] .modal {
+  background-color: #1F2937 !important;
+  color: #F9FAFB !important;
+}
+
+html[data-theme='dark'] .modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Force all text to be white in dark mode - most aggressive override */
+html[data-theme='dark'] *:not(input):not(textarea):not(select):not(svg):not(path) {
+  color: #FFFFFF !important;
+}
+
+/* Ensure specific elements that might be missed */
+html[data-theme='dark'] .text-black,
+html[data-theme='dark'] .text-gray-900,
+html[data-theme='dark'] .text-gray-800,
+html[data-theme='dark'] .text-gray-700,
+html[data-theme='dark'] .text-gray-600,
+html[data-theme='dark'] .text-gray-500,
+html[data-theme='dark'] .text-gray-400,
+html[data-theme='dark'] .text-gray-300,
+html[data-theme='dark'] .text-gray-200,
+html[data-theme='dark'] .text-gray-100 {
+  color: #FFFFFF !important;
+}
+
+/* Transitions for smooth theme switching */
+html[data-theme] * {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
