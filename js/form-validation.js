@@ -337,7 +337,8 @@ const ValidationRules = {
         email: ['required', 'email'],
         password: ['required', 'strongPassword'],
         confirmPassword: ['required'],
-        location: ['required', { type: 'minLength', params: [3], message: 'Location must be at least 3 characters' }],
+        address: ['required', { type: 'minLength', params: [3], message: 'Address must be at least 3 characters' }],
+        country: ['required'],
         accountType: ['required'],
         phone: ['phone'],
         organization: [{ type: 'minLength', params: [2], message: 'Organization name must be at least 2 characters' }]

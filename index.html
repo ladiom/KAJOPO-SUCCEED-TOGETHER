@@ -5,8 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kájọpọ̀ - Succeed Together | Coming Soon</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/unified-auth.js"></script>
     <link rel="stylesheet" href="css/themesNew.css">
     <link rel="stylesheet" href="css/notifications.css">
+    <link rel="stylesheet" href="css/dark-theme.css">
     <script src="js/mobile-nav.js"></script>
     
     <!-- Initialize theme immediately to prevent FOUC -->
@@ -34,6 +38,14 @@
         color: #222 !important;
       }
       
+      /* Ensure white background cards have dark text in both themes */
+      .bg-white h3, .bg-white p {
+        color: #1f2937 !important; /* Dark gray for headings */
+      }
+      .bg-white p {
+        color: #374151 !important; /* Medium gray for paragraphs */
+      }
+      
       /* Fix tagline text flash issue - ensure proper color initialization */
       .tagline-text {
         color: #6B7280; /* Default gray color for light mode */
@@ -52,6 +64,56 @@
       /* Fix main tagline heading visibility in dark mode */
       html[data-theme='dark'] .text-gray-900 {
         color: #FFFFFF !important; /* White for visibility in dark mode */
+      }
+      
+      /* Ensure all text is white in dark mode */
+      html[data-theme='dark'] * {
+        color: #FFFFFF !important;
+      }
+      
+      /* Override any specific color classes */
+      html[data-theme='dark'] .text-gray-600,
+      html[data-theme='dark'] .text-gray-700,
+      html[data-theme='dark'] .text-gray-800,
+      html[data-theme='dark'] .text-gray-900 {
+        color: #FFFFFF !important;
+      }
+      
+      /* Theme toggle button dark mode styling */
+      html[data-theme='dark'] #theme-toggle {
+        background-color: #374151 !important;
+        border-color: #4B5563 !important;
+        color: #F9FAFB !important;
+      }
+      
+      html[data-theme='dark'] #theme-toggle:hover {
+        background-color: #4B5563 !important;
+      }
+      
+      /* Dark mode body and text colors */
+      html[data-theme='dark'] body {
+        background-color: #111827 !important;
+        color: #F9FAFB !important;
+      }
+      
+      html[data-theme='dark'] .bg-gray-50 {
+        background-color: #1F2937 !important;
+      }
+      
+      html[data-theme='dark'] .bg-gray-100 {
+        background-color: #374151 !important;
+      }
+      
+      html[data-theme='dark'] .text-gray-600 {
+        color: #D1D5DB !important;
+      }
+      
+      html[data-theme='dark'] .text-gray-700 {
+        color: #E5E7EB !important;
+      }
+      
+      html[data-theme='dark'] .text-gray-800 {
+        color: #F3F4F6 !important;
       }
       
       html[data-theme] .tagline-text {
@@ -157,12 +219,12 @@
 <!-- start here -->
 <!-- Dual Call-to-Action Buttons with Browse Opportunities -->
 <div class="grid md:grid-cols-3 gap-8 mb-16 max-w-3xl mx-auto text-center">
-    <button onclick="openSeekerModal()" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105">
-        Seeking Opportunity
-    </button>
-    <button onclick="openProviderModal()" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-6 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105">
-        Providing Opportunity
-    </button>
+    <a href="registration-form.html" class="w-full flex items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105">
+        Seek Opportunities
+    </a>
+    <a href="registration-form.html" class="w-full flex items-center justify-center bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-6 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105">
+        Provide Opportunities
+    </a>
     <a href="browse-opportunities.html" class="w-full flex items-center justify-center bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 text-white px-6 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105">
         Browse All Opportunities
     </a>
@@ -183,15 +245,15 @@
             <p class="text-gray-500 mb-8">Join the growing community of changemakers</p>
             <div class="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
                 <div class="text-center">
-                    <div class="text-3xl font-bold text-indigo-600" id="seekerCount">247</div>
+                    <div class="text-3xl font-bold text-indigo-600" id="seekerCount">Loading...</div>
                     <div class="text-sm text-gray-500">Seekers Registered</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-3xl font-bold text-green-600" id="providerCount">189</div>
+                    <div class="text-3xl font-bold text-green-600" id="providerCount">Loading...</div>
                     <div class="text-sm text-gray-500">Providers Ready</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-3xl font-bold text-purple-600" id="matchCount">156</div>
+                    <div class="text-3xl font-bold text-purple-600" id="matchCount">Loading...</div>
                     <div class="text-sm text-gray-500">Successful Matches</div>
                 </div>
             </div>
@@ -208,8 +270,8 @@
                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
               </svg>
             </div>
-            <h3 class="text-xl font-bold text-gray-800 mb-2">Smart Matching</h3>
-            <p class="text-gray-600">AI-powered algorithms connect you with the perfect opportunities and solutions.</p>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Smart Matching</h3>
+            <p class="text-gray-700">AI-powered algorithms connect you with the perfect opportunities and solutions.</p>
           </div>
           
           <!-- Card 2 - Community Focus -->
@@ -220,8 +282,8 @@
                 <path d="M8 12h8M12 8v8" stroke="currentColor" stroke-width="2" fill="none"/>
               </svg>
             </div>
-            <h3 class="text-xl font-bold text-gray-800 mb-2">Community Focus</h3>
-            <p class="text-gray-600">Strengthen local bonds through mutual support and collaborative opportunities.</p>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Community Focus</h3>
+            <p class="text-gray-700">Strengthen local bonds through mutual support and collaborative opportunities.</p>
           </div>
           
           <!-- Card 3 - Instant Connection -->
@@ -231,121 +293,13 @@
                 <path d="M7 2v11h3v9l7-12h-4l4-8z"/>
               </svg>
             </div>
-            <h3 class="text-xl font-bold text-gray-800 mb-2">Instant Connection</h3>
-            <p class="text-gray-600">Get matched quickly with verified community members ready to help or collaborate.</p>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Instant Connection</h3>
+            <p class="text-gray-700">Get matched quickly with verified community members ready to help or collaborate.</p>
           </div>
         </div>
 
     </main>
     
-    <!-- Seeker Modal -->
-    <div id="seekerModal" class="fixed inset-0 bg-black bg-opacity-50 modal hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-8 transform transition-all">
-            <div class="text-center mb-6">
-                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                </div>
-                <h3 class="text-2xl font-bold text-gray-900 mb-2">Join as Opportunity Seeker</h3>
-                <p class="text-gray-600">Be the first to know when we launch!</p>
-            </div>
-            
-            <form id="seekerForm" class="space-y-4">
-                <div>
-                    <input type="text" id="seekerName" placeholder="Your Name" required 
-                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                </div>
-                <div>
-                    <input type="email" id="seekerEmail" placeholder="Your Email" required 
-                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                </div>
-                <div>
-                    <select id="seekerType" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <option value="">What are you looking for?</option>
-                        <option value="services">Services & Help</option>
-                        <option value="jobs">Job Opportunities</option>
-                        <option value="mentorship">Mentorship</option>
-                        <option value="resources">Resources & Support</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-                <div class="flex space-x-3 pt-4">
-                    <button type="button" onclick="closeSeekerModal()" 
-                            class="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-                        Cancel
-                    </button>
-                    <button type="submit" 
-                            class="flex-1 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-3 rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all">
-                        Join Waitlist
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Provider Modal -->
-    <div id="providerModal" class="fixed inset-0 bg-black bg-opacity-50 modal hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-8 transform transition-all">
-            <div class="text-center mb-6">
-                <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2V6"></path>
-                    </svg>
-                </div>
-                <h3 class="text-2xl font-bold text-gray-900 mb-2">Join as Solution Provider</h3>
-                <p class="text-gray-600">Be ready to help when we launch!</p>
-            </div>
-            
-            <form id="providerForm" class="space-y-4">
-                <div>
-                    <input type="text" id="providerName" placeholder="Your Name" required 
-                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                </div>
-                <div>
-                    <input type="email" id="providerEmail" placeholder="Your Email" required 
-                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                </div>
-                <div>
-                    <select id="providerType" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                        <option value="">What do you offer?</option>
-                        <option value="professional">Professional Services</option>
-                        <option value="skills">Skills & Expertise</option>
-                        <option value="mentoring">Mentoring & Coaching</option>
-                        <option value="resources">Resources & Tools</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-                <div class="flex space-x-3 pt-4">
-                    <button type="button" onclick="closeProviderModal()" 
-                            class="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-                        Cancel
-                    </button>
-                    <button type="submit" 
-                            class="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-3 rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all">
-                        Join Waitlist
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Success Modal -->
-    <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 modal hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-8 text-center transform transition-all">
-            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-            </div>
-            <h3 class="text-2xl font-bold text-gray-900 mb-2">Welcome to Kájọpọ̀!</h3>
-            <p class="text-gray-600 mb-6">You're now on our waitlist. We'll notify you as soon as we launch!</p>
-            <button onclick="closeSuccessModal()" 
-                    class="w-full bg-indigo-600 text-white px-4 py-3 rounded-lg hover:bg-indigo-700 transition-colors">
-                Continue
-            </button>
-        </div>
-    </div>
 
     <!-- Theme Toggle Button in Navigation -->
     <!-- Removed duplicate theme toggle button from bottom left -->
@@ -403,118 +357,120 @@
     });
     </script>
     <script>
-        // Modal Functions
-        function openSeekerModal() {
-            document.getElementById('seekerModal').classList.remove('hidden');
-        }
-        
-        function closeSeekerModal() {
-            document.getElementById('seekerModal').classList.add('hidden');
-        }
-        
-        function openProviderModal() {
-            document.getElementById('providerModal').classList.remove('hidden');
-        }
-        
-        function closeProviderModal() {
-            document.getElementById('providerModal').classList.add('hidden');
-        }
-        
-        function closeSuccessModal() {
-            document.getElementById('successModal').classList.add('hidden');
-        }
-
-        // Form Submissions
-        document.getElementById('seekerForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = {
-                type: 'seeker',
-                name: document.getElementById('seekerName').value,
-                email: document.getElementById('seekerEmail').value,
-                seekingType: document.getElementById('seekerType').value,
-                timestamp: new Date().toISOString()
-            };
-            
-            // Store in localStorage (in real app, this would go to a backend)
-            let leads = JSON.parse(localStorage.getItem('kajopo_leads') || '[]');
-            leads.push(formData);
-            localStorage.setItem('kajopo_leads', JSON.stringify(leads));
-            
-            // Update counter
-            updateCounters();
-            
-            // Close seeker modal and show success
-            closeSeekerModal();
-            document.getElementById('successModal').classList.remove('hidden');
-            
-            // Reset form
-            this.reset();
-        });
-        
-        document.getElementById('providerForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = {
-                type: 'provider',
-                name: document.getElementById('providerName').value,
-                email: document.getElementById('providerEmail').value,
-                providingType: document.getElementById('providerType').value,
-                timestamp: new Date().toISOString()
-            };
-            
-            // Store in localStorage (in real app, this would go to a backend)
-            let leads = JSON.parse(localStorage.getItem('kajopo_leads') || '[]');
-            leads.push(formData);
-            localStorage.setItem('kajopo_leads', JSON.stringify(leads));
-            
-            // Update counter
-            updateCounters();
-            
-            // Close provider modal and show success
-            closeProviderModal();
-            document.getElementById('successModal').classList.remove('hidden');
-            
-            // Reset form
-            this.reset();
-        });
-
-        // Update counters based on stored leads
-        function updateCounters() {
-            const leads = JSON.parse(localStorage.getItem('kajopo_leads') || '[]');
-            const seekers = leads.filter(lead => lead.type === 'seeker').length;
-            const providers = leads.filter(lead => lead.type === 'provider').length;
-            
-            document.getElementById('seekerCount').textContent = 247 + seekers;
-            document.getElementById('providerCount').textContent = 189 + providers;
-            document.getElementById('matchCount').textContent = 156 + Math.floor((seekers + providers) * 0.7);
-        }
-
-        // Close modals when clicking outside
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('modal')) {
-                e.target.classList.add('hidden');
+        // Load user statistics from database
+        async function loadUserStats() {
+            try {
+                if (window.dbManager && await window.dbManager.ensureInitialized()) {
+                    const { data: users, error } = await window.dbManager.supabase
+                        .from('users')
+                        .select('accountType');
+                    
+                    if (error) {
+                        console.error('Error loading user stats:', error);
+                        // Fallback to default numbers
+                        document.getElementById('seekerCount').textContent = '24';
+                        document.getElementById('providerCount').textContent = '18';
+                        document.getElementById('matchCount').textContent = '12';
+                        return;
+                    }
+                    
+                    const seekers = users.filter(user => user.accountType === 'seeker').length;
+                    const providers = users.filter(user => user.accountType === 'provider').length;
+                    const matches = Math.floor((seekers + providers) * 0.3); // Estimate matches
+                    
+                    document.getElementById('seekerCount').textContent = seekers;
+                    document.getElementById('providerCount').textContent = providers;
+                    document.getElementById('matchCount').textContent = matches;
+                } else {
+                    // Fallback if database not available
+                    document.getElementById('seekerCount').textContent = '24';
+                    document.getElementById('providerCount').textContent = '18';
+                    document.getElementById('matchCount').textContent = '12';
+                }
+            } catch (error) {
+                console.error('Error loading user stats:', error);
+                // Fallback to default numbers
+                document.getElementById('seekerCount').textContent = '24';
+                document.getElementById('providerCount').textContent = '18';
+                document.getElementById('matchCount').textContent = '12';
             }
+        }
+
+        // Load stats when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserStats();
         });
 
         // Check user authentication and update navigation
         function checkUserAuth() {
-            const userData = localStorage.getItem('kajopo_current_user') || localStorage.getItem('kajopo_user');
+            console.log('Checking user authentication on index page...');
+            
+            // Check for current authentication system (kajopo_session)
+            const sessionData = localStorage.getItem('kajopo_session');
+            let userIsAuthenticated = false;
+            let currentUser = null;
+            
+            console.log('Session data:', sessionData);
+            
+            if (sessionData) {
+                try {
+                    const parsed = JSON.parse(sessionData);
+                    console.log('Parsed session:', parsed);
+                    
+                    // Check for different session structures
+                    if (parsed.user && parsed.user.id) {
+                        // New structure: {user: {id: ..., email: ...}}
+                        userIsAuthenticated = true;
+                        currentUser = parsed.user;
+                    } else if (parsed.userId && parsed.email) {
+                        // Alternative structure: {userId: ..., email: ..., firstName: ...}
+                        userIsAuthenticated = true;
+                        currentUser = {
+                            id: parsed.userId,
+                            email: parsed.email,
+                            firstName: parsed.firstName,
+                            lastName: parsed.LastName || parsed.lastName,
+                            displayName: parsed.displayName,
+                            accountType: parsed.accountType,
+                            role: parsed.role
+                        };
+                    }
+                    
+                    console.log('User authenticated via session:', userIsAuthenticated);
+                    console.log('Current user from session:', currentUser);
+                } catch (error) {
+                    console.error('Error parsing session data:', error);
+                }
+            }
+            
+            // Fallback to old system for compatibility
+            if (!userIsAuthenticated) {
+                const userData = localStorage.getItem('kajopo_current_user') || localStorage.getItem('kajopo_user');
+                console.log('Fallback user data:', userData);
+                if (userData) {
+                    try {
+                        currentUser = JSON.parse(userData);
+                        userIsAuthenticated = true;
+                        console.log('User authenticated via fallback:', userIsAuthenticated);
+                    } catch (error) {
+                        console.error('Error parsing user data:', error);
+                    }
+                }
+            }
+            
+            console.log('Final user:', currentUser);
+            console.log('Final authenticated:', userIsAuthenticated);
+            
             const userMenu = document.getElementById('userMenu');
             const guestMenu = document.getElementById('guestMenu');
             
-            if (userData) {
-                try {
-                    const user = JSON.parse(userData);
-                    updateUserInfo(user);
-                    userMenu.classList.remove('hidden');
-                    guestMenu.classList.add('hidden');
-                } catch (error) {
-                    console.error('Error parsing user data:', error);
-                    userMenu.classList.add('hidden');
-                    guestMenu.classList.remove('hidden');
-                }
+            if (userIsAuthenticated && currentUser) {
+                console.log('Showing authenticated menu on index page');
+                updateUserInfo(currentUser);
+                userMenu.classList.remove('hidden');
+                guestMenu.classList.add('hidden');
             } else {
+                console.log('Showing guest menu on index page');
                 userMenu.classList.add('hidden');
                 guestMenu.classList.remove('hidden');
             }
@@ -559,77 +515,120 @@
             if (signOutBtn) {
                 // Handle sign out
                 signOutBtn.addEventListener('click', function() {
+                    // Clear all session data
+                    localStorage.removeItem('kajopo_session');
                     localStorage.removeItem('kajopo_user');
                     localStorage.removeItem('kajopo_current_user');
                     localStorage.removeItem('kajopo_user_session');
                     localStorage.removeItem('userAuthenticated');
                     localStorage.removeItem('userInfo');
-                    window.location.reload();
+                    
+                    // Also clear Supabase session if available
+                    if (window.supabaseAuth && typeof window.supabaseAuth.signOut === 'function') {
+                        window.supabaseAuth.signOut();
+                    }
+                    
+                    // Redirect to home page
+                    window.location.href = 'index.html';
                 });
             }
         }
         
-        // Theme-switching logic (reuse on all pages)
+        // Theme-switching logic (now handled by theme-utils.js)
         function setupThemeToggle() {
+          // Theme management is now handled by the centralized ThemeManager
+          // This function is kept for backward compatibility
+          console.log('Theme toggle setup - using centralized ThemeManager');
+          
+          // Ensure ThemeManager is properly initialized
+          if (window.themeManager) {
+            console.log('ThemeManager found, ensuring proper initialization');
+            window.themeManager.init();
+          } else {
+            console.error('ThemeManager not found!');
+            // Fallback theme toggle
+            setupFallbackThemeToggle();
+          }
+        }
+        
+        // Fallback theme toggle function
+        function setupFallbackThemeToggle() {
           const themeToggleBtn = document.getElementById('theme-toggle');
           const sunIcon = document.getElementById('sun-icon');
           const moonIcon = document.getElementById('moon-icon');
-          const html = document.documentElement;
-          const savedTheme = localStorage.getItem('theme');
-          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          
-          function applyTheme(theme) {
-            if (theme === 'dark') {
-              html.setAttribute('data-theme', 'dark');
-              if (sunIcon && moonIcon) {
-                sunIcon.classList.add('hidden');
-                moonIcon.classList.remove('hidden');
-              }
-              localStorage.setItem('theme', 'dark');
-            } else {
-              html.setAttribute('data-theme', 'light');
-              if (sunIcon && moonIcon) {
-                sunIcon.classList.remove('hidden');
-                moonIcon.classList.add('hidden');
-              }
-              localStorage.setItem('theme', 'light');
-            }
-          }
-          
-          // Apply theme immediately to prevent flash
-          if (savedTheme) {
-            applyTheme(savedTheme);
-          } else if (prefersDark) {
-            applyTheme('dark');
-          } else {
-            applyTheme('light');
-          }
           
           if (themeToggleBtn) {
-            themeToggleBtn.addEventListener('click', () => {
+            themeToggleBtn.addEventListener('click', function() {
+              const html = document.documentElement;
               const currentTheme = html.getAttribute('data-theme');
+              
               if (currentTheme === 'dark') {
-                applyTheme('light');
+                html.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+                if (sunIcon) sunIcon.classList.remove('hidden');
+                if (moonIcon) moonIcon.classList.add('hidden');
+                console.log('Switched to light theme (fallback)');
               } else {
-                applyTheme('dark');
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                if (sunIcon) sunIcon.classList.add('hidden');
+                if (moonIcon) moonIcon.classList.remove('hidden');
+                console.log('Switched to dark theme (fallback)');
               }
             });
+            console.log('Fallback theme toggle setup complete');
           }
         }
         
         function goToProfile() {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            console.log('goToProfile called - checking session data...');
+            
+            // Use session data instead of localStorage
+            const sessionData = localStorage.getItem('kajopo_session');
+            let currentUser = null;
+            
+            if (sessionData) {
+                try {
+                    const parsed = JSON.parse(sessionData);
+                    console.log('Session data for goToProfile:', parsed);
+                    
+                    // Check for different session structures
+                    if (parsed.user && parsed.user.id) {
+                        currentUser = parsed.user;
+                    } else if (parsed.userId && parsed.email) {
+                        currentUser = {
+                            id: parsed.userId,
+                            email: parsed.email,
+                            firstName: parsed.firstName,
+                            lastName: parsed.LastName || parsed.lastName,
+                            displayName: parsed.displayName,
+                            accountType: parsed.accountType,
+                            role: parsed.role
+                        };
+                    }
+                    
+                    console.log('Current user for goToProfile:', currentUser);
+                } catch (error) {
+                    console.error('Error parsing session data for goToProfile:', error);
+                }
+            }
+            
             if (currentUser) {
-                const isSeeker = currentUser.accountType === 'seeker' || currentUser.role === 'I Need Help';
+                const accountType = currentUser.accountType || currentUser.role;
+                console.log('Account type for goToProfile:', accountType);
                 
-                if (isSeeker) {
-                    // Redirect to seeker profile
+                if (accountType === 'seeker' || accountType === 'I Need Help') {
+                    console.log('Redirecting to seeker profile');
                     window.location.href = 'seeker-profile.html';
-                } else {
-                    // Redirect to provider profile
+                } else if (accountType === 'provider' || accountType === 'I Can Help') {
+                    console.log('Redirecting to provider profile');
                     window.location.href = 'provider-profile.html';
+                } else {
+                    console.log('Unknown account type, defaulting to seeker profile');
+                    window.location.href = 'seeker-profile.html';
                 }
             } else {
+                console.log('No user data found, defaulting to seeker profile');
                 // Fallback to seeker profile if no user data
                 window.location.href = 'seeker-profile.html';
             }
@@ -642,6 +641,63 @@
             updateCounters();
             setupThemeToggle();
         });
+
+        // Update counter statistics
+        async function updateCounters() {
+            try {
+                // Check if database manager is available
+                if (typeof window.dbManager === 'undefined' || !window.dbManager.supabase) {
+                    console.log('Database manager not available, using default counters');
+                    setDefaultCounters();
+                    return;
+                }
+
+                // Get user counts from database
+                const { data: users, error } = await window.dbManager.supabase
+                    .from('users')
+                    .select('accountType');
+                
+                if (error) {
+                    console.error('Error fetching user data:', error);
+                    setDefaultCounters();
+                    return;
+                }
+                
+                if (users) {
+                    const seekers = users.filter(user => user.accountType === 'seeker').length;
+                    const providers = users.filter(user => user.accountType === 'provider').length;
+                    const matches = Math.floor((seekers + providers) * 0.3); // Estimate matches
+                    
+                    // Update counter elements
+                    const seekerCountEl = document.getElementById('seekerCount');
+                    const providerCountEl = document.getElementById('providerCount');
+                    const matchCountEl = document.getElementById('matchCount');
+                    
+                    if (seekerCountEl) seekerCountEl.textContent = seekers;
+                    if (providerCountEl) providerCountEl.textContent = providers;
+                    if (matchCountEl) matchCountEl.textContent = matches;
+                } else {
+                    setDefaultCounters();
+                }
+            } catch (error) {
+                console.error('Error updating counters:', error);
+                setDefaultCounters();
+            }
+        }
+
+        // Set default counter values
+        function setDefaultCounters() {
+            const seekerCountEl = document.getElementById('seekerCount');
+            const providerCountEl = document.getElementById('providerCount');
+            const matchCountEl = document.getElementById('matchCount');
+            
+            if (seekerCountEl) seekerCountEl.textContent = '24';
+            if (providerCountEl) providerCountEl.textContent = '18';
+            if (matchCountEl) matchCountEl.textContent = '12';
+        }
     </script>
+    
+    <!-- Theme Management Script -->
+    <script src="js/theme-utils.js"></script>
 </body>
 </html>

@@ -1,10 +1,14 @@
-         <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Kájọpọ̀ Succeed Together</title>
-    <link rel="stylesheet" href="css/themesNew.css">    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/themesNew.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/unified-auth.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -46,146 +50,2179 @@
         .text-indigo-600 {
             color: var(--color-primary) !important;
         }
+        
+        /* Dark mode input styling */
+        [data-theme="dark"] input[type="text"],
+        [data-theme="dark"] input[type="email"],
+        [data-theme="dark"] input[type="password"],
+        [data-theme="dark"] select {
+            background-color: var(--bg-tertiary) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--text-tertiary) !important;
+        }
+        
+        [data-theme="dark"] input::placeholder {
+            color: var(--text-tertiary) !important;
+        }
+        
+        [data-theme="dark"] select option {
+            background-color: var(--bg-tertiary) !important;
+            color: var(--text-primary) !important;
+        }
 
         /* Adjustments for the specific dashboard layout */
         .sidebar {
-            background-color: var(--card-bg) !important;
-            color: var(--text-secondary) !important;
-            border-right: 1px solid var(--border-primary);
-        }
-        .sidebar a {
-            color: var(--text-secondary);
-        }
-
-        /* Dashboard specific color overrides from the original code */
-        .bg-gray-800 {
-            background-color: var(--color-primary-dark);
-        }
-        .text-gray-300 {
-            color: var(--text-inverse);
-        }
-        .text-white {
-            color: var(--text-inverse) !important;
-        }
-        .text-gray-400 {
-            color: rgba(var(--text-inverse), 0.8) !important;
-        }
-
-        /* Active navigation item uses a theme color */
-        .nav-item.active {
-            background-color: var(--color-primary) !important;
-        }
-        .nav-item.active:hover {
-            background-color: var(--color-primary-dark) !important;
+            background-color: var(--bg-secondary) !important;
         }
         .nav-item {
-            color: var(--text-primary);
+            color: var(--text-secondary) !important;
         }
-
-        .border-gray-700 {
-            border-color: var(--border-primary) !important;
+        .nav-item.active {
+            background-color: var(--color-primary) !important;
+            color: white !important;
         }
-        
+        .nav-item:hover {
+            background-color: var(--bg-tertiary) !important;
+        }
     </style>
 </head>
-<body class="bg-gray-50 font-sans leading-normal tracking-normal">
-    <nav class="bg-white flex items-center justify-between p-4 shadow-md">
-        <div class="flex items-center space-x-4">
-            <h1 class="text-xl font-bold text-gray-900">Admin Dashboard</h1>
-            <a href="index.html" class="text-gray-600 hover:text-indigo-600 transition-colors font-medium">Back to Main Site</a>
-        </div>
-        
-        <div class="flex items-center space-x-4">
-            <button id="theme-toggle" class="p-2 rounded-full text-gray-700 hover:text-indigo-600 transition-colors" aria-label="Toggle dark mode">
-                <svg id="sun-icon" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-                <svg id="moon-icon" class="h-6 w-6 hidden" fill="currentColor" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                </svg>
-            </button>
-            <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition-colors">Logout</button>
+<body class="bg-gray-50">
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-semibold text-gray-900">Admin Dashboard</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="text-gray-600 hover:text-gray-900">Back to Main Site</a>
+                    <button id="themeToggleBtn" class="p-2 rounded-md hover:bg-gray-100">
+                        <svg id="sunIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        <svg id="moonIcon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
+                    </button>
+                    
+                    <!-- User Menu Dropdown -->
+                    <div class="relative">
+                        <button id="userMenuBtn" class="flex items-center space-x-2 text-gray-700 hover:text-gray-900">
+                            <span id="userName" class="font-medium">Admin User</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border">
+                            <a href="dashboard.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">User Dashboard</a>
+                            <a href="#" onclick="goToProfile()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                            <a href="messaging.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Messages</a>
+                            <hr class="my-1">
+                            <button id="logoutBtn" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">Sign Out</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </nav>
 
-    <div class="flex">
-        <aside class="w-64 sidebar min-h-screen p-6">
-            <nav>
-                <ul>
-                    <li class="mb-2">
-                        <a href="#" id="users-nav" class="nav-item active flex items-center p-3 rounded-lg hover:bg-gray-100 transition-colors">
-                            <svg class="h-5 w-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5m-5 0a2 2 0 100-4m0 4a2 2 0 110-4m-9-2h1m-1 15h1m-1 0a2 2 0 100-4m0 4a2 2 0 110-4m-9-2h1m-1 15h1m-1 0a2 2 0 100-4m0 4a2 2 0 110-4M5 21v-3.5A2.5 2.5 0 017.5 15h9a2.5 2.5 0 012.5 2.5V21"></path>
-                            </svg>
-                            Users
-                        </a>
-                    </li>
-                    <li class="mb-2">
-                        <a href="#" id="opportunities-nav" class="nav-item flex items-center p-3 rounded-lg hover:bg-gray-100 transition-colors">
-                            <svg class="h-5 w-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2V6"></path>
-                            </svg>
-                            Opportunities
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </aside>
-
-        <div id="content" class="flex-1 p-8">
+    <div class="flex h-screen bg-gray-50">
+        <!-- Sidebar -->
+        <div class="w-64 sidebar shadow-lg">
+            <div class="p-4">
+                <nav class="space-y-2">
+                    <a href="#" id="users-nav" class="nav-item group flex items-center px-2 py-2 text-base font-medium rounded-md">
+                        <svg class="mr-4 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                        </svg>
+                        Users
+                    </a>
+                    <a href="#" id="opportunities-nav" class="nav-item group flex items-center px-2 py-2 text-base font-medium rounded-md mt-1">
+                        <svg class="mr-4 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9"></path>
+                        </svg>
+                        Opportunities
+                    </a>
+                    <a href="#" id="applications-nav" class="nav-item group flex items-center px-2 py-2 text-base font-medium rounded-md mt-1 active">
+                        <svg class="mr-4 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Applications
+                    </a>
+                </nav>
             </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-hidden">
+            <div class="p-6">
+                <div id="content">
+                    <!-- Content will be loaded here -->
+                    <div class="text-center">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-4">Loading Dashboard...</h2>
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
     
     <script>
-        // Theme-switching logic
-        function setupThemeToggle() {
-            const themeToggleBtn = document.getElementById('theme-toggle');
-            const sunIcon = document.getElementById('sun-icon');
-            const moonIcon = document.getElementById('moon-icon');
-            const html = document.documentElement;
-
-            const savedTheme = localStorage.getItem('theme');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-            function applyTheme(theme) {
-                if (theme === 'dark') {
-                    html.setAttribute('data-theme', 'dark');
-                    sunIcon.classList.add('hidden');
-                    moonIcon.classList.remove('hidden');
-                    localStorage.setItem('theme', 'dark');
+        // Use Supabase configuration from supabase-config.js
+        
+        let supabase = null;
+        let currentView = 'applications';
+        
+        // Authentication check
+        function checkAdminAuth() {
+            // Wait for unified auth to initialize
+            if (typeof window.unifiedAuth === 'undefined') {
+                console.log('Unified auth not loaded, waiting...');
+                setTimeout(() => {
+                    checkAdminAuth();
+                }, 500);
+                return false;
+            }
+            
+            // Check if Supabase is ready
+            if (!window.unifiedAuth.isSupabaseReady()) {
+                console.log('Supabase not ready, waiting...');
+                setTimeout(() => {
+                    checkAdminAuth();
+                }, 500);
+                return false;
+            }
+            
+            // Use unified auth system
+            const currentUser = window.unifiedAuth.getCurrentUser();
+            const userIsAuthenticated = window.unifiedAuth.isAuthenticated();
+            
+            console.log('Admin Dashboard - Authentication check:', { currentUser, userIsAuthenticated });
+            
+            if (!userIsAuthenticated || !currentUser) {
+                console.log('No user found, redirecting to admin login');
+                window.location.href = 'admin-login.html';
+                return false;
+            }
+            
+            const isAdmin = currentUser.accountType === 'admin' || currentUser.isAdmin || currentUser.role === 'admin';
+            if (!isAdmin) {
+                console.log('User is not admin, redirecting to admin login');
+                alert('Access denied. Admin privileges required.');
+                window.location.href = 'admin-login.html';
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // Initialize Supabase
+        async function initializeSupabase() {
+            try {
+                console.log('Initializing Supabase...');
+                
+                // Wait for script to load
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Use the existing Supabase client from supabase-config.js
+                if (window.supabaseClient) {
+                    supabase = window.supabaseClient;
+                    console.log('✅ Using existing Supabase client from supabase-config.js');
+                } else if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+                    supabase = window.supabase.createClient(window.supabaseConfig.url, window.supabaseConfig.anonKey);
+                    console.log('✅ Supabase client created successfully');
+                } else if (typeof window.SupabaseClient === 'function') {
+                    supabase = new window.SupabaseClient(window.supabaseConfig.url, window.supabaseConfig.anonKey);
+                    console.log('✅ Supabase client created using SupabaseClient constructor');
                 } else {
-                    html.removeAttribute('data-theme');
-                    sunIcon.classList.remove('hidden');
-                    moonIcon.classList.add('hidden');
-                    localStorage.setItem('theme', 'light');
+                    throw new Error('Supabase not available');
+                }
+                
+                return true;
+            } catch (error) {
+                console.error('❌ Error initializing Supabase:', error);
+                return false;
+            }
+        }
+        
+        // Load applications data
+        async function loadApplicationsData() {
+            try {
+                console.log('Loading applications data...');
+                
+                const { data: applications, error } = await supabase
+                    .from('applications')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    throw new Error(error.message);
+                }
+                
+                const apps = applications || [];
+                console.log(`Found ${apps.length} applications`);
+                
+                // Store in global variables
+                allApplications = apps;
+                filteredApplications = [...apps];
+                
+                // Calculate stats
+                const totalApplications = apps.length;
+                const pendingApplications = apps.filter(app => app.status === 'pending').length;
+                const approvedApplications = apps.filter(app => app.status === 'approved').length;
+                const rejectedApplications = apps.filter(app => app.status === 'rejected').length;
+                
+                const oneWeekAgo = new Date();
+                oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+                const weeklyApplications = apps.filter(app => {
+                    const appDate = new Date(app.created_at);
+                    return appDate >= oneWeekAgo;
+                }).length;
+                
+                // Update stats cards
+                document.getElementById('total-applications').textContent = totalApplications;
+                document.getElementById('pending-applications').textContent = pendingApplications;
+                document.getElementById('approved-applications').textContent = approvedApplications;
+                document.getElementById('rejected-applications').textContent = rejectedApplications;
+                document.getElementById('weekly-applications').textContent = weeklyApplications;
+                
+                // Setup search and filter
+                setupSearchAndFilter();
+                
+                // Setup pagination
+                setupPagination('applications', filteredApplications, renderApplicationsTable, currentApplicationsPage);
+                
+                // Setup multi-select functionality
+                setupApplicationsMultiSelect();
+                
+            } catch (error) {
+                console.error('Error loading applications:', error);
+                document.getElementById('applications-table-body').innerHTML = 
+                    '<tr><td colspan="7" class="px-6 py-4 text-center text-red-500">Error loading applications: ' + error.message + '</td></tr>';
+            }
+        }
+        
+        // Setup applications multi-select functionality
+        function setupApplicationsMultiSelect() {
+            const selectAllCheckbox = document.getElementById('select-all-applications');
+            const applicationCheckboxes = document.querySelectorAll('.application-checkbox');
+            const bulkActions = document.getElementById('applications-bulk-actions');
+            const selectedCount = document.getElementById('applications-selected-count');
+            const deleteSelectedBtn = document.getElementById('delete-selected-applications');
+            const clearSelectionBtn = document.getElementById('clear-applications-selection');
+            
+            // Select all functionality
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', function() {
+                    applicationCheckboxes.forEach(checkbox => {
+                        checkbox.checked = this.checked;
+                    });
+                    updateApplicationsBulkActions();
+                });
+            }
+            
+            // Individual checkbox functionality
+            applicationCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    updateApplicationsSelectAllState();
+                    updateApplicationsBulkActions();
+                });
+            });
+            
+            // Delete selected functionality
+            if (deleteSelectedBtn) {
+                deleteSelectedBtn.addEventListener('click', function() {
+                    const selectedApplicationIds = getSelectedApplicationIds();
+                    if (selectedApplicationIds.length > 0) {
+                        deleteSelectedApplications(selectedApplicationIds);
+                    }
+                });
+            }
+            
+            // Clear selection functionality
+            if (clearSelectionBtn) {
+                clearSelectionBtn.addEventListener('click', function() {
+                    applicationCheckboxes.forEach(checkbox => {
+                        checkbox.checked = false;
+                    });
+                    if (selectAllCheckbox) {
+                        selectAllCheckbox.checked = false;
+                    }
+                    updateApplicationsBulkActions();
+                });
+            }
+            
+            function updateApplicationsSelectAllState() {
+                if (selectAllCheckbox) {
+                    const checkedBoxes = document.querySelectorAll('.application-checkbox:checked');
+                    selectAllCheckbox.checked = checkedBoxes.length === applicationCheckboxes.length;
+                    selectAllCheckbox.indeterminate = checkedBoxes.length > 0 && checkedBoxes.length < applicationCheckboxes.length;
                 }
             }
+            
+            function updateApplicationsBulkActions() {
+                const selectedApplicationIds = getSelectedApplicationIds();
+                if (selectedApplicationIds.length > 0) {
+                    bulkActions.classList.remove('hidden');
+                    selectedCount.textContent = `${selectedApplicationIds.length} selected`;
+                } else {
+                    bulkActions.classList.add('hidden');
+                }
+            }
+            
+            function getSelectedApplicationIds() {
+                const checkedBoxes = document.querySelectorAll('.application-checkbox:checked');
+                return Array.from(checkedBoxes).map(checkbox => checkbox.dataset.applicationId);
+            }
+        }
+        
+        // Delete selected applications
+        async function deleteSelectedApplications(applicationIds) {
+            if (!confirm(`Are you sure you want to delete ${applicationIds.length} application(s)? This action cannot be undone.`)) {
+                return;
+            }
+            
+            try {
+                console.log('Deleting applications:', applicationIds);
+                
+                // Delete from Supabase applications table
+                const { error } = await supabase
+                    .from('applications')
+                    .delete()
+                    .in('id', applicationIds);
+                
+                if (error) {
+                    throw new Error(error.message);
+                }
+                
+                // Show success message
+                alert(`Successfully deleted ${applicationIds.length} application(s).`);
+                
+                // Reload the applications data
+                await loadApplicationsData();
+                
+            } catch (error) {
+                console.error('Error deleting applications:', error);
+                alert(`Error deleting applications: ${error.message}`);
+            }
+        }
+        
+        // Render applications table
+        function renderApplicationsTable(applications) {
+            const tbody = document.getElementById('applications-table-body');
+            if (!tbody) return;
 
-            if (savedTheme) {
-                applyTheme(savedTheme);
-            } else if (prefersDark) {
-                applyTheme('dark');
-            } else {
-                applyTheme('light');
+            if (applications.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-gray-500">No applications found</td></tr>';
+                return;
             }
 
-            if (themeToggleBtn) {
-                themeToggleBtn.addEventListener('click', () => {
-                    const currentTheme = html.getAttribute('data-theme');
-                    if (currentTheme === 'dark') {
-                        applyTheme('light');
-                    } else {
-                        applyTheme('dark');
+            tbody.innerHTML = applications.map(app => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <input type="checkbox" class="application-checkbox rounded border-gray-300 text-kajopo-blue focus:ring-kajopo-blue" data-application-id="${app.id}">
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">${app.full_name || 'N/A'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-500">${app.email || 'N/A'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${app.opportunity_title || 'N/A'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-500">${app.organization || 'N/A'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            app.status === 'approved' ? 'bg-green-100 text-green-800' :
+                            app.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                            'bg-yellow-100 text-yellow-800'
+                        }">
+                            ${app.status || 'pending'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${app.created_at ? new Date(app.created_at).toLocaleDateString() : 'N/A'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button onclick="viewApplication('${app.id}')" class="text-kajopo-blue hover:text-kajopo-purple mr-3">View</button>
+                        <button onclick="updateApplicationStatus('${app.id}', 'approved')" class="text-green-600 hover:text-green-900 mr-3">Approve</button>
+                        <button onclick="updateApplicationStatus('${app.id}', 'rejected')" class="text-red-600 hover:text-red-900">Reject</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Load users data
+        async function loadUsersData() {
+            try {
+                console.log('Loading users data...');
+                
+                const { data: users, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    throw new Error(error.message);
+                }
+                
+                const usersList = users || [];
+                console.log(`Found ${usersList.length} users`);
+                
+                // Map database fields to expected camelCase format
+                const mappedUsers = usersList.map(user => ({
+                    ...user,
+                    // Map snake_case to camelCase for compatibility
+                    accountType: user.account_type || user.accountType,
+                    firstName: user.first_name || user.firstName,
+                    lastName: user.last_name || user.lastName,
+                    organizationName: user.organization_name || user.organizationName,
+                    isverified: user.verified || user.isverified,
+                    // Keep both formats for backward compatibility
+                    account_type: user.account_type,
+                    first_name: user.first_name,
+                    last_name: user.last_name,
+                    organization_name: user.organization_name,
+                    verified: user.verified
+                }));
+                
+                
+                // Store in global variables
+                allUsers = mappedUsers;
+                filteredUsers = [...mappedUsers];
+                
+                // Calculate stats
+                const totalUsers = mappedUsers.length;
+                const seekers = mappedUsers.filter(user => user.accountType === 'seeker').length;
+                const providers = mappedUsers.filter(user => user.accountType === 'provider').length;
+                const admins = mappedUsers.filter(user => user.accountType === 'admin').length;
+                const confirmed = mappedUsers.filter(user => user.verified || user.email_confirmed_at).length;
+                const pending = totalUsers - confirmed;
+                
+                // Update stats cards
+                document.getElementById('total-users').textContent = totalUsers;
+                document.getElementById('seekers').textContent = seekers;
+                document.getElementById('providers').textContent = providers;
+                document.getElementById('admins').textContent = admins;
+                document.getElementById('confirmed').textContent = confirmed;
+                document.getElementById('pending').textContent = pending;
+                
+                // Setup search and filter
+                setupSearchAndFilter();
+                
+                // Setup pagination
+                setupPagination('users', filteredUsers, renderUsersTable, currentUsersPage);
+                
+                // Setup multi-select functionality
+                setupMultiSelect();
+                
+            } catch (error) {
+                console.error('Error loading users:', error);
+                document.getElementById('users-table-body').innerHTML = 
+                    '<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">Error loading users: ' + error.message + '</td></tr>';
+            }
+        }
+        
+        // Setup multi-select functionality
+        function setupMultiSelect() {
+            const selectAllCheckbox = document.getElementById('select-all-users');
+            const userCheckboxes = document.querySelectorAll('.user-checkbox');
+            const bulkActions = document.getElementById('bulk-actions');
+            const selectedCount = document.getElementById('selected-count');
+            const deleteSelectedBtn = document.getElementById('delete-selected');
+            const clearSelectionBtn = document.getElementById('clear-selection');
+            
+            // Select all functionality
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', function() {
+                    userCheckboxes.forEach(checkbox => {
+                        checkbox.checked = this.checked;
+                    });
+                    updateBulkActions();
+                });
+            }
+            
+            // Individual checkbox functionality
+            userCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    updateSelectAllState();
+                    updateBulkActions();
+                });
+            });
+            
+            // Delete selected functionality
+            if (deleteSelectedBtn) {
+                deleteSelectedBtn.addEventListener('click', function() {
+                    const selectedUserIds = getSelectedUserIds();
+                    if (selectedUserIds.length > 0) {
+                        deleteSelectedUsers(selectedUserIds);
+                    }
+                });
+            }
+            
+            // Clear selection functionality
+            if (clearSelectionBtn) {
+                clearSelectionBtn.addEventListener('click', function() {
+                    userCheckboxes.forEach(checkbox => {
+                        checkbox.checked = false;
+                    });
+                    if (selectAllCheckbox) {
+                        selectAllCheckbox.checked = false;
+                    }
+                    updateBulkActions();
+                });
+            }
+            
+            function updateSelectAllState() {
+                if (selectAllCheckbox) {
+                    const checkedBoxes = document.querySelectorAll('.user-checkbox:checked');
+                    selectAllCheckbox.checked = checkedBoxes.length === userCheckboxes.length;
+                    selectAllCheckbox.indeterminate = checkedBoxes.length > 0 && checkedBoxes.length < userCheckboxes.length;
+                }
+            }
+            
+            function updateBulkActions() {
+                const selectedUserIds = getSelectedUserIds();
+                if (selectedUserIds.length > 0) {
+                    bulkActions.classList.remove('hidden');
+                    selectedCount.textContent = `${selectedUserIds.length} selected`;
+                } else {
+                    bulkActions.classList.add('hidden');
+                }
+            }
+            
+            function getSelectedUserIds() {
+                const checkedBoxes = document.querySelectorAll('.user-checkbox:checked');
+                return Array.from(checkedBoxes).map(checkbox => checkbox.dataset.userId);
+            }
+        }
+        
+        // Delete selected users
+        async function deleteSelectedUsers(userIds) {
+            if (!confirm(`Are you sure you want to delete ${userIds.length} user(s)? This action cannot be undone.`)) {
+                return;
+            }
+            
+            try {
+                console.log('Deleting users:', userIds);
+                
+                // Delete from Supabase users table
+                const { error } = await supabase
+                    .from('users')
+                    .delete()
+                    .in('id', userIds);
+                
+                if (error) {
+                    throw new Error(error.message);
+                }
+                
+                // Also delete from Supabase Auth (if needed)
+                for (const userId of userIds) {
+                    try {
+                        const { error: authError } = await supabase.auth.admin.deleteUser(userId);
+                        if (authError) {
+                            console.warn(`Could not delete user ${userId} from auth:`, authError.message);
+                        }
+                    } catch (authError) {
+                        console.warn(`Could not delete user ${userId} from auth:`, authError.message);
+                    }
+                }
+                
+                // Show success message
+                alert(`Successfully deleted ${userIds.length} user(s).`);
+                
+                // Reload the users data
+                await loadUsersData();
+                
+            } catch (error) {
+                console.error('Error deleting users:', error);
+                alert(`Error deleting users: ${error.message}`);
+            }
+        }
+        
+        // Render users table
+        function renderUsersTable(users) {
+            const tbody = document.getElementById('users-table-body');
+            if (!tbody) return;
+
+            if (users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No users found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = users.map(user => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <input type="checkbox" class="user-checkbox rounded border-gray-300 text-kajopo-blue focus:ring-kajopo-blue" data-user-id="${user.id}">
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">${user.accountType === 'provider' ? (user.organization_name || user.organizationName || '') : (user.firstName || '') + ' ' + (user.lastName || '')}</div>
+                        <div class="text-sm text-gray-500">${user.email}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            user.accountType === 'admin' ? 'bg-red-100 text-red-800' :
+                            user.accountType === 'provider' ? 'bg-purple-100 text-purple-800' :
+                            'bg-green-100 text-green-800'
+                        }">
+                            ${user.accountType || 'seeker'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            user.verified || user.email_confirmed_at ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                        }">
+                            ${user.verified || user.email_confirmed_at ? 'Confirmed' : 'Pending'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button onclick="viewUser('${user.id}')" class="text-kajopo-blue hover:text-kajopo-purple mr-3">View</button>
+                        <div class="inline-flex items-center space-x-2">
+                            <select id="user-status-${user.id}" data-original="${user.verified || user.email_confirmed_at ? 'confirmed' : 'pending'}" onchange="onUserStatusChange('${user.id}')" class="text-sm border border-gray-300 rounded px-2 py-1 bg-white text-gray-900 dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                                <option value="pending" ${!user.verified && !user.email_confirmed_at ? 'selected' : ''}>Pending</option>
+                                <option value="confirmed" ${user.verified || user.email_confirmed_at ? 'selected' : ''}>Confirmed</option>
+                            </select>
+                            <button onclick="saveUserStatus('${user.id}')" class="text-green-600 hover:text-green-900 text-xs px-2 py-1 border border-green-300 rounded hidden" id="save-user-${user.id}">Save</button>
+                            <button onclick="cancelUserStatus('${user.id}')" class="text-gray-600 hover:text-gray-900 text-xs px-2 py-1 border border-gray-300 rounded hidden" id="cancel-user-${user.id}">Cancel</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Load users view
+        function loadUsersView() {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Users Management</h2>
+                    
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-6 gap-6 mb-6">
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-semibold text-gray-700">Total Users</h3>
+                            <p class="text-3xl font-bold text-kajopo-blue" id="total-users">Loading...</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-semibold text-gray-700">Seekers</h3>
+                            <p class="text-3xl font-bold text-green-600" id="seekers">Loading...</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-semibold text-gray-700">Providers</h3>
+                            <p class="text-3xl font-bold text-purple-600" id="providers">Loading...</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-semibold text-gray-700">Admins</h3>
+                            <p class="text-3xl font-bold text-red-600" id="admins">Loading...</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-semibold text-gray-700">Confirmed</h3>
+                            <p class="text-3xl font-bold text-green-600" id="confirmed">Loading...</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-semibold text-gray-700">Pending</h3>
+                            <p class="text-3xl font-bold text-yellow-600" id="pending">Loading...</p>
+                        </div>
+                    </div>
+
+                    <!-- Search and Filter -->
+                    <div class="bg-white rounded-lg shadow mb-6 p-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex-1 max-w-md">
+                                <div class="relative">
+                                    <input type="text" id="user-search" placeholder="Search users by name, email..." 
+                                           class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-kajopo-blue focus:border-kajopo-blue bg-white text-gray-900 dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <svg class="h-5 w-5 text-gray-400 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <select id="user-status-filter" class="px-3 py-2 border border-gray-300 rounded-md focus:ring-kajopo-blue focus:border-kajopo-blue bg-white text-gray-900 dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                                    <option value="all">All Status</option>
+                                    <option value="confirmed">Confirmed</option>
+                                    <option value="pending">Pending</option>
+                                </select>
+                                <select id="user-type-filter" class="px-3 py-2 border border-gray-300 rounded-md focus:ring-kajopo-blue focus:border-kajopo-blue bg-white text-gray-900 dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                                    <option value="all">All Types</option>
+                                    <option value="seeker">Seeker</option>
+                                    <option value="provider">Provider</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Users Table -->
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-lg font-semibold text-gray-900">All Users</h3>
+                                <div id="bulk-actions" class="hidden flex items-center space-x-2">
+                                    <span id="selected-count" class="text-sm text-gray-600">0 selected</span>
+                                    <button id="delete-selected" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                                        Delete Selected
+                                    </button>
+                                    <button id="clear-selection" class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                                        Clear Selection
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <input type="checkbox" id="select-all-users" class="rounded border-gray-300 text-kajopo-blue focus:ring-kajopo-blue">
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none" data-sort="name">
+                                            <div class="flex items-center space-x-1">
+                                                <span>User</span>
+                                                <svg class="w-4 h-4 sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                                </svg>
+                                            </div>
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none" data-sort="accountType">
+                                            <div class="flex items-center space-x-1">
+                                                <span>Type</span>
+                                                <svg class="w-4 h-4 sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                                </svg>
+                                            </div>
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none" data-sort="status">
+                                            <div class="flex items-center space-x-1">
+                                                <span>Status</span>
+                                                <svg class="w-4 h-4 sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                                </svg>
+                                            </div>
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none" data-sort="created_at">
+                                            <div class="flex items-center space-x-1">
+                                                <span>Joined</span>
+                                                <svg class="w-4 h-4 sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                                </svg>
+                                            </div>
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-table-body" class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">Loading users...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <div id="users-pagination" class="px-6 py-4 border-t border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <div class="text-sm text-gray-700">
+                                    Showing <span id="users-start">1</span> to <span id="users-end">10</span> of <span id="users-total">0</span> results
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <button id="users-prev" class="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                        Previous
+                                    </button>
+                                    <div id="users-page-numbers" class="flex space-x-1">
+                                        <!-- Page numbers will be inserted here -->
+                                    </div>
+                                    <button id="users-next" class="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                        Next
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Load users data
+            loadUsersData();
+        }
+        
+        // Load opportunities data
+        async function loadOpportunitiesData() {
+            try {
+                console.log('Loading opportunities data...');
+                
+                const { data: opportunities, error } = await supabase
+                    .from('opportunities')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    throw new Error(error.message);
+                }
+                
+                const opps = opportunities || [];
+                console.log(`Found ${opps.length} opportunities`);
+                
+                // Store in global variables
+                allOpportunities = opps;
+                filteredOpportunities = [...opps];
+                
+                // Calculate stats
+                const totalOpportunities = opps.length;
+                const paidOpportunities = opps.filter(opp => opp.type === 'paid').length;
+                const volunteerOpportunities = opps.filter(opp => opp.type === 'volunteer').length;
+                const activeOpportunities = opps.filter(opp => opp.status === 'active' || !opp.status).length;
+                const thisWeek = opps.filter(opp => {
+                    const oppDate = new Date(opp.created_at);
+                    const oneWeekAgo = new Date();
+                    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+                    return oppDate >= oneWeekAgo;
+                }).length;
+                
+                // Update stats cards
+                document.getElementById('total-opportunities').textContent = totalOpportunities;
+                document.getElementById('paid-opportunities').textContent = paidOpportunities;
+                document.getElementById('volunteer-opportunities').textContent = volunteerOpportunities;
+                document.getElementById('active-opportunities').textContent = activeOpportunities;
+                document.getElementById('weekly-opportunities').textContent = thisWeek;
+                
+                // Setup search and filter
+                setupSearchAndFilter();
+                
+                // Setup pagination
+                setupPagination('opportunities', filteredOpportunities, renderOpportunitiesTable, currentOpportunitiesPage);
+                
+                // Setup multi-select functionality
+                setupOpportunitiesMultiSelect();
+                
+            } catch (error) {
+                console.error('Error loading opportunities:', error);
+                document.getElementById('opportunities-table-body').innerHTML = 
+                    '<tr><td colspan="6" class="px-6 py-4 text-center text-red-500">Error loading opportunities: ' + error.message + '</td></tr>';
+            }
+        }
+        
+        // Setup opportunities multi-select functionality
+        function setupOpportunitiesMultiSelect() {
+            const selectAllCheckbox = document.getElementById('select-all-opportunities');
+            const opportunityCheckboxes = document.querySelectorAll('.opportunity-checkbox');
+            const bulkActions = document.getElementById('opportunities-bulk-actions');
+            const selectedCount = document.getElementById('opportunities-selected-count');
+            const deleteSelectedBtn = document.getElementById('delete-selected-opportunities');
+            const clearSelectionBtn = document.getElementById('clear-opportunities-selection');
+            
+            // Select all functionality
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', function() {
+                    opportunityCheckboxes.forEach(checkbox => {
+                        checkbox.checked = this.checked;
+                    });
+                    updateOpportunitiesBulkActions();
+                });
+            }
+            
+            // Individual checkbox functionality
+            opportunityCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    updateOpportunitiesSelectAllState();
+                    updateOpportunitiesBulkActions();
+                });
+            });
+            
+            // Delete selected functionality
+            if (deleteSelectedBtn) {
+                deleteSelectedBtn.addEventListener('click', function() {
+                    const selectedOpportunityIds = getSelectedOpportunityIds();
+                    if (selectedOpportunityIds.length > 0) {
+                        deleteSelectedOpportunities(selectedOpportunityIds);
+                    }
+                });
+            }
+            
+            // Clear selection functionality
+            if (clearSelectionBtn) {
+                clearSelectionBtn.addEventListener('click', function() {
+                    opportunityCheckboxes.forEach(checkbox => {
+                        checkbox.checked = false;
+                    });
+                    if (selectAllCheckbox) {
+                        selectAllCheckbox.checked = false;
+                    }
+                    updateOpportunitiesBulkActions();
+                });
+            }
+            
+            function updateOpportunitiesSelectAllState() {
+                if (selectAllCheckbox) {
+                    const checkedBoxes = document.querySelectorAll('.opportunity-checkbox:checked');
+                    selectAllCheckbox.checked = checkedBoxes.length === opportunityCheckboxes.length;
+                    selectAllCheckbox.indeterminate = checkedBoxes.length > 0 && checkedBoxes.length < opportunityCheckboxes.length;
+                }
+            }
+            
+            function updateOpportunitiesBulkActions() {
+                const selectedOpportunityIds = getSelectedOpportunityIds();
+                if (selectedOpportunityIds.length > 0) {
+                    bulkActions.classList.remove('hidden');
+                    selectedCount.textContent = `${selectedOpportunityIds.length} selected`;
+                } else {
+                    bulkActions.classList.add('hidden');
+                }
+            }
+            
+            function getSelectedOpportunityIds() {
+                const checkedBoxes = document.querySelectorAll('.opportunity-checkbox:checked');
+                return Array.from(checkedBoxes).map(checkbox => checkbox.dataset.opportunityId);
+            }
+        }
+        
+        // Delete selected opportunities
+        async function deleteSelectedOpportunities(opportunityIds) {
+            if (!confirm(`Are you sure you want to delete ${opportunityIds.length} opportunity(ies)? This action cannot be undone.`)) {
+                return;
+            }
+            
+            try {
+                console.log('Deleting opportunities:', opportunityIds);
+                
+                // Delete from Supabase opportunities table
+                const { error } = await supabase
+                    .from('opportunities')
+                    .delete()
+                    .in('id', opportunityIds);
+                
+                if (error) {
+                    throw new Error(error.message);
+                }
+                
+                // Show success message
+                alert(`Successfully deleted ${opportunityIds.length} opportunity(ies).`);
+                
+                // Reload the opportunities data
+                await loadOpportunitiesData();
+                
+            } catch (error) {
+                console.error('Error deleting opportunities:', error);
+                alert(`Error deleting opportunities: ${error.message}`);
+            }
+        }
+        
+        // Render opportunities table
+        function renderOpportunitiesTable(opportunities) {
+            const tbody = document.getElementById('opportunities-table-body');
+            if (!tbody) return;
+
+            if (opportunities.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No opportunities found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = opportunities.map(opp => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <input type="checkbox" class="opportunity-checkbox rounded border-gray-300 text-kajopo-blue focus:ring-kajopo-blue" data-opportunity-id="${opp.id}">
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">${opp.title || 'N/A'}</div>
+                        <div class="text-sm text-gray-500">${opp.organization || 'N/A'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            opp.type === 'paid' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
+                        }">
+                            ${opp.type || 'volunteer'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${opp.category || 'N/A'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            opp.status === 'active' || !opp.status ? 'bg-green-100 text-green-800' :
+                            opp.status === 'inactive' ? 'bg-gray-100 text-gray-800' :
+                            opp.status === 'paused' ? 'bg-yellow-100 text-yellow-800' :
+                            opp.status === 'completed' ? 'bg-blue-100 text-blue-800' :
+                            'bg-gray-100 text-gray-800'
+                        }">
+                            ${opp.status || 'active'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${opp.created_at ? new Date(opp.created_at).toLocaleDateString() : 'N/A'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button onclick="viewOpportunity('${opp.id}')" class="text-kajopo-blue hover:text-kajopo-purple mr-3">View</button>
+                        <div class="inline-flex items-center space-x-2">
+                            <select id="opp-status-${opp.id}" data-original="${opp.status || 'active'}" onchange="onOpportunityStatusChange('${opp.id}')" class="text-sm border border-gray-300 rounded px-2 py-1 bg-white text-gray-900 dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                                <option value="active" ${opp.status === 'active' || !opp.status ? 'selected' : ''}>Active</option>
+                                <option value="inactive" ${opp.status === 'inactive' ? 'selected' : ''}>Inactive</option>
+                                <option value="paused">Paused</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                            <button onclick="saveOpportunityStatus('${opp.id}')" class="text-green-600 hover:text-green-900 text-xs px-2 py-1 border border-green-300 rounded hidden" id="save-opp-${opp.id}">Save</button>
+                            <button onclick="cancelOpportunityStatus('${opp.id}')" class="text-gray-600 hover:text-gray-900 text-xs px-2 py-1 border border-gray-300 rounded hidden" id="cancel-opp-${opp.id}">Cancel</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Load opportunities view
+        function loadOpportunitiesView() {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Opportunities Management</h2>
+                    
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-semibold text-gray-700">Total Opportunities</h3>
+                            <p class="text-3xl font-bold text-kajopo-blue" id="total-opportunities">Loading...</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-semibold text-gray-700">Paid</h3>
+                            <p class="text-3xl font-bold text-green-600" id="paid-opportunities">Loading...</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-semibold text-gray-700">Volunteer</h3>
+                            <p class="text-3xl font-bold text-blue-600" id="volunteer-opportunities">Loading...</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-semibold text-gray-700">Active</h3>
+                            <p class="text-3xl font-bold text-green-600" id="active-opportunities">Loading...</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-semibold text-gray-700">This Week</h3>
+                            <p class="text-3xl font-bold text-kajopo-purple" id="weekly-opportunities">Loading...</p>
+                        </div>
+                    </div>
+
+                    <!-- Search and Filter -->
+                    <div class="bg-white rounded-lg shadow mb-6 p-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex-1 max-w-md">
+                                <div class="relative">
+                                    <input type="text" id="opportunity-search" placeholder="Search opportunities by title, organization..." 
+                                           class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-kajopo-blue focus:border-kajopo-blue bg-white text-gray-900 dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <svg class="h-5 w-5 text-gray-400 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <select id="opportunity-status-filter" class="px-3 py-2 border border-gray-300 rounded-md focus:ring-kajopo-blue focus:border-kajopo-blue bg-white text-gray-900 dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                                    <option value="all">All Status</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                    <option value="paused">Paused</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                                <select id="opportunity-type-filter" class="px-3 py-2 border border-gray-300 rounded-md focus:ring-kajopo-blue focus:border-kajopo-blue bg-white text-gray-900 dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                                    <option value="all">All Types</option>
+                                    <option value="paid">Paid</option>
+                                    <option value="volunteer">Volunteer</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Opportunities Table -->
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-lg font-semibold text-gray-900">All Opportunities</h3>
+                                <div id="opportunities-bulk-actions" class="hidden flex items-center space-x-2">
+                                    <span id="opportunities-selected-count" class="text-sm text-gray-600">0 selected</span>
+                                    <button id="delete-selected-opportunities" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                                        Delete Selected
+                                    </button>
+                                    <button id="clear-opportunities-selection" class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                                        Clear Selection
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <input type="checkbox" id="select-all-opportunities" class="rounded border-gray-300 text-kajopo-blue focus:ring-kajopo-blue">
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none" data-sort="title">
+                                            <div class="flex items-center space-x-1">
+                                                <span>Opportunity</span>
+                                                <svg class="w-4 h-4 sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                                </svg>
+                                            </div>
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none" data-sort="type">
+                                            <div class="flex items-center space-x-1">
+                                                <span>Type</span>
+                                                <svg class="w-4 h-4 sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                                </svg>
+                                            </div>
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none" data-sort="category">
+                                            <div class="flex items-center space-x-1">
+                                                <span>Category</span>
+                                                <svg class="w-4 h-4 sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                                </svg>
+                                            </div>
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none" data-sort="status">
+                                            <div class="flex items-center space-x-1">
+                                                <span>Status</span>
+                                                <svg class="w-4 h-4 sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                                </svg>
+                                            </div>
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none" data-sort="created_at">
+                                            <div class="flex items-center space-x-1">
+                                                <span>Created</span>
+                                                <svg class="w-4 h-4 sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                                </svg>
+                                            </div>
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="opportunities-table-body" class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">Loading opportunities...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <div id="opportunities-pagination" class="px-6 py-4 border-t border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <div class="text-sm text-gray-700">
+                                    Showing <span id="opportunities-start">1</span> to <span id="opportunities-end">10</span> of <span id="opportunities-total">0</span> results
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <button id="opportunities-prev" class="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                        Previous
+                                    </button>
+                                    <div id="opportunities-page-numbers" class="flex space-x-1">
+                                        <!-- Page numbers will be inserted here -->
+                                    </div>
+                                    <button id="opportunities-next" class="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                        Next
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Load opportunities data
+            loadOpportunitiesData();
+        }
+        
+        // Load applications view
+        function loadApplicationsView() {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Applications Management</h2>
+                    
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-semibold text-gray-700">Total Applications</h3>
+                            <p class="text-3xl font-bold text-kajopo-blue" id="total-applications">Loading...</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-semibold text-gray-700">Pending</h3>
+                            <p class="text-3xl font-bold text-yellow-600" id="pending-applications">Loading...</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-semibold text-gray-700">Approved</h3>
+                            <p class="text-3xl font-bold text-green-600" id="approved-applications">Loading...</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-semibold text-gray-700">Rejected</h3>
+                            <p class="text-3xl font-bold text-red-600" id="rejected-applications">Loading...</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-semibold text-gray-700">This Week</h3>
+                            <p class="text-3xl font-bold text-kajopo-purple" id="weekly-applications">Loading...</p>
+                        </div>
+                    </div>
+
+                    <!-- Search and Filter -->
+                    <div class="bg-white rounded-lg shadow mb-6 p-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex-1 max-w-md">
+                                <div class="relative">
+                                    <input type="text" id="application-search" placeholder="Search applications by name, email, opportunity..." 
+                                           class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-kajopo-blue focus:border-kajopo-blue bg-white text-gray-900 dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <svg class="h-5 w-5 text-gray-400 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <select id="application-status-filter" class="px-3 py-2 border border-gray-300 rounded-md focus:ring-kajopo-blue focus:border-kajopo-blue bg-white text-gray-900 dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                                    <option value="all">All Status</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="approved">Approved</option>
+                                    <option value="rejected">Rejected</option>
+                                </select>
+                                <select id="application-type-filter" class="px-3 py-2 border border-gray-300 rounded-md focus:ring-kajopo-blue focus:border-kajopo-blue bg-white text-gray-900 dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                                    <option value="all">All Types</option>
+                                    <option value="paid">Paid</option>
+                                    <option value="volunteer">Volunteer</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Applications Table -->
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-lg font-semibold text-gray-900">All Applications</h3>
+                                <div id="applications-bulk-actions" class="hidden flex items-center space-x-2">
+                                    <span id="applications-selected-count" class="text-sm text-gray-600">0 selected</span>
+                                    <button id="delete-selected-applications" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                                        Delete Selected
+                                    </button>
+                                    <button id="clear-applications-selection" class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                                        Clear Selection
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <input type="checkbox" id="select-all-applications" class="rounded border-gray-300 text-kajopo-blue focus:ring-kajopo-blue">
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none" data-sort="full_name">
+                                            <div class="flex items-center space-x-1">
+                                                <span>Applicant</span>
+                                                <svg class="w-4 h-4 sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                                </svg>
+                                            </div>
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none" data-sort="email">
+                                            <div class="flex items-center space-x-1">
+                                                <span>Email</span>
+                                                <svg class="w-4 h-4 sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                                </svg>
+                                            </div>
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Opportunity</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Organization</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none" data-sort="status">
+                                            <div class="flex items-center space-x-1">
+                                                <span>Status</span>
+                                                <svg class="w-4 h-4 sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                                </svg>
+                                            </div>
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none" data-sort="created_at">
+                                            <div class="flex items-center space-x-1">
+                                                <span>Applied</span>
+                                                <svg class="w-4 h-4 sort-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                                </svg>
+                                            </div>
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="applications-table-body" class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">Loading applications...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <div id="applications-pagination" class="px-6 py-4 border-t border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <div class="text-sm text-gray-700">
+                                    Showing <span id="applications-start">1</span> to <span id="applications-end">10</span> of <span id="applications-total">0</span> results
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <button id="applications-prev" class="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                        Previous
+                                    </button>
+                                    <div id="applications-page-numbers" class="flex space-x-1">
+                                        <!-- Page numbers will be inserted here -->
+                                    </div>
+                                    <button id="applications-next" class="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                        Next
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Load applications data
+            loadApplicationsData();
+        }
+        
+        // View application details
+        async function viewApplication(applicationId) {
+            try {
+                const { data: application, error } = await supabase
+                    .from('applications')
+                    .select(`
+                        *,
+                        opportunities (
+                            title,
+                            organization,
+                            type,
+                            category,
+                            description
+                        )
+                    `)
+                    .eq('id', applicationId)
+                    .single();
+                
+                if (error) {
+                    throw new Error(error.message);
+                }
+                
+                const opp = application.opportunities;
+                const message = application.message || 'No message provided';
+                
+                alert(`Application Details:
+                
+Applicant: ${application.full_name || 'N/A'}
+Email: ${application.email || 'N/A'}
+Phone: ${application.phone || 'N/A'}
+
+Opportunity: ${opp?.title || 'N/A'}
+Organization: ${opp?.organization || 'N/A'}
+Type: ${opp?.type || 'N/A'}
+Category: ${opp?.category || 'N/A'}
+
+Status: ${application.status || 'pending'}
+Applied: ${application.created_at ? new Date(application.created_at).toLocaleString() : 'N/A'}
+
+Message:
+${message}`);
+                
+            } catch (error) {
+                console.error('Error viewing application:', error);
+                alert('Failed to load application details: ' + error.message);
+            }
+        }
+        
+        // Update application status
+        async function updateApplicationStatus(applicationId, newStatus) {
+            try {
+                const { error } = await supabase
+                    .from('applications')
+                    .update({ 
+                        status: newStatus,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', applicationId);
+                
+                if (error) {
+                    throw new Error(error.message);
+                }
+                
+                alert(`Application ${newStatus} successfully`);
+                
+                // Refresh applications data
+                loadApplicationsData();
+                
+            } catch (error) {
+                console.error('Error updating application status:', error);
+                alert('Failed to update application status: ' + error.message);
+            }
+        }
+        
+        // User management functions
+        async function viewUser(userId) {
+            try {
+                const { data: user, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
+                
+                if (error) {
+                    throw new Error(error.message);
+                }
+                
+                // Map database fields to expected format
+                const mappedUser = {
+                    ...user,
+                    accountType: user.account_type || user.accountType,
+                    firstName: user.first_name || user.firstName,
+                    lastName: user.last_name || user.lastName,
+                    organizationName: user.organization_name || user.organizationName,
+                    verified: user.verified || user.isverified
+                };
+                
+                const displayName = mappedUser.accountType === 'provider' ? 
+                    (mappedUser.organizationName || '') : 
+                    `${mappedUser.firstName || ''} ${mappedUser.lastName || ''}`.trim();
+                
+                alert(`User Details:
+                
+Name: ${displayName}
+Email: ${mappedUser.email}
+Type: ${mappedUser.accountType || 'seeker'}
+Status: ${mappedUser.verified || mappedUser.email_confirmed_at ? 'Confirmed' : 'Pending'}
+Joined: ${mappedUser.created_at ? new Date(mappedUser.created_at).toLocaleString() : 'N/A'}`);
+                
+            } catch (error) {
+                console.error('Error viewing user:', error);
+                alert('Failed to load user details: ' + error.message);
+            }
+        }
+        
+        // User status management with Save/Cancel
+        function onUserStatusChange(userId) {
+            const select = document.getElementById(`user-status-${userId}`);
+            const saveBtn = document.getElementById(`save-user-${userId}`);
+            const cancelBtn = document.getElementById(`cancel-user-${userId}`);
+            const originalValue = select.getAttribute('data-original');
+            
+            if (select.value !== originalValue) {
+                // Show Save/Cancel buttons
+                saveBtn.classList.remove('hidden');
+                cancelBtn.classList.remove('hidden');
+                // Highlight the select to show it's changed
+                select.classList.add('border-yellow-400', 'bg-yellow-50');
+            } else {
+                // Hide Save/Cancel buttons
+                saveBtn.classList.add('hidden');
+                cancelBtn.classList.add('hidden');
+                // Remove highlight
+                select.classList.remove('border-yellow-400', 'bg-yellow-50');
+            }
+        }
+        
+        async function saveUserStatus(userId) {
+            try {
+                const select = document.getElementById(`user-status-${userId}`);
+                const newStatus = select.value;
+                
+                let updateData = {
+                    updated_at: new Date().toISOString()
+                };
+                
+                // Handle different status values
+                switch (newStatus) {
+                    case 'confirmed':
+                        updateData.verified = true;
+                        break;
+                    case 'pending':
+                        updateData.verified = false;
+                        break;
+                    case 'suspended':
+                        updateData.verified = false;
+                        // Note: We don't have a suspended status column, so we just set verified to false
+                        break;
+                    default:
+                        throw new Error('Invalid status value');
+                }
+                
+                // Update user status
+                const { error: updateError } = await supabase
+                    .from('users')
+                    .update(updateData)
+                    .eq('id', userId);
+                
+                if (updateError) {
+                    throw new Error(updateError.message);
+                }
+                
+                // Update the original value
+                select.setAttribute('data-original', newStatus);
+                
+                // Hide Save/Cancel buttons
+                document.getElementById(`save-user-${userId}`).classList.add('hidden');
+                document.getElementById(`cancel-user-${userId}`).classList.add('hidden');
+                
+                // Remove highlight
+                select.classList.remove('border-yellow-400', 'bg-yellow-50');
+                
+                alert(`User status updated to: ${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)}`);
+                
+                // Refresh users data
+                loadUsersData();
+                
+            } catch (error) {
+                console.error('Error updating user status:', error);
+                alert('Failed to update user status: ' + error.message);
+            }
+        }
+        
+        function cancelUserStatus(userId) {
+            const select = document.getElementById(`user-status-${userId}`);
+            const originalValue = select.getAttribute('data-original');
+            
+            // Reset to original value
+            select.value = originalValue;
+            
+            // Hide Save/Cancel buttons
+            document.getElementById(`save-user-${userId}`).classList.add('hidden');
+            document.getElementById(`cancel-user-${userId}`).classList.add('hidden');
+            
+            // Remove highlight
+            select.classList.remove('border-yellow-400', 'bg-yellow-50');
+        }
+        
+        // Opportunity management functions
+        async function viewOpportunity(opportunityId) {
+            try {
+                const { data: opportunity, error } = await supabase
+                    .from('opportunities')
+                    .select('*')
+                    .eq('id', opportunityId)
+                    .single();
+                
+                if (error) {
+                    throw new Error(error.message);
+                }
+                
+                alert(`Opportunity Details:
+                
+Title: ${opportunity.title || 'N/A'}
+Organization: ${opportunity.organization || 'N/A'}
+Type: ${opportunity.type || 'volunteer'}
+Category: ${opportunity.category || 'N/A'}
+Status: ${opportunity.status || 'active'}
+Description: ${opportunity.description || 'No description available'}
+Created: ${opportunity.created_at ? new Date(opportunity.created_at).toLocaleString() : 'N/A'}`);
+                
+            } catch (error) {
+                console.error('Error viewing opportunity:', error);
+                alert('Failed to load opportunity details: ' + error.message);
+            }
+        }
+        
+        // Opportunity status management with Save/Cancel
+        function onOpportunityStatusChange(opportunityId) {
+            const select = document.getElementById(`opp-status-${opportunityId}`);
+            const saveBtn = document.getElementById(`save-opp-${opportunityId}`);
+            const cancelBtn = document.getElementById(`cancel-opp-${opportunityId}`);
+            const originalValue = select.getAttribute('data-original');
+            
+            if (select.value !== originalValue) {
+                // Show Save/Cancel buttons
+                saveBtn.classList.remove('hidden');
+                cancelBtn.classList.remove('hidden');
+                // Highlight the select to show it's changed
+                select.classList.add('border-yellow-400', 'bg-yellow-50');
+            } else {
+                // Hide Save/Cancel buttons
+                saveBtn.classList.add('hidden');
+                cancelBtn.classList.add('hidden');
+                // Remove highlight
+                select.classList.remove('border-yellow-400', 'bg-yellow-50');
+            }
+        }
+        
+        async function saveOpportunityStatus(opportunityId) {
+            try {
+                const select = document.getElementById(`opp-status-${opportunityId}`);
+                const newStatus = select.value;
+                
+                // Update opportunity status
+                const { error: updateError } = await supabase
+                    .from('opportunities')
+                    .update({ 
+                        status: newStatus,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', opportunityId);
+                
+                if (updateError) {
+                    throw new Error(updateError.message);
+                }
+                
+                // Update the original value
+                select.setAttribute('data-original', newStatus);
+                
+                // Hide Save/Cancel buttons
+                document.getElementById(`save-opp-${opportunityId}`).classList.add('hidden');
+                document.getElementById(`cancel-opp-${opportunityId}`).classList.add('hidden');
+                
+                // Remove highlight
+                select.classList.remove('border-yellow-400', 'bg-yellow-50');
+                
+                alert(`Opportunity status updated to: ${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)}`);
+                
+                // Refresh opportunities data
+                loadOpportunitiesData();
+                
+            } catch (error) {
+                console.error('Error updating opportunity status:', error);
+                alert('Failed to update opportunity status: ' + error.message);
+            }
+        }
+        
+        function cancelOpportunityStatus(opportunityId) {
+            const select = document.getElementById(`opp-status-${opportunityId}`);
+            const originalValue = select.getAttribute('data-original');
+            
+            // Reset to original value
+            select.value = originalValue;
+            
+            // Hide Save/Cancel buttons
+            document.getElementById(`save-opp-${opportunityId}`).classList.add('hidden');
+            document.getElementById(`cancel-opp-${opportunityId}`).classList.add('hidden');
+            
+            // Remove highlight
+            select.classList.remove('border-yellow-400', 'bg-yellow-50');
+        }
+        
+        // Switch view
+        function switchView(view) {
+            // Update navigation active state
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            document.getElementById(`${view}-nav`)?.classList.add('active');
+            currentView = view;
+
+            // Load appropriate view
+            if (view === 'applications') {
+                loadApplicationsView();
+            } else if (view === 'users') {
+                loadUsersView();
+            } else if (view === 'opportunities') {
+                loadOpportunitiesView();
+            } else {
+                document.getElementById('content').innerHTML = `
+                    <div class="text-center">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-4">${view.charAt(0).toUpperCase() + view.slice(1)} Management</h2>
+                        <p class="text-gray-600">This section is coming soon!</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Theme toggle
+        function setupThemeToggle() {
+            const themeToggleBtn = document.getElementById('themeToggleBtn');
+            const sunIcon = document.getElementById('sunIcon');
+            const moonIcon = document.getElementById('moonIcon');
+            
+            // Get current theme
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            
+            if (currentTheme === 'dark') {
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+            
+            themeToggleBtn.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                
+                if (newTheme === 'dark') {
+                    sunIcon.classList.add('hidden');
+                    moonIcon.classList.remove('hidden');
+                } else {
+                    sunIcon.classList.remove('hidden');
+                    moonIcon.classList.add('hidden');
+                }
+            });
+        }
+        
+        // Logout
+        function setupLogout() {
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                if (window.unifiedAuth) {
+                    window.unifiedAuth.logout();
+                } else {
+                    localStorage.removeItem('kajopo_session');
+                    localStorage.removeItem('kajopo_current_user');
+                    localStorage.removeItem('kajopo_user');
+                }
+                window.location.href = 'index.html';
+            });
+        }
+
+        // Setup user menu dropdown functionality
+        function setupUserMenuListeners() {
+            const userMenuBtn = document.getElementById('userMenuBtn');
+            const userDropdown = document.getElementById('userDropdown');
+            
+            if (userMenuBtn && userDropdown) {
+                userMenuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    userDropdown.classList.toggle('hidden');
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!userMenuBtn.contains(event.target) && !userDropdown.contains(event.target)) {
+                        userDropdown.classList.add('hidden');
                     }
                 });
             }
         }
 
-        // Initialize theme manager
-        document.addEventListener('DOMContentLoaded', function() {
-            setupThemeToggle();
-        });
+        // Navigate to user profile
+        function goToProfile() {
+            const currentUser = window.unifiedAuth ? window.unifiedAuth.getCurrentUser() : null;
+            
+            if (currentUser) {
+                const isSeeker = currentUser.accountType === 'seeker' || currentUser.role === 'I Need Help';
+                
+                if (isSeeker) {
+                    window.location.href = 'seeker-profile.html';
+                } else {
+                    window.location.href = 'provider-profile.html';
+                }
+            } else {
+                window.location.href = 'signin-form.html';
+            }
+        }
+        
+        // Global variables for search and sort
+        let allUsers = [];
+        let filteredUsers = [];
+        let allOpportunities = [];
+        let filteredOpportunities = [];
+        let allApplications = [];
+        let filteredApplications = [];
+        let currentSortColumn = null;
+        let currentSortDirection = 'asc';
+
+        // Search and filter functions
+        function setupSearchAndFilter() {
+            // Users search and filter
+            const userSearch = document.getElementById('user-search');
+            const userStatusFilter = document.getElementById('user-status-filter');
+            const userTypeFilter = document.getElementById('user-type-filter');
+
+            if (userSearch) {
+                userSearch.addEventListener('input', () => filterUsers());
+            }
+            if (userStatusFilter) {
+                userStatusFilter.addEventListener('change', () => filterUsers());
+            }
+            if (userTypeFilter) {
+                userTypeFilter.addEventListener('change', () => filterUsers());
+            }
+
+            // Opportunities search and filter
+            const opportunitySearch = document.getElementById('opportunity-search');
+            const opportunityStatusFilter = document.getElementById('opportunity-status-filter');
+            const opportunityTypeFilter = document.getElementById('opportunity-type-filter');
+
+            if (opportunitySearch) {
+                opportunitySearch.addEventListener('input', () => filterOpportunities());
+            }
+            if (opportunityStatusFilter) {
+                opportunityStatusFilter.addEventListener('change', () => filterOpportunities());
+            }
+            if (opportunityTypeFilter) {
+                opportunityTypeFilter.addEventListener('change', () => filterOpportunities());
+            }
+
+            // Applications search and filter
+            const applicationSearch = document.getElementById('application-search');
+            const applicationStatusFilter = document.getElementById('application-status-filter');
+            const applicationTypeFilter = document.getElementById('application-type-filter');
+
+            if (applicationSearch) {
+                applicationSearch.addEventListener('input', () => filterApplications());
+            }
+            if (applicationStatusFilter) {
+                applicationStatusFilter.addEventListener('change', () => filterApplications());
+            }
+            if (applicationTypeFilter) {
+                applicationTypeFilter.addEventListener('change', () => filterApplications());
+            }
+
+            // Sort functionality
+            document.querySelectorAll('[data-sort]').forEach(header => {
+                header.addEventListener('click', (e) => {
+                    const column = e.currentTarget.dataset.sort;
+                    
+                    if (currentView === 'users') {
+                        sortUsers(column);
+                    } else if (currentView === 'opportunities') {
+                        sortOpportunities(column);
+                    } else if (currentView === 'applications') {
+                        sortApplications(column);
+                    }
+                });
+            });
+        }
+
+        function filterUsers() {
+            const searchTerm = document.getElementById('user-search')?.value.toLowerCase() || '';
+            const statusFilter = document.getElementById('user-status-filter')?.value || 'all';
+            const typeFilter = document.getElementById('user-type-filter')?.value || 'all';
+
+            filteredUsers = allUsers.filter(user => {
+                const matchesSearch = !searchTerm || 
+                    (user.firstName && user.firstName.toLowerCase().includes(searchTerm)) ||
+                    (user.lastName && user.lastName.toLowerCase().includes(searchTerm)) ||
+                    (user.email && user.email.toLowerCase().includes(searchTerm));
+
+                const matchesStatus = statusFilter === 'all' || 
+                    (statusFilter === 'confirmed' && (user.verified || user.email_confirmed_at)) ||
+                    (statusFilter === 'pending' && !user.verified && !user.email_confirmed_at);
+
+                const matchesType = typeFilter === 'all' || user.accountType === typeFilter;
+
+                return matchesSearch && matchesStatus && matchesType;
+            });
+
+            renderUsersTable(filteredUsers);
+        }
+
+        function filterOpportunities() {
+            const searchTerm = document.getElementById('opportunity-search')?.value.toLowerCase() || '';
+            const statusFilter = document.getElementById('opportunity-status-filter')?.value || 'all';
+            const typeFilter = document.getElementById('opportunity-type-filter')?.value || 'all';
+
+            filteredOpportunities = allOpportunities.filter(opp => {
+                const matchesSearch = !searchTerm || 
+                    (opp.title && opp.title.toLowerCase().includes(searchTerm)) ||
+                    (opp.organization && opp.organization.toLowerCase().includes(searchTerm));
+
+                const matchesStatus = statusFilter === 'all' || opp.status === statusFilter;
+
+                const matchesType = typeFilter === 'all' || opp.type === typeFilter;
+
+                return matchesSearch && matchesStatus && matchesType;
+            });
+
+            renderOpportunitiesTable(filteredOpportunities);
+        }
+
+        function filterApplications() {
+            const searchTerm = document.getElementById('application-search')?.value.toLowerCase() || '';
+            const statusFilter = document.getElementById('application-status-filter')?.value || 'all';
+            const typeFilter = document.getElementById('application-type-filter')?.value || 'all';
+
+            filteredApplications = allApplications.filter(app => {
+                const matchesSearch = !searchTerm || 
+                    (app.full_name && app.full_name.toLowerCase().includes(searchTerm)) ||
+                    (app.email && app.email.toLowerCase().includes(searchTerm)) ||
+                    (app.opportunity_title && app.opportunity_title.toLowerCase().includes(searchTerm));
+
+                const matchesStatus = statusFilter === 'all' || app.status === statusFilter;
+
+                const matchesType = typeFilter === 'all' || app.opportunity_type === typeFilter;
+
+                return matchesSearch && matchesStatus && matchesType;
+            });
+
+            renderApplicationsTable(filteredApplications);
+        }
+
+        function sortUsers(column) {
+            if (currentSortColumn === column) {
+                currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSortColumn = column;
+                currentSortDirection = 'asc';
+            }
+
+            // Update sort icons
+            updateSortIcons(column, currentSortDirection);
+
+            filteredUsers.sort((a, b) => {
+                let aValue, bValue;
+
+                switch (column) {
+                    case 'name':
+                        // For providers, use organization name; for seekers, use first/last name
+                        aValue = a.accountType === 'provider' ? 
+                            (a.organization_name || a.organizationName || '') : 
+                            `${a.firstName || ''} ${a.lastName || ''}`.trim();
+                        bValue = b.accountType === 'provider' ? 
+                            (b.organization_name || b.organizationName || '') : 
+                            `${b.firstName || ''} ${b.lastName || ''}`.trim();
+                        break;
+                    case 'accountType':
+                        aValue = a.accountType || '';
+                        bValue = b.accountType || '';
+                        break;
+                    case 'status':
+                        aValue = a.verified || a.email_confirmed_at ? 'confirmed' : 'pending';
+                        bValue = b.verified || b.email_confirmed_at ? 'confirmed' : 'pending';
+                        break;
+                    case 'created_at':
+                        aValue = new Date(a.created_at || 0);
+                        bValue = new Date(b.created_at || 0);
+                        break;
+                    default:
+                        return 0;
+                }
+
+                if (aValue < bValue) return currentSortDirection === 'asc' ? -1 : 1;
+                if (aValue > bValue) return currentSortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            renderUsersTable(filteredUsers);
+        }
+
+        // Update sort icons to show current sort direction
+        function updateSortIcons(column, direction) {
+            // Reset all sort icons
+            document.querySelectorAll('.sort-icon').forEach(icon => {
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>';
+            });
+            
+            // Update the current column's sort icon
+            const currentHeader = document.querySelector(`[data-sort="${column}"] .sort-icon`);
+            if (currentHeader) {
+                if (direction === 'asc') {
+                    currentHeader.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 14l3-3 3 3m-6 0l3 3 3-3"></path>';
+                } else {
+                    currentHeader.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 10l3 3 3-3m-6 0l3-3 3 3"></path>';
+                }
+            }
+        }
+
+        function sortOpportunities(column) {
+            if (currentSortColumn === column) {
+                currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSortColumn = column;
+                currentSortDirection = 'asc';
+            }
+
+            filteredOpportunities.sort((a, b) => {
+                let aValue, bValue;
+
+                switch (column) {
+                    case 'title':
+                        aValue = a.title || '';
+                        bValue = b.title || '';
+                        break;
+                    case 'type':
+                        aValue = a.type || '';
+                        bValue = b.type || '';
+                        break;
+                    case 'category':
+                        aValue = a.category || '';
+                        bValue = b.category || '';
+                        break;
+                    case 'status':
+                        aValue = a.status || '';
+                        bValue = b.status || '';
+                        break;
+                    case 'created_at':
+                        aValue = new Date(a.created_at || 0);
+                        bValue = new Date(b.created_at || 0);
+                        break;
+                    default:
+                        return 0;
+                }
+
+                if (aValue < bValue) return currentSortDirection === 'asc' ? -1 : 1;
+                if (aValue > bValue) return currentSortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            renderOpportunitiesTable(filteredOpportunities);
+        }
+
+        function sortApplications(column) {
+            if (currentSortColumn === column) {
+                currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSortColumn = column;
+                currentSortDirection = 'asc';
+            }
+
+            filteredApplications.sort((a, b) => {
+                let aValue, bValue;
+
+                switch (column) {
+                    case 'full_name':
+                        aValue = a.full_name || '';
+                        bValue = b.full_name || '';
+                        break;
+                    case 'email':
+                        aValue = a.email || '';
+                        bValue = b.email || '';
+                        break;
+                    case 'status':
+                        aValue = a.status || '';
+                        bValue = b.status || '';
+                        break;
+                    case 'created_at':
+                        aValue = new Date(a.created_at || 0);
+                        bValue = new Date(b.created_at || 0);
+                        break;
+                    default:
+                        return 0;
+                }
+
+                if (aValue < bValue) return currentSortDirection === 'asc' ? -1 : 1;
+                if (aValue > bValue) return currentSortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            renderApplicationsTable(filteredApplications);
+        }
+
+        // Initialize dashboard
+        async function initializeDashboard() {
+            try {
+                console.log('Starting dashboard initialization...');
+                
+                // Check authentication
+                if (!checkAdminAuth()) {
+                    return;
+                }
+                
+                // Initialize Supabase
+                const supabaseReady = await initializeSupabase();
+                if (!supabaseReady) {
+                    throw new Error('Failed to initialize Supabase');
+                }
+                
+                // Setup event listeners
+                document.getElementById('applications-nav')?.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    switchView('applications');
+                });
+                
+                document.getElementById('users-nav')?.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    switchView('users');
+                });
+                
+                document.getElementById('opportunities-nav')?.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    switchView('opportunities');
+                });
+                
+                setupThemeToggle();
+                setupLogout();
+                setupUserMenuListeners();
+                
+                // Load default view (applications)
+                switchView('applications');
+                
+                console.log('✅ Dashboard initialized successfully');
+                
+            } catch (error) {
+                console.error('❌ Failed to initialize dashboard:', error);
+                document.getElementById('content').innerHTML = `
+                    <div class="text-center">
+                        <h2 class="text-2xl font-bold text-red-600 mb-4">Failed to load dashboard</h2>
+                        <p class="text-gray-600 mb-4">Error: ${error.message}</p>
+                        <button onclick="location.reload()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Retry</button>
+                    </div>
+                `;
+            }
+        }
+        
+        // Pagination functionality
+        const ITEMS_PER_PAGE = 10;
+        let currentUsersPage = 1;
+        let currentOpportunitiesPage = 1;
+        let currentApplicationsPage = 1;
+        
+        // Generic pagination setup
+        function setupPagination(tableType, data, renderFunction, currentPage) {
+            const totalItems = data.length;
+            const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+            const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+            const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalItems);
+            
+            // Update pagination info
+            const startElement = document.getElementById(`${tableType}-start`);
+            const endElement = document.getElementById(`${tableType}-end`);
+            const totalElement = document.getElementById(`${tableType}-total`);
+            
+            if (startElement) startElement.textContent = startIndex + 1;
+            if (endElement) endElement.textContent = endIndex;
+            if (totalElement) totalElement.textContent = totalItems;
+            
+            // Update pagination buttons
+            const prevBtn = document.getElementById(`${tableType}-prev`);
+            const nextBtn = document.getElementById(`${tableType}-next`);
+            
+            if (prevBtn) prevBtn.disabled = currentPage === 1;
+            if (nextBtn) nextBtn.disabled = currentPage === totalPages;
+            
+            // Generate page numbers
+            const pageNumbersContainer = document.getElementById(`${tableType}-page-numbers`);
+            if (pageNumbersContainer) {
+                pageNumbersContainer.innerHTML = '';
+                
+                for (let i = 1; i <= totalPages; i++) {
+                    const pageBtn = document.createElement('button');
+                    pageBtn.textContent = i;
+                    pageBtn.className = `px-3 py-1 text-sm border rounded-md ${
+                        i === currentPage 
+                            ? 'bg-kajopo-blue text-white border-kajopo-blue' 
+                            : 'border-gray-300 hover:bg-gray-50'
+                    }`;
+                    pageBtn.addEventListener('click', () => {
+                        if (tableType === 'users') {
+                            currentUsersPage = i;
+                            setupPagination('users', allUsers, renderUsersTable, currentUsersPage);
+                        } else if (tableType === 'opportunities') {
+                            currentOpportunitiesPage = i;
+                            setupPagination('opportunities', allOpportunities, renderOpportunitiesTable, currentOpportunitiesPage);
+                        } else if (tableType === 'applications') {
+                            currentApplicationsPage = i;
+                            setupPagination('applications', allApplications, renderApplicationsTable, currentApplicationsPage);
+                        }
+                    });
+                    pageNumbersContainer.appendChild(pageBtn);
+                }
+            }
+            
+            // Render current page data
+            const pageData = data.slice(startIndex, endIndex);
+            renderFunction(pageData);
+        }
+        
+        // Start initialization when DOM is ready
+        document.addEventListener('DOMContentLoaded', initializeDashboard);
     </script>
-    <script src="js/admin-dashboard.js"></script>
 </body>
 </html>

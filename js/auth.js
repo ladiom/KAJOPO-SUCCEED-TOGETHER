@@ -276,7 +276,6 @@ class UserAuth {
                     currentRole: 'Community Health Coordinator',
                     organization: 'Health for All NGO',
                     experience: '6-10',
-                    skills: 'Community health, Training delivery, Health education, Data collection, Program management',
                     languages: 'English, Swahili',
                     interests: ['healthcare', 'education', 'community-development'],
                     bio: 'Passionate about improving healthcare access in underserved communities through innovative programs and community engagement.',
@@ -297,7 +296,6 @@ class UserAuth {
                     currentRole: 'Program Director',
                     organization: 'Global Health Initiative',
                     experience: '11-15',
-                    skills: 'Program management, Grant writing, Partnership development, Strategic planning, Impact measurement',
                     languages: 'English, Mandarin, Spanish',
                     interests: ['healthcare', 'poverty', 'economic-development'],
                     bio: 'Leading global health programs focused on sustainable development and capacity building in emerging markets.',
@@ -470,7 +468,6 @@ class UserAuth {
                 phone: userData.phone || '',
                 location: userData.location || '',
                 organization: userData.organization || '',
-                skills: userData.skills || '',
                 interests: userData.interests || []
             });
 

@@ -9,7 +9,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="js/mobile-nav.js"></script>
     <!-- <script src="js/error-handler.js"></script> -->
-    <script src="js/auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/unified-auth.js"></script>
     <style>
         .tab-content {
             display: none;
@@ -211,7 +213,7 @@
                         <div id="userAvatar" class="w-8 h-8 bg-cyan-600 rounded-full flex items-center justify-center">
                             <span id="userInitials" class="text-white text-sm font-medium"></span>
                         </div>
-                        <span id="userName" class="font-medium"></span>
+                        <span id="userName" class="font-medium">User</span>
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
@@ -271,7 +273,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Welcome Section -->
         <div class="mb-8">
-            <h2 class="text-3xl font-bold text-gray-900 mb-2">Welcome back, <span id="welcomeName">Sarah</span>!</h2>
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">Welcome back, <span id="welcomeName">User</span>!</h2>
             <p class="text-gray-600">Here's what's happening with your opportunities today.</p>
         </div>
 
@@ -351,7 +353,7 @@
                         <div>
                             <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
                             <div class="space-y-3">
-                                <a href="browse-opportunities.html" class="block p-4 bg-cyan-50 border border-cyan-200 rounded-lg hover:bg-cyan-100 transition-colors">
+                                <a href="#" onclick="goToOpportunities()" class="block p-4 bg-cyan-50 border border-cyan-200 rounded-lg hover:bg-cyan-100 transition-colors">
                                     <div class="flex items-center">
                                         <svg class="h-5 w-5 text-cyan-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -519,7 +521,7 @@
     </script>
 
     <script>
-        // User authentication and menu functionality
+        // User authentication and menu functionality - v2 (cache bust)
         let currentUser = null;
 
         // Initialize page
@@ -529,7 +531,11 @@
                 console.log('userAuth available:', typeof userAuth);
                 console.log('setupUserMenuListeners available:', typeof setupUserMenuListeners);
                 
-                checkAuthenticationStatus();
+                // Wait for unified auth to initialize before checking authentication
+                setTimeout(() => {
+                    checkAuthenticationStatus();
+                }, 1500);
+                
                 setupEventListeners();
                 
                 // Ensure setupUserMenuListeners is available before calling
@@ -567,22 +573,51 @@
         function checkAuthenticationStatus() {
             try {
                 console.log('Checking authentication status...');
-                console.log('userAuth object:', typeof userAuth);
+                console.log('unifiedAuth object:', typeof window.unifiedAuth);
                 
-                // Use centralized auth system
-                if (typeof userAuth !== 'undefined' && userAuth.getCurrentUser) {
-                    currentUser = userAuth.getCurrentUser();
-                    console.log('Current user from userAuth:', currentUser);
-                } else {
-                    // Fallback to localStorage - check both possible keys
-                    console.log('userAuth not available, checking localStorage');
-                    let userData = localStorage.getItem('kajopo_current_user');
-                    if (!userData) {
-                        userData = localStorage.getItem('kajopo_user');
+                // Ensure unified auth is initialized
+                if (typeof window.unifiedAuth !== 'undefined' && window.unifiedAuth.isSupabaseReady) {
+                    if (!window.unifiedAuth.isSupabaseReady()) {
+                        console.log('Supabase not ready, waiting...');
+                        setTimeout(() => {
+                            checkAuthenticationStatus();
+                        }, 1000);
+                        return;
                     }
-                    currentUser = userData ? JSON.parse(userData) : null;
+                }
+                
+                // Use unified auth system
+                if (typeof window.unifiedAuth !== 'undefined' && window.unifiedAuth.getCurrentUser) {
+                    currentUser = window.unifiedAuth.getCurrentUser();
+                    console.log('Current user from unifiedAuth:', currentUser);
+                } else {
+                    // Fallback to localStorage - check session storage
+                    console.log('unifiedAuth not available, checking localStorage');
+                    let userData = localStorage.getItem('kajopo_session');
+                    if (userData) {
+                        const sessionData = JSON.parse(userData);
+                        currentUser = sessionData.user || sessionData; // Get user object from session
+                        console.log('Session data structure:', sessionData);
+                    } else {
+                        userData = localStorage.getItem('kajopo_user');
+                        currentUser = userData ? JSON.parse(userData) : null;
+                        console.log('User data from localStorage:', userData);
+                    }
                     console.log('Current user from localStorage:', currentUser);
                 }
+                
+                // If currentUser is still null, try to load session from unified auth
+                if (!currentUser && typeof window.unifiedAuth !== 'undefined' && window.unifiedAuth.loadSession) {
+                    console.log('Trying to load session from unified auth...');
+                    const session = window.unifiedAuth.loadSession();
+                    if (session) {
+                        currentUser = session;
+                        console.log('Loaded user from session:', currentUser);
+                    }
+                }
+                
+                // Debug: Log all localStorage keys related to user data
+                console.log('All localStorage keys:', Object.keys(localStorage).filter(key => key.includes('kajopo') || key.includes('user')));
                 
                 if (currentUser) {
                     console.log('User is authenticated, updating UI');
@@ -591,14 +626,13 @@
                         errorHandler.showSuccess(`Welcome back, ${currentUser.firstName}!`);
                     }
                 } else {
-                    console.log('No user found, but allowing page to load for testing');
-                    // For testing purposes, don't redirect immediately
-                    // if (typeof errorHandler !== 'undefined') {
-                    //     errorHandler.showError('Please sign in to access your dashboard');
-                    // }
-                    // setTimeout(() => {
-                    //     window.location.href = 'signin-form.html?returnUrl=' + encodeURIComponent(window.location.href);
-                    // }, 2000);
+                    console.log('No user found, redirecting to sign in');
+                    if (typeof errorHandler !== 'undefined') {
+                        errorHandler.showError('Please sign in to access your dashboard');
+                    }
+                    setTimeout(() => {
+                        window.location.href = 'signin-form.html?returnUrl=' + encodeURIComponent(window.location.href);
+                    }, 2000);
                 }
             } catch (error) {
                 console.error('Authentication check error:', error);
@@ -611,13 +645,33 @@
         function updateUserInfo() {
             try {
                 if (currentUser) {
-                    const firstName = currentUser.firstName || 'New';
-                    const lastName = currentUser.lastName || 'User';
+                    console.log('Updating user info with:', currentUser);
+                    
+                    // Try multiple possible field names for first name
+                    const firstName = currentUser.firstName || currentUser.first_name || currentUser.given_name || 'New';
+                    const lastName = currentUser.lastName || currentUser.last_name || currentUser.family_name || 'User';
+                    const fullName = currentUser.name || currentUser.display_name || `${firstName} ${lastName}`;
                     const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
                     
-                    document.getElementById('userName').textContent = firstName + ' ' + lastName;
-                    document.getElementById('userInitials').textContent = initials;
-                    document.getElementById('welcomeName').textContent = firstName;
+                    console.log('Extracted names:', { firstName, lastName, fullName, initials });
+                    
+                    // Update the user name in the dropdown menu
+                    const userNameElement = document.getElementById('userName');
+                    if (userNameElement) {
+                        userNameElement.textContent = fullName;
+                    }
+                    
+                    // Update the user initials in the avatar
+                    const userInitialsElement = document.getElementById('userInitials');
+                    if (userInitialsElement) {
+                        userInitialsElement.textContent = initials;
+                    }
+                    
+                    // Update the welcome message
+                    const welcomeNameElement = document.getElementById('welcomeName');
+                    if (welcomeNameElement) {
+                        welcomeNameElement.textContent = firstName;
+                    }
                     
                     // Show navigation menu after successful authentication
                     const navigation = document.getElementById('mainNavigation');
@@ -627,6 +681,8 @@
                     
                     // Update Quick Actions based on user type
                     updateQuickActions();
+                } else {
+                    console.log('No current user found for updateUserInfo');
                 }
             } catch (error) {
                 console.error('Error updating user info:', error);
@@ -681,8 +737,30 @@
                     window.location.href = 'provider-profile.html';
                 }
             } else {
-                // Fallback to seeker profile if no user data
-                window.location.href = 'seeker-profile.html';
+                // Redirect to sign-in if no user data
+                window.location.href = 'signin-form.html';
+            }
+        }
+
+        function goToMessages() {
+            if (currentUser) {
+                window.location.href = 'messaging.html';
+            } else {
+                window.location.href = 'signin-form.html';
+            }
+        }
+
+        function goToOpportunities() {
+            if (currentUser) {
+                const isSeeker = currentUser.accountType === 'seeker' || currentUser.role === 'I Need Help';
+                
+                if (isSeeker) {
+                    window.location.href = 'browse-opportunities.html';
+                } else {
+                    window.location.href = 'create-opportunity.html';
+                }
+            } else {
+                window.location.href = 'signin-form.html';
             }
         }
 
@@ -727,14 +805,20 @@
             if (signOutBtn) {
                 signOutBtn.addEventListener('click', function() {
                     console.log('Sign out button clicked');
-                    if (typeof userAuth !== 'undefined' && userAuth.clearSession) {
-                        userAuth.clearSession();
-                    } else {
-                        // Clear all possible user data keys
-                        localStorage.removeItem('kajopo_user');
-                        localStorage.removeItem('kajopo_user_session');
-                        localStorage.removeItem('kajopo_current_user');
+                    
+                    // Clear all session data
+                    localStorage.removeItem('kajopo_session');
+                    localStorage.removeItem('kajopo_user');
+                    localStorage.removeItem('kajopo_user_session');
+                    localStorage.removeItem('kajopo_current_user');
+                    localStorage.removeItem('userAuthenticated');
+                    localStorage.removeItem('userInfo');
+                    
+                    // Also clear Supabase session if available
+                    if (window.supabaseAuth && typeof window.supabaseAuth.signOut === 'function') {
+                        window.supabaseAuth.signOut();
                     }
+                    
                     currentUser = null;
                     window.location.href = 'index.html';
                 });

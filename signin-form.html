@@ -141,20 +141,6 @@
                 </button>
             </form>
 
-            <!-- Demo Login Options -->
-            <div class="px-6 pb-6">
-                <div class="border-t border-gray-200 pt-6">
-                    <p class="text-sm text-gray-900 text-center mb-4">Demo Login Options:</p>
-                    <div class="space-y-2">
-                        <button id="demoSeeker" class="w-full bg-green-100 text-green-800 px-4 py-2 rounded-md hover:bg-green-200 transition-colors text-sm">
-                            Demo: Opportunity Seeker
-                        </button>
-                        <button id="demoProvider" class="w-full bg-purple-100 text-purple-800 px-4 py-2 rounded-md hover:bg-purple-200 transition-colors text-sm">
-                            Demo: Opportunity Provider
-                        </button>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- Register Link -->
@@ -167,37 +153,65 @@
     </main>
 
     <!-- Include JavaScript modules -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3"></script>
     <script src="js/supabase-config.js"></script>
     <script src="js/mobile-nav.js"></script>
     <script src="js/error-handler.js"></script>
     <script src="js/data-manager.js"></script>
     <script src="js/form-validation.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/admin-auth.js"></script>
+    <script src="js/unified-auth.js"></script>
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Wait for all scripts to load and initialize
+            setTimeout(() => {
+                checkAuthSystem();
+            }, 1000);
+            
             setupEventListeners();
             setupFormValidation();
         });
 
+        function checkAuthSystem() {
+            if (!window.unifiedAuth) {
+                console.error('Unified auth not available');
+                showAuthError();
+            } else if (!window.unifiedAuth.isSupabaseReady()) {
+                console.warn('Supabase not ready, waiting...');
+                // Wait a bit more for Supabase to initialize
+                setTimeout(() => {
+                    if (!window.unifiedAuth.isSupabaseReady()) {
+                        showAuthError();
+                    } else {
+                        console.log('✓ Authentication system ready');
+                    }
+                }, 1000);
+            } else {
+                console.log('✓ Authentication system ready');
+            }
+        }
+
+        function showAuthError() {
+            // Show error notification
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+            errorDiv.innerHTML = `
+                <div class="flex items-center">
+                    <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Authentication system is not available. Please refresh the page and try again.
+                </div>
+            `;
+            document.body.appendChild(errorDiv);
+        }
+
         function setupEventListeners() {
             const form = document.getElementById('signinForm');
-            const demoSeekerBtn = document.getElementById('demoSeeker');
-            const demoProviderBtn = document.getElementById('demoProvider');
             
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
                 handleSignIn();
-            });
-
-            demoSeekerBtn.addEventListener('click', function() {
-                loginDemoUser('seeker');
-            });
-
-            demoProviderBtn.addEventListener('click', function() {
-                loginDemoUser('provider');
             });
         }
         
@@ -231,46 +245,76 @@
                     return;
                 }
 
-                // Check if this is an admin email
-                const isAdminEmail = email.includes('admin') || email.endsWith('@kajopo.com');
+                // Check if unified auth is available
+                if (!window.unifiedAuth) {
+                    throw new Error('Authentication system not loaded. Please refresh the page.');
+                }
                 
-                let loginResult;
-                if (isAdminEmail && typeof window.adminAuth !== 'undefined') {
-                    // Try admin authentication first
-                    loginResult = await window.adminAuth.login(email, password, rememberMe);
+                // Check if Supabase is ready, if not try to initialize
+                if (!window.unifiedAuth.isSupabaseReady()) {
+                    console.warn('Supabase not ready, attempting to reinitialize...');
+                    window.unifiedAuth.initializeSupabase();
+                    await new Promise(resolve => setTimeout(resolve, 500));
                     
-                    if (loginResult.success) {
-                        // Show success message
-                        if (typeof errorHandler !== 'undefined') {
-                            errorHandler.showSuccess('Admin login successful! Redirecting to dashboard...');
-                        }
-                        
-                        // Redirect to admin dashboard
-                        setTimeout(() => {
-                            window.location.href = 'admin-dashboard.html';
-                        }, 1000);
-                        return;
+                    if (!window.unifiedAuth.isSupabaseReady()) {
+                        throw new Error('Authentication system is not available. Please refresh the page and try again.');
                     }
                 }
                 
-                // Fall back to regular user authentication
-                loginResult = await userAuth.login(email, password, rememberMe);
+                // Use unified authentication system - let it determine account type
+                const loginResult = await window.unifiedAuth.login(email, password);
                 
                 if (loginResult.success) {
-                    // Handle return URL if present
+                    // Show success message based on account type
+                    const accountType = loginResult.accountType;
+                    let message = 'Login successful!';
+                    let redirectUrl = 'dashboard.html'; // Default fallback
+                    
+                    // Redirect to appropriate profile page based on account type
+                    if (accountType === 'admin') {
+                        message = 'Admin login successful! Redirecting to admin dashboard...';
+                        redirectUrl = 'admin-dashboard.html';
+                    } else if (accountType === 'provider') {
+                        message = 'Provider login successful! Redirecting to provider profile...';
+                        redirectUrl = 'provider-profile.html';
+                    } else if (accountType === 'seeker') {
+                        message = 'Seeker login successful! Redirecting to seeker profile...';
+                        redirectUrl = 'seeker-profile.html';
+                    } else {
+                        // Default to seeker profile for unknown account types
+                        message = 'Login successful! Redirecting to profile...';
+                        redirectUrl = 'seeker-profile.html';
+                    }
+                    
+                    console.log('Login successful, redirecting to:', redirectUrl, 'for account type:', accountType);
+                    
+                    if (typeof errorHandler !== 'undefined') {
+                        errorHandler.showSuccess(message);
+                    }
+                    
+                    // Handle return URL if present (but prioritize account type redirect)
                     const urlParams = new URLSearchParams(window.location.search);
                     const returnUrl = urlParams.get('returnUrl');
                     
-                    // Small delay to show success message
+                    // Redirect after showing success message
                     setTimeout(() => {
-                        if (returnUrl && returnUrl.startsWith('/')) {
+                        // Only use returnUrl if it's not a profile page redirect
+                        if (returnUrl && returnUrl.startsWith('/') && 
+                            !returnUrl.includes('profile') && 
+                            !returnUrl.includes('dashboard')) {
                             window.location.href = returnUrl;
                         } else {
-                            window.location.href = 'dashboard.html';
+                            window.location.href = redirectUrl;
                         }
                     }, 1000);
+                } else {
+                    // Show error message
+                    if (typeof errorHandler !== 'undefined') {
+                        errorHandler.showError(loginResult.error || 'Login failed');
+                    }
                 }
-                // Error handling is done in the auth.js file
+                
+
             } catch (error) {
                 console.error('Login error:', error);
                 errorHandler.handleError(error, 'Sign in');
@@ -329,11 +373,6 @@
             }, 1500);
         }
 
-        // Demo function to clear login (for testing)
-        function clearLogin() {
-            localStorage.removeItem('kajopo_user');
-            alert('Login cleared. You can now test the authentication flow again.');
-        }
     </script>
     <!-- Theme Toggle Script -->
    <script>

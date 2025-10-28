@@ -5,11 +5,39 @@ const SUPABASE_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzd
 
 // Initialize Supabase client when the library is available
 function initializeSupabase() {
-    if (typeof window.supabase !== 'undefined') {
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let createClientFunction = null;
+    
+    // Try different ways to find the createClient function
+    if (typeof supabase !== 'undefined' && supabase.createClient) {
+        createClientFunction = supabase.createClient;
+    } else if (typeof window.supabase?.createClient === 'function') {
+        createClientFunction = window.supabase.createClient;
+    } else if (typeof window.SupabaseClient === 'function') {
+        createClientFunction = function(url, key) {
+            return new window.SupabaseClient(url, key);
+        };
+    } else if (typeof window.createClient === 'function') {
+        createClientFunction = window.createClient;
+    } else {
+        // Look for any SupabaseClient constructor (like SupabaseClient_2)
+        const supabaseKeys = Object.keys(window).filter(k => k.includes('SupabaseClient'));
+        for (const key of supabaseKeys) {
+            if (typeof window[key] === 'function') {
+                createClientFunction = function(url, key) {
+                    return new window[key](url, key);
+                };
+                console.log('Using SupabaseClient constructor:', key);
+                break;
+            }
+        }
+    }
+    
+    if (createClientFunction) {
+        const supabaseClient = createClientFunction(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         // Export for use in other files
         window.supabaseClient = supabaseClient;
+        window.supabase = supabaseClient; // For admin dashboard compatibility
         window.supabaseConfig = {
             url: SUPABASE_URL,
             anonKey: SUPABASE_ANON_KEY,
@@ -19,7 +47,8 @@ function initializeSupabase() {
         console.log('Supabase initialized successfully');
         return true;
     } else {
-        console.warn('Supabase library not yet loaded, retrying...');
+        console.warn('Supabase library not yet loaded or createClient not found, retrying...');
+        console.log('Available globals:', Object.keys(window).filter(k => k.toLowerCase().includes('supabase')));
         return false;
     }
 }

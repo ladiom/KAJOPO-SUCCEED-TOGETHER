@@ -10,10 +10,24 @@ This document outlines the expected database schema for the Kájọpọ̀ Connec
 **Columns**:
 - `id` (UUID, Primary Key) - User ID from Supabase Auth
 - `email` (VARCHAR) - User email address
-- `full_name` (VARCHAR) - User's full name
-- `user_type` (VARCHAR) - Type of user ('seeker' or 'provider')
+- `firstName` (VARCHAR) - User's first name
+- `lastName` (VARCHAR) - User's last name
+- `name` (VARCHAR) - User's full name
+- `accountType` (VARCHAR) - Type of user ('seeker', 'provider', or 'admin')
 - `phone` (VARCHAR) - User's phone number
+- `location` (VARCHAR) - User's location
+- `organization` (VARCHAR) - User's organization/company
+- `currentRole` (VARCHAR) - User's current role/position
+- `experience` (TEXT) - User's experience level
+- `skills` (TEXT) - User's skills and expertise
+- `languages` (VARCHAR) - Languages spoken
+- `interests` (JSONB) - User's areas of interest
+- `bio` (TEXT) - User's biography
+- `isverified` (BOOLEAN) - Email verification status
+- `profilecomplete` (BOOLEAN) - Profile completion status
+- `status` (VARCHAR) - User account status
 - `created_at` (TIMESTAMP) - Account creation timestamp
+- `updated_at` (TIMESTAMP) - Last update timestamp
 
 ### 2. opportunities
 **Purpose**: Store opportunity listings
@@ -48,6 +62,27 @@ This document outlines the expected database schema for the Kájọpọ̀ Connec
 - `created_at` (TIMESTAMP) - Application submission timestamp
 - Additional application data fields (varies based on form)
 
+### 4. conversations
+**Purpose**: Store conversation threads between users
+
+**Columns**:
+- `id` (UUID, Primary Key) - Unique conversation identifier
+- `participant1` (UUID, Foreign Key) - References users.id (first participant)
+- `participant2` (UUID, Foreign Key) - References users.id (second participant)
+- `created_at` (TIMESTAMP) - Conversation creation timestamp
+- `updated_at` (TIMESTAMP) - Last message timestamp
+
+### 5. messages
+**Purpose**: Store individual messages within conversations
+
+**Columns**:
+- `id` (UUID, Primary Key) - Unique message identifier
+- `conversation_id` (UUID, Foreign Key) - References conversations.id
+- `sender_id` (UUID, Foreign Key) - References users.id
+- `content` (TEXT) - Message content
+- `sent_at` (TIMESTAMP) - Message sent timestamp
+- `read_at` (TIMESTAMP) - Message read timestamp (nullable)
+
 ## Relationships
 
 1. **users → opportunities**: One-to-many (provider_id)
@@ -58,6 +93,16 @@ This document outlines the expected database schema for the Kájọpọ̀ Connec
 
 3. **opportunities → applications**: One-to-many (opportunity_id)
    - An opportunity can have multiple applications
+
+4. **users → conversations**: One-to-many (participant1, participant2)
+   - A user can participate in multiple conversations
+   - Each conversation has exactly two participants
+
+5. **conversations → messages**: One-to-many (conversation_id)
+   - A conversation can have multiple messages
+
+6. **users → messages**: One-to-many (sender_id)
+   - A user can send multiple messages
 
 ## Notes
 

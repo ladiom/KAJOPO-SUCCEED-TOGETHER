@@ -21,10 +21,10 @@
             }
         }
     </script>
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3"></script>
     <script src="js/supabase-config.js"></script>
+    <script src="js/unified-auth.js"></script>
     <script src="js/data-manager.js"></script>
-    <script src="js/auth.js"></script>
     <script src="js/opportunities.js"></script>
     <script src="js/error-handler.js"></script>
     <style>
@@ -46,6 +46,23 @@
         /* Ensure text is visible in light theme too */
         #categoryFilter, #typeFilter, #locationFilter, #searchInput {
             color: #111827 !important;
+        }
+        
+        /* Ensure white background cards have dark text for better contrast */
+        .bg-white h3 {
+            color: #111827 !important; /* Very dark gray for headings */
+        }
+        .bg-white p {
+            color: #374151 !important; /* Dark gray for paragraphs */
+        }
+        .bg-white .text-gray-600 {
+            color: #4B5563 !important; /* Medium dark gray */
+        }
+        .bg-white .text-gray-500 {
+            color: #6B7280 !important; /* Medium gray */
+        }
+        .bg-white .text-gray-400 {
+            color: #9CA3AF !important; /* Light gray but still readable */
         }
     </style>
     <script>
@@ -126,8 +143,11 @@
                     console.error('Database manager not initialized');
                     return;
                 }
+                console.log('dbManager found:', dbManager);
+                console.log('getUniqueCategories method:', typeof dbManager.getUniqueCategories);
+                console.log('Available methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(dbManager)));
                 // Get unique values from database
-                const [categoriesResult, , locationsResult] = await Promise.all([
+                const [categoriesResult, typesResult, locationsResult] = await Promise.all([
                     dbManager.getUniqueCategories(),
                     dbManager.getUniqueTypes(),
                     dbManager.getUniqueLocations()
@@ -234,45 +254,179 @@
             }
         }
 
+        // Check user authentication and update navigation
+        function checkUserAuth() {
+            console.log('Checking user authentication...');
+            
+            // Check for current authentication system (kajopo_session)
+            const sessionData = localStorage.getItem('kajopo_session');
+            let userIsAuthenticated = false;
+            let currentUser = null;
+            
+            console.log('Session data:', sessionData);
+            
+            if (sessionData) {
+                try {
+                    const parsed = JSON.parse(sessionData);
+                    console.log('Parsed session:', parsed);
+                    
+                    // Check for different session structures
+                    if (parsed.user && parsed.user.id) {
+                        // New structure: {user: {id: ..., email: ...}}
+                        userIsAuthenticated = true;
+                        currentUser = parsed.user;
+                    } else if (parsed.userId && parsed.email) {
+                        // Alternative structure: {userId: ..., email: ..., firstName: ...}
+                        userIsAuthenticated = true;
+                        currentUser = {
+                            id: parsed.userId,
+                            email: parsed.email,
+                            firstName: parsed.firstName,
+                            lastName: parsed.LastName || parsed.lastName,
+                            displayName: parsed.displayName,
+                            accountType: parsed.accountType,
+                            role: parsed.role
+                        };
+                    }
+                    
+                    console.log('User authenticated via session:', userIsAuthenticated);
+                    console.log('Current user from session:', currentUser);
+                } catch (error) {
+                    console.error('Error parsing session data:', error);
+                }
+            }
+            
+            // Fallback to old system for compatibility
+            if (!userIsAuthenticated) {
+                const userData = localStorage.getItem('kajopo_current_user') || localStorage.getItem('kajopo_user');
+                console.log('Fallback user data:', userData);
+                if (userData) {
+                    try {
+                        currentUser = JSON.parse(userData);
+                        userIsAuthenticated = true;
+                        console.log('User authenticated via fallback:', userIsAuthenticated);
+                    } catch (error) {
+                        console.error('Error parsing user data:', error);
+                    }
+                }
+            }
+            
+            console.log('Final user:', currentUser);
+            console.log('Final authenticated:', userIsAuthenticated);
+            return currentUser;
+        }
+
         // Call this function when the page loads
         document.addEventListener('DOMContentLoaded', async function() {
-            checkUserAuth();
-            setupUserMenuListeners();
+            // Debug localStorage contents
+            console.log('=== LOCALSTORAGE DEBUG ===');
+            console.log('All localStorage keys:', Object.keys(localStorage));
+            console.log('kajopo_session:', localStorage.getItem('kajopo_session'));
+            console.log('kajopo_current_user:', localStorage.getItem('kajopo_current_user'));
+            console.log('kajopo_user:', localStorage.getItem('kajopo_user'));
+            console.log('=== END LOCALSTORAGE DEBUG ===');
+            
             // Auth logic: show/hide menus based on user
             const user = checkUserAuth();
+            console.log('User found on page load:', user);
+            
             if (user) {
+                console.log('Showing authenticated menu');
                 document.getElementById('guestMenu').classList.add('hidden');
                 document.getElementById('authenticatedMenu').classList.remove('hidden');
+                document.getElementById('mobileGuestMenu').classList.add('hidden');
+                document.getElementById('mobileAuthenticatedMenu').classList.remove('hidden');
+                
+                // Handle both old and new user data structures
+                let firstName = user.firstName || '';
+                let lastName = user.lastName || '';
+                let fullName = '';
+                
+                console.log('Processing user data:', user);
+                console.log('firstName:', firstName, 'lastName:', lastName);
+                
+                if (firstName && lastName) {
+                    fullName = `${firstName} ${lastName}`;
+                } else if (user.displayName) {
+                    fullName = user.displayName;
+                    const names = user.displayName.split(' ');
+                    firstName = names[0] || '';
+                    lastName = names[1] || '';
+                } else if (user.name) {
+                    fullName = user.name;
+                    const names = user.name.split(' ');
+                    firstName = names[0] || '';
+                    lastName = names[1] || '';
+                } else if (user.email) {
+                    fullName = user.email;
+                    firstName = user.email.split('@')[0];
+                }
+                
+                console.log('Processed names - firstName:', firstName, 'lastName:', lastName, 'fullName:', fullName);
+                
                 // Show user's name in greeting
                 const greeting = document.getElementById('userGreeting');
-                if (greeting && user.firstName) {
-                    greeting.textContent = `Welcome, ${user.firstName}!`;
+                if (greeting && firstName) {
+                    greeting.textContent = `Welcome, ${firstName}!`;
                 }
+                
                 // Set user full name in menu button
                 const userNameSpan = document.getElementById('userName');
-                if (userNameSpan && user.firstName && user.lastName) {
-                    userNameSpan.textContent = `${user.firstName} ${user.lastName}`;
+                if (userNameSpan && fullName) {
+                    userNameSpan.textContent = fullName;
                 }
+                
                 // Mobile greeting
                 const mobileGreeting = document.getElementById('mobileUserGreeting');
-                if (mobileGreeting && user.firstName) {
-                    mobileGreeting.textContent = `Welcome, ${user.firstName}!`;
+                if (mobileGreeting && firstName) {
+                    mobileGreeting.textContent = `Welcome, ${firstName}!`;
                 }
             } else {
+                console.log('Showing guest menu');
                 document.getElementById('guestMenu').classList.remove('hidden');
                 document.getElementById('authenticatedMenu').classList.add('hidden');
+                document.getElementById('mobileGuestMenu').classList.remove('hidden');
+                document.getElementById('mobileAuthenticatedMenu').classList.add('hidden');
             }
+            
+            // Setup user menu listeners after authentication check
             setupUserMenuListeners();
+            
             setupThemeToggle();
             await populateFilterDropdowns();
             
-            // Initialize using OpportunityManager for unified approach
-            if (typeof opportunityManager === 'undefined') {
-                console.error('OpportunityManager not available');
+            // Initialize OpportunityManager
+            if (typeof OpportunityManager === 'undefined') {
+                console.error('OpportunityManager class not available');
                 return;
             }
             
+            // Create global opportunityManager instance
+            window.opportunityManager = new OpportunityManager();
+            console.log('OpportunityManager initialized');
+            
             await loadDynamicOpportunities();
+            
+            // Setup Apply Now button functionality immediately after loading opportunities
+            console.log('Setting up Apply Now buttons after loading opportunities...');
+            if (typeof window.setupApplyNowButtons === 'function') {
+                console.log('Calling window.setupApplyNowButtons...');
+                window.setupApplyNowButtons();
+                console.log('Apply Now buttons set up successfully');
+            } else {
+                console.error('window.setupApplyNowButtons not available!');
+            }
+            
+            // Also try the direct function call
+            console.log('Checking setupApplyNowButtons function...');
+            console.log('setupApplyNowButtons type:', typeof setupApplyNowButtons);
+            if (typeof setupApplyNowButtons === 'function') {
+                console.log('Calling setupApplyNowButtons...');
+                setupApplyNowButtons();
+                console.log('setupApplyNowButtons called successfully');
+            } else {
+                console.error('setupApplyNowButtons function not found!');
+            }
             
             // Initialize search filter module
             if (typeof searchFilter !== 'undefined') {
@@ -305,12 +459,15 @@
                 const filters = {
                     category: categoryFilter ? categoryFilter.value : 'all',
                     type: typeFilter ? typeFilter.value : 'all',
-                    location: locationFilter ? locationFilter.value : 'all',
+                    region: locationFilter ? locationFilter.value : 'all',
                     search: searchInput ? searchInput.value.trim() : ''
                 };
                 
+                console.log('Filtering with:', filters);
+                
                 // Use OpportunityManager's unified filtering
                 const filteredOpportunities = await opportunityManager.filterOpportunities(filters);
+                console.log('Filtered opportunities:', filteredOpportunities);
                 renderOpportunities(filteredOpportunities);
             }
             // Setup filter event listeners with dynamic element detection
@@ -341,33 +498,30 @@
             
             // Event handler functions
             async function categoryChangeHandler() {
+                console.log('Category changed');
                 await updateTypeDropdown();
                 const typeFilter = document.getElementById('typeFilter');
                 if (typeFilter) typeFilter.value = 'all';
-                if (typeof filterOpportunities === 'function') {
-                    await filterOpportunities();
-                }
+                await filterOpportunities();
             }
             
             async function typeChangeHandler() {
-                if (typeof filterOpportunities === 'function') {
-                    await filterOpportunities();
-                }
+                console.log('Type changed');
+                await filterOpportunities();
             }
             
             async function locationChangeHandler() {
-                if (typeof filterOpportunities === 'function') {
-                    await filterOpportunities();
-                }
+                console.log('Location changed');
+                await filterOpportunities();
             }
             
             async function searchInputHandler() {
-                if (typeof filterOpportunities === 'function') {
-                    await filterOpportunities();
-                }
+                console.log('Search input changed');
+                await filterOpportunities();
             }
             
             async function clearFiltersHandler() {
+                console.log('Clear filters clicked');
                 const categoryFilter = document.getElementById('categoryFilter');
                 const typeFilter = document.getElementById('typeFilter');
                 const locationFilter = document.getElementById('locationFilter');
@@ -378,9 +532,7 @@
                 if (locationFilter) locationFilter.value = 'all';
                 if (searchInput) searchInput.value = '';
                 updateTypeDropdown();
-                if (typeof filterOpportunities === 'function') {
-                    await filterOpportunities();
-                }
+                await filterOpportunities();
             }
             
             // Initial setup
@@ -397,22 +549,23 @@
             return `
             <div class="bg-white rounded-lg shadow-md p-6 flex flex-col justify-between">
                 <div>
-                    <h3 class="text-xl font-semibold mb-2">${opp.title || ''}</h3>
-                    <p class="text-gray-600 mb-2">${opp.organization || ''}</p>
+                    <h3 class="text-xl font-semibold mb-2 text-gray-900">${opp.title || ''}</h3>
+                    <p class="text-gray-700 mb-2">${opp.organization || ''}</p>
                     <div class="flex flex-wrap gap-2 mb-2">
                         ${(opp.tags || []).map(tag => `<span class='bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs'>${tag}</span>`).join('')}
                         ${opp.category ? `<span class='bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs'>${opp.category}</span>` : ''}
                         ${opp.type ? `<span class='bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs'>${opp.type}</span>` : ''}
                     </div>
-                    <div class="mb-2 text-sm text-gray-500">${opp.location || ''}</div>
-                    <p class="text-gray-700 mb-4">${opp.description || ''}</p>
+                    <div class="mb-2 text-sm text-gray-600">${opp.location || ''}</div>
+                    <p class="text-gray-800 mb-4">${opp.description || ''}</p>
                 </div>
                 <div class="mt-4 flex justify-between items-center">
-                    <div class="text-xs text-gray-400">
+                    <div class="text-xs text-gray-500">
                         Deadline: ${opp.deadline || 'N/A'}<br>
                         Duration: ${opp.duration || 'N/A'}
                     </div>
-                    <a href="application-form.html" class="bg-kajopo-blue text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">Apply Now</a>
+                    <button class="apply-now-btn bg-kajopo-blue text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors" 
+                            data-opportunity-id="${opp.id}">Apply Now</button>
                 </div>
             </div>
             `;
@@ -437,7 +590,8 @@
         }
         
         function goToProfile() {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            // Use the same authentication check as the rest of the page
+            const currentUser = checkUserAuth();
             if (currentUser) {
                 const isSeeker = currentUser.accountType === 'seeker' || currentUser.role === 'I Need Help';
                 
@@ -451,6 +605,115 @@
             } else {
                 // Fallback to seeker profile if no user data
                 window.location.href = 'seeker-profile.html';
+            }
+        }
+
+        // Custom setupUserMenuListeners that uses current authentication system
+        function setupUserMenuListeners() {
+            const userMenuBtn = document.getElementById('userMenuBtn');
+            const userDropdown = document.getElementById('userDropdown');
+            const signOutBtn = document.getElementById('signOutBtn');
+            const mobileSignOutBtn = document.getElementById('mobileSignOutBtn');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            console.log('Setting up user menu listeners...');
+            console.log('User menu button:', userMenuBtn);
+            console.log('User dropdown:', userDropdown);
+            console.log('Mobile menu button:', mobileMenuBtn);
+            console.log('Mobile menu:', mobileMenu);
+
+            // Desktop user menu dropdown
+            if (userMenuBtn && userDropdown) {
+                userMenuBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('User menu button clicked');
+                    
+                    // Simple toggle of display style
+                    const isVisible = userDropdown.style.display === 'block';
+                    console.log('Current dropdown state - isVisible:', isVisible);
+                    console.log('Current display style:', userDropdown.style.display);
+                    
+                    if (isVisible) {
+                        userDropdown.style.display = 'none';
+                        console.log('Dropdown hidden');
+                    } else {
+                        userDropdown.style.display = 'block';
+                        console.log('Dropdown shown');
+                        console.log('Dropdown position:', userDropdown.getBoundingClientRect());
+                    }
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!userMenuBtn.contains(e.target) && !userDropdown.contains(e.target)) {
+                        userDropdown.style.display = 'none';
+                    }
+                });
+
+                userDropdown.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
+
+            // Mobile menu toggle
+            if (mobileMenuBtn && mobileMenu) {
+                mobileMenuBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Mobile menu button clicked');
+                    
+                    // Toggle both hidden class and display style
+                    const isHidden = mobileMenu.classList.contains('hidden');
+                    if (isHidden) {
+                        mobileMenu.classList.remove('hidden');
+                        mobileMenu.style.display = 'block';
+                        console.log('Mobile menu shown');
+                    } else {
+                        mobileMenu.classList.add('hidden');
+                        mobileMenu.style.display = 'none';
+                        console.log('Mobile menu hidden');
+                    }
+                });
+
+                // Close mobile menu when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!mobileMenuBtn.contains(e.target) && !mobileMenu.contains(e.target)) {
+                        mobileMenu.classList.add('hidden');
+                        mobileMenu.style.display = 'none';
+                    }
+                });
+
+                mobileMenu.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
+
+            function handleSignOut() {
+                // Clear all session data
+                localStorage.removeItem('kajopo_session');
+                localStorage.removeItem('kajopo_current_user');
+                localStorage.removeItem('kajopo_user');
+                localStorage.removeItem('kajopo_user_session');
+                localStorage.removeItem('userAuthenticated');
+                localStorage.removeItem('userInfo');
+                
+                // Also clear Supabase session if available
+                if (window.supabaseAuth && typeof window.supabaseAuth.signOut === 'function') {
+                    window.supabaseAuth.signOut();
+                }
+                
+                // Redirect to home page
+                window.location.href = 'index.html';
+            }
+
+            if (signOutBtn) {
+                signOutBtn.addEventListener('click', handleSignOut);
+            }
+            
+            if (mobileSignOutBtn) {
+                mobileSignOutBtn.addEventListener('click', handleSignOut);
             }
         }
     </script>
@@ -505,7 +768,7 @@
                                         <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
                                     </svg>
                                 </button>
-                                <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                                <div id="userDropdown" style="display: none; position: fixed; top: 60px; right: 20px; width: 200px; background: white; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); z-index: 10000; padding: 8px 0;">
                                     <a href="Index.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><span class="inline-block w-5 text-center mr-2">🏠</span>Home</a>
                                     <a href="dashboard.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><span class="inline-block w-5 text-center mr-2">📊</span>Dashboard</a>
                                     <a href="browse-opportunities.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><span class="inline-block w-5 text-center mr-2">🔍</span>Browse Opportunities</a>
@@ -521,8 +784,8 @@
                 <!-- Mobile menu button -->
                 <div class="md:hidden flex items-center">
                     <button id="mobile-menu-btn" class="text-gray-700 hover:text-kajopo-blue focus:outline-none focus:text-kajopo-blue">
-                        <svg class=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\">
-                            <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M4 6h16M4 12h16M4 18h16\"></path>
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                         </svg>
                     </button>
                 </div>
@@ -608,18 +871,18 @@
                     <p class="text-gray-300 mb-4">Connecting communities through meaningful opportunities. Together, we succeed.</p>
                     <div class="flex space-x-4">
                         <a href="#" class="text-gray-300 hover:text-white transition-colors">
-                            <svg class=\"w-6 h-6\" fill=\"currentColor\" viewBox=\"0 0 24 24\">
-                                <path d=\"M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z\"></path>
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"></path>
                             </svg>
                         </a>
                         <a href="#" class="text-gray-300 hover:text-white transition-colors">
-                            <svg class=\"w-6 h-6\" fill=\"currentColor\" viewBox=\"0 0 24 24\">
-                                <path d=\"M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z\"></path>
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"></path>
                             </svg>
                         </a>
                         <a href="#" class="text-gray-300 hover:text-white transition-colors">
-                            <svg class=\"w-6 h-6\" fill=\"currentColor\" viewBox=\"0 0 24 24\">
-                                <path d=\"M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z\"></path>
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"></path>
                             </svg>
                         </a>
                     </div>

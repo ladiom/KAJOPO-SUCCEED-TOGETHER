@@ -40,24 +40,58 @@ class DatabaseManager {
                 throw new Error('Supabase client not available');
             }
             
-            // Register with Supabase Auth
-            const { data: authData, error: authError } = await this.supabase.auth.signUp({
-                email: userData.email,
-                password: userData.password,
-                options: {
-                    data: {
-                        firstName: userData.firstName,
-                        lastName: userData.lastName,
-                        name: `${userData.firstName} ${userData.lastName}`,
-                        accountType: userData.accountType || userData.userType,
-                        phone: userData.phone,
-                        location: userData.location,
-                        organization: userData.organization
-                    }
-                }
-            });
+            // Check if user already exists in users table
+            const { data: existingUser, error: checkError } = await this.supabase
+                .from('users')
+                .select('id, email')
+                .eq('email', userData.email)
+                .single();
             
-            if (authError) throw authError;
+            if (existingUser) {
+                console.log('User already exists in database:', existingUser);
+                return { 
+                    success: false, 
+                    error: 'An account with this email already exists. Please sign in instead.',
+                    userExists: true
+                };
+            }
+            
+                // Register with Supabase Auth
+                const { data: authData, error: authError } = await this.supabase.auth.signUp({
+                    email: userData.email,
+                    password: userData.password,
+                    options: {
+                        data: {
+                            first_name: userData.firstName,
+                            last_name: userData.lastName,
+                            account_type: userData.accountType || userData.userType,
+                            phone: userData.phone,
+                            location: userData.location,
+                            organization: userData.organization
+                        }
+                    }
+                });
+            
+            if (authError) {
+                console.error('Supabase Auth error:', authError);
+                
+                // If user already exists, try to sign them in instead
+                if (authError.message && authError.message.includes('already registered')) {
+                    console.log('User already exists, attempting sign in...');
+                    const { data: signInData, error: signInError } = await this.supabase.auth.signInWithPassword({
+                        email: userData.email,
+                        password: userData.password
+                    });
+                    
+                    if (signInError) {
+                        throw signInError;
+                    }
+                    
+                    return { success: true, data: signInData, message: 'User already exists and signed in successfully' };
+                }
+                
+                throw authError;
+            }
             
             // Insert additional user data into users table and wait for completion
             if (authData.user) {
@@ -66,20 +100,19 @@ class DatabaseManager {
                     .insert([{
                         id: authData.user.id,
                         email: userData.email,
-                        firstName: userData.firstName,
-                        lastName: userData.lastName,
-                        name: `${userData.firstName} ${userData.lastName}`,
-                        accountType: userData.accountType || userData.userType,
+                        first_name: userData.firstName,
+                        last_name: userData.lastName,
+                        account_type: userData.accountType || userData.userType,
                         phone: userData.phone || '',
                         location: userData.location || '',
-                        organization: userData.organization || '',
-                        currentRole: userData.currentRole || '',
+                        organization_name: userData.organization || '',
+                        current_role: userData.currentRole || '',
                         experience: userData.experience || '',
-                        skills: userData.skills || '',
                         languages: userData.languages || '',
                         interests: userData.interests || [],
                         bio: userData.bio || '',
-                        // status: 'active',
+                        verified: false,
+                        registration_status: 'registered',
                         created_at: new Date().toISOString()
                     }])
                     .select();
@@ -94,13 +127,25 @@ class DatabaseManager {
                     throw new Error('User record creation failed - no record returned');
                 }
                 
-                // Add a small delay to ensure database consistency
-                await new Promise(resolve => setTimeout(resolve, 100));
+                // Add a delay to prevent rate limiting and ensure database consistency
+                await new Promise(resolve => setTimeout(resolve, 1000));
             }
             
             return { success: true, data: authData };
         } catch (error) {
             console.error('Registration error:', error);
+            
+            // Handle rate limiting specifically
+            if (error.message && error.message.includes('For security purposes')) {
+                const waitTime = error.message.match(/(\d+) seconds/);
+                const seconds = waitTime ? waitTime[1] : 'some';
+                return { 
+                    success: false, 
+                    error: `Too many registration attempts. Please wait ${seconds} seconds before trying again.`,
+                    isRateLimited: true
+                };
+            }
+            
             return { success: false, error: error.message };
         }
     }
@@ -219,10 +264,10 @@ class DatabaseManager {
             }
             
             const { data, error } = await this.supabase
-                .from('admin_users')
+                .from('users')
                 .select('*')
-                .eq('email', email)
-                .eq('password_hash', password) // In production, this should be properly hashed
+                .eq('email', email) // Password authentication handled by Supabase Auth
+                .eq('account_type', 'admin')
                 .single();
             
             if (error || !data) {
@@ -296,7 +341,7 @@ class DatabaseManager {
 
     // ==================== APPLICATION MANAGEMENT ====================
     
-    async submitApplication(applicationData) {
+    async submitApplication(opportunity_id, full_name, email, phone, message) {
         try {
             if (!(await this.ensureInitialized())) {
                 throw new Error('Supabase client not available');
@@ -304,14 +349,19 @@ class DatabaseManager {
             const { data: { user } } = await this.supabase.auth.getUser();
             if (!user) throw new Error('User must be logged in');
             
+            const applicationData = {
+                opportunity_id: opportunity_id,
+                seeker_id: user.id,
+                full_name: full_name,
+                email: email,
+                phone: phone,
+                message: message,
+                status: 'pending'
+            };
+            
             const { data, error } = await this.supabase
                 .from('applications')
-                .insert([{
-                    ...applicationData,
-                    seeker_id: user.id,
-                   // status: 'pending',
-                    created_at: new Date().toISOString()
-                }])
+                .insert([applicationData])
                 .select();
             
             if (error) throw error;
@@ -348,6 +398,112 @@ class DatabaseManager {
         } catch (error) {
             console.error('Get applications error:', error);
             return { success: false, error: error.message };
+        }
+    }
+
+    // ==================== ADMIN METHODS ====================
+    
+    async getUsers() {
+        try {
+            if (!(await this.ensureInitialized())) {
+                throw new Error('Supabase client not available');
+            }
+            
+            const { data, error } = await this.supabase
+                .from('users')
+                .select('*')
+                .order('created_at', { ascending: false });
+            
+            if (error) throw error;
+            return data || [];
+        } catch (error) {
+            console.error('Get users error:', error);
+            throw error;
+        }
+    }
+    
+    async getUserById(userId) {
+        try {
+            if (!(await this.ensureInitialized())) {
+                throw new Error('Supabase client not available');
+            }
+            
+            const { data, error } = await this.supabase
+                .from('users')
+                .select('*')
+                .eq('id', userId)
+                .single();
+            
+            if (error) throw error;
+            return data;
+        } catch (error) {
+            console.error('Get user by ID error:', error);
+            throw error;
+        }
+    }
+    
+    async deleteUser(userId) {
+        try {
+            if (!(await this.ensureInitialized())) {
+                throw new Error('Supabase client not available');
+            }
+            
+            // First delete from auth
+            const { error: authError } = await this.supabase.auth.admin.deleteUser(userId);
+            if (authError) {
+                console.warn('Auth delete error (may not have admin privileges):', authError);
+            }
+            
+            // Delete from users table
+            const { error: userError } = await this.supabase
+                .from('users')
+                .delete()
+                .eq('id', userId);
+            
+            if (userError) throw userError;
+            return { success: true };
+        } catch (error) {
+            console.error('Delete user error:', error);
+            throw error;
+        }
+    }
+    
+    async getOpportunityById(opportunityId) {
+        try {
+            if (!(await this.ensureInitialized())) {
+                throw new Error('Supabase client not available');
+            }
+            
+            const { data, error } = await this.supabase
+                .from('opportunities')
+                .select('*')
+                .eq('id', opportunityId)
+                .single();
+            
+            if (error) throw error;
+            return data;
+        } catch (error) {
+            console.error('Get opportunity by ID error:', error);
+            throw error;
+        }
+    }
+    
+    async deleteOpportunity(opportunityId) {
+        try {
+            if (!(await this.ensureInitialized())) {
+                throw new Error('Supabase client not available');
+            }
+            
+            const { error } = await this.supabase
+                .from('opportunities')
+                .delete()
+                .eq('id', opportunityId);
+            
+            if (error) throw error;
+            return { success: true };
+        } catch (error) {
+            console.error('Delete opportunity error:', error);
+            throw error;
         }
     }
 
@@ -517,6 +673,77 @@ class DatabaseManager {
         }
     }
 
+    // ==================== FILTER HELPER METHODS ====================
+    
+    async getUniqueCategories() {
+        try {
+            if (!(await this.ensureInitialized())) {
+                throw new Error('Supabase client not available');
+            }
+            const { data, error } = await this.supabase
+                .from('opportunities')
+                .select('category')
+                .not('category', 'is', null);
+            
+            if (error) throw error;
+            
+            const uniqueCategories = [...new Set(data.map(item => item.category))]
+                .filter(category => category && category.trim() !== '')
+                .sort();
+            
+            return { success: true, data: uniqueCategories };
+        } catch (error) {
+            console.error('Get unique categories error:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    async getUniqueTypes() {
+        try {
+            if (!(await this.ensureInitialized())) {
+                throw new Error('Supabase client not available');
+            }
+            const { data, error } = await this.supabase
+                .from('opportunities')
+                .select('type')
+                .not('type', 'is', null);
+            
+            if (error) throw error;
+            
+            const uniqueTypes = [...new Set(data.map(item => item.type))]
+                .filter(type => type && type.trim() !== '')
+                .sort();
+            
+            return { success: true, data: uniqueTypes };
+        } catch (error) {
+            console.error('Get unique types error:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    async getUniqueLocations() {
+        try {
+            if (!(await this.ensureInitialized())) {
+                throw new Error('Supabase client not available');
+            }
+            const { data, error } = await this.supabase
+                .from('opportunities')
+                .select('location')
+                .not('location', 'is', null);
+            
+            if (error) throw error;
+            
+            const uniqueLocations = [...new Set(data.map(item => item.location))]
+                .filter(location => location && location.trim() !== '')
+                .sort();
+            
+            return { success: true, data: uniqueLocations };
+        } catch (error) {
+            console.error('Get unique locations error:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
     // ==================== REAL-TIME SUBSCRIPTIONS ====================
     
     async subscribeToMessages(conversationId, callback) {
@@ -553,4 +780,6 @@ class DatabaseManager {
 
 // Initialize and export
 window.dbManager = new DatabaseManager();
+window.dataManager = window.dbManager; // For admin dashboard compatibility
 console.log('Database Manager initialized successfully');
+console.log('Available methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(window.dbManager)));

@@ -50,6 +50,23 @@
             color: #6b7280 !important; /* gray-500 */
         }
         
+        /* Account type selection styling */
+        .peer:checked + div {
+            background-color: #1f2937 !important; /* gray-800 */
+            border-color: #6b7280 !important; /* gray-500 */
+            border-width: 4px !important; /* thicker border when selected */
+            border-style: solid !important;
+        }
+        .peer:checked + div h3 {
+            color: white !important;
+        }
+        .peer:checked + div p {
+            color: #e5e7eb !important; /* gray-200 */
+        }
+        .peer:checked + div svg {
+            color: white !important;
+        }
+        
 
     </style>
 </head>
@@ -83,9 +100,34 @@
                             <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
                         </svg>
                     </button>
-                    <a href="signin-form.html" class="text-cyan-600 hover:text-cyan-700 px-4 py-2 rounded-lg transition-colors">
-                        Already have an account? Sign In
-                    </a>
+                    
+                    <!-- Guest Menu (shown when not signed in) -->
+                    <div id="guestMenu">
+                        <a href="signin-form.html" class="text-cyan-600 hover:text-cyan-700 px-4 py-2 rounded-lg transition-colors">
+                            Already have an account? Sign In
+                        </a>
+                    </div>
+                    
+                    <!-- Authenticated User Menu (shown when signed in) -->
+                    <div id="authenticatedMenu" class="hidden flex items-center space-x-4">
+                        <span id="userGreeting" class="text-gray-700 text-sm">Welcome!</span>
+                        <div class="relative">
+                            <button id="userMenuBtn" class="flex items-center space-x-2 text-gray-700 hover:text-cyan-600">
+                                <span id="userName" class="font-medium"></span>
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                </svg>
+                            </button>
+                            <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                                <a href="index.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><span class="inline-block w-5 text-center mr-2">🏠</span>Home</a>
+                                <a href="dashboard.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><span class="inline-block w-5 text-center mr-2">📊</span>Dashboard</a>
+                                <a href="browse-opportunities.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><span class="inline-block w-5 text-center mr-2">🔍</span>Browse Opportunities</a>
+                                <a href="#" onclick="goToProfile()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><span class="inline-block w-5 text-center mr-2">👤</span>Profile</a>
+                                <a href="messaging.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><span class="inline-block w-5 text-center mr-2">💬</span>Messages</a>
+                                <button id="signOutBtn" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><span class="inline-block w-5 text-center mr-2">🚪</span>Sign Out</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Mobile menu button -->
@@ -117,14 +159,14 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <label class="relative cursor-pointer">
                             <input type="radio" name="accountType" value="seeker" class="sr-only peer" required>
-                            <div class="p-4 border-2 border-gray-200 rounded-lg peer-checked:border-blue-500 peer-checked:bg-blue-50 hover:border-gray-300 transition-colors">
+                            <div class="p-4 border-2 border-gray-200 rounded-lg peer-checked:border-gray-500 peer-checked:bg-gray-800 hover:border-gray-300 transition-colors">
                                 <div class="flex items-center space-x-3">
-                                    <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="h-6 w-6 text-blue-600 peer-checked:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                     </svg>
                                     <div>
-                                        <h3 class="font-medium text-gray-900">I Need Help</h3>
-                                        <p class="text-sm text-gray-500">Looking for opportunities, resources, or support</p>
+                                        <h3 class="font-medium text-gray-900 peer-checked:text-white">I Need Help</h3>
+                                        <p class="text-sm text-gray-500 peer-checked:text-gray-200">Looking for opportunities, resources, or support</p>
                                     </div>
                                 </div>
                             </div>
@@ -132,14 +174,14 @@
                         
                         <label class="relative cursor-pointer">
                             <input type="radio" name="accountType" value="provider" class="sr-only peer" required>
-                            <div class="p-4 border-2 border-gray-200 rounded-lg peer-checked:border-blue-500 peer-checked:bg-blue-50 hover:border-gray-300 transition-colors">
+                            <div class="p-4 border-2 border-gray-200 rounded-lg peer-checked:border-gray-500 peer-checked:bg-gray-800 hover:border-gray-300 transition-colors">
                                 <div class="flex items-center space-x-3">
-                                    <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="h-6 w-6 text-green-600 peer-checked:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
                                     </svg>
                                     <div>
-                                        <h3 class="font-medium text-gray-900">I Can Help</h3>
-                                        <p class="text-sm text-gray-500">Offering opportunities, resources, or support</p>
+                                        <h3 class="font-medium text-gray-900 peer-checked:text-white">I Can Help</h3>
+                                        <p class="text-sm text-gray-500 peer-checked:text-gray-200">Offering opportunities, resources, or support</p>
                                     </div>
                                 </div>
                             </div>
@@ -172,9 +214,187 @@
                         <input type="tel" id="phone" name="phone" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     </div>
 
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address *</label>
+                            <input type="text" id="address" name="address" required placeholder="Street address, City" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
                     <div>
-                        <label for="location" class="block text-sm font-medium text-gray-700 mb-1">Location *</label>
-                        <input type="text" id="location" name="location" required placeholder="City, Country" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <label for="country" class="block text-sm font-medium text-gray-700 mb-1">Country *</label>
+                            <select id="country" name="country" required class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">Select Country</option>
+                                <option value="US">United States</option>
+                                <option value="CA">Canada</option>
+                                <option value="GB">United Kingdom</option>
+                                <option value="AU">Australia</option>
+                                <option value="DE">Germany</option>
+                                <option value="FR">France</option>
+                                <option value="IT">Italy</option>
+                                <option value="ES">Spain</option>
+                                <option value="NL">Netherlands</option>
+                                <option value="BE">Belgium</option>
+                                <option value="CH">Switzerland</option>
+                                <option value="AT">Austria</option>
+                                <option value="SE">Sweden</option>
+                                <option value="NO">Norway</option>
+                                <option value="DK">Denmark</option>
+                                <option value="FI">Finland</option>
+                                <option value="IE">Ireland</option>
+                                <option value="PT">Portugal</option>
+                                <option value="GR">Greece</option>
+                                <option value="PL">Poland</option>
+                                <option value="CZ">Czech Republic</option>
+                                <option value="HU">Hungary</option>
+                                <option value="RO">Romania</option>
+                                <option value="BG">Bulgaria</option>
+                                <option value="HR">Croatia</option>
+                                <option value="SI">Slovenia</option>
+                                <option value="SK">Slovakia</option>
+                                <option value="LT">Lithuania</option>
+                                <option value="LV">Latvia</option>
+                                <option value="EE">Estonia</option>
+                                <option value="LU">Luxembourg</option>
+                                <option value="MT">Malta</option>
+                                <option value="CY">Cyprus</option>
+                                <option value="JP">Japan</option>
+                                <option value="KR">South Korea</option>
+                                <option value="CN">China</option>
+                                <option value="IN">India</option>
+                                <option value="SG">Singapore</option>
+                                <option value="HK">Hong Kong</option>
+                                <option value="TW">Taiwan</option>
+                                <option value="TH">Thailand</option>
+                                <option value="MY">Malaysia</option>
+                                <option value="ID">Indonesia</option>
+                                <option value="PH">Philippines</option>
+                                <option value="VN">Vietnam</option>
+                                <option value="NZ">New Zealand</option>
+                                <option value="ZA">South Africa</option>
+                                <option value="NG">Nigeria</option>
+                                <option value="KE">Kenya</option>
+                                <option value="GH">Ghana</option>
+                                <option value="EG">Egypt</option>
+                                <option value="MA">Morocco</option>
+                                <option value="TN">Tunisia</option>
+                                <option value="DZ">Algeria</option>
+                                <option value="LY">Libya</option>
+                                <option value="SD">Sudan</option>
+                                <option value="ET">Ethiopia</option>
+                                <option value="UG">Uganda</option>
+                                <option value="TZ">Tanzania</option>
+                                <option value="RW">Rwanda</option>
+                                <option value="MW">Malawi</option>
+                                <option value="ZM">Zambia</option>
+                                <option value="ZW">Zimbabwe</option>
+                                <option value="BW">Botswana</option>
+                                <option value="NA">Namibia</option>
+                                <option value="SZ">Eswatini</option>
+                                <option value="LS">Lesotho</option>
+                                <option value="MG">Madagascar</option>
+                                <option value="MU">Mauritius</option>
+                                <option value="SC">Seychelles</option>
+                                <option value="AR">Argentina</option>
+                                <option value="BR">Brazil</option>
+                                <option value="CL">Chile</option>
+                                <option value="CO">Colombia</option>
+                                <option value="PE">Peru</option>
+                                <option value="VE">Venezuela</option>
+                                <option value="UY">Uruguay</option>
+                                <option value="PY">Paraguay</option>
+                                <option value="BO">Bolivia</option>
+                                <option value="EC">Ecuador</option>
+                                <option value="GY">Guyana</option>
+                                <option value="SR">Suriname</option>
+                                <option value="MX">Mexico</option>
+                                <option value="GT">Guatemala</option>
+                                <option value="BZ">Belize</option>
+                                <option value="SV">El Salvador</option>
+                                <option value="HN">Honduras</option>
+                                <option value="NI">Nicaragua</option>
+                                <option value="CR">Costa Rica</option>
+                                <option value="PA">Panama</option>
+                                <option value="CU">Cuba</option>
+                                <option value="JM">Jamaica</option>
+                                <option value="HT">Haiti</option>
+                                <option value="DO">Dominican Republic</option>
+                                <option value="PR">Puerto Rico</option>
+                                <option value="TT">Trinidad and Tobago</option>
+                                <option value="BB">Barbados</option>
+                                <option value="AG">Antigua and Barbuda</option>
+                                <option value="BS">Bahamas</option>
+                                <option value="DM">Dominica</option>
+                                <option value="GD">Grenada</option>
+                                <option value="KN">Saint Kitts and Nevis</option>
+                                <option value="LC">Saint Lucia</option>
+                                <option value="VC">Saint Vincent and the Grenadines</option>
+                                <option value="RU">Russia</option>
+                                <option value="UA">Ukraine</option>
+                                <option value="BY">Belarus</option>
+                                <option value="MD">Moldova</option>
+                                <option value="GE">Georgia</option>
+                                <option value="AM">Armenia</option>
+                                <option value="AZ">Azerbaijan</option>
+                                <option value="KZ">Kazakhstan</option>
+                                <option value="UZ">Uzbekistan</option>
+                                <option value="TM">Turkmenistan</option>
+                                <option value="TJ">Tajikistan</option>
+                                <option value="KG">Kyrgyzstan</option>
+                                <option value="AF">Afghanistan</option>
+                                <option value="PK">Pakistan</option>
+                                <option value="BD">Bangladesh</option>
+                                <option value="LK">Sri Lanka</option>
+                                <option value="MV">Maldives</option>
+                                <option value="NP">Nepal</option>
+                                <option value="BT">Bhutan</option>
+                                <option value="MM">Myanmar</option>
+                                <option value="LA">Laos</option>
+                                <option value="KH">Cambodia</option>
+                                <option value="BN">Brunei</option>
+                                <option value="TL">Timor-Leste</option>
+                                <option value="FJ">Fiji</option>
+                                <option value="PG">Papua New Guinea</option>
+                                <option value="SB">Solomon Islands</option>
+                                <option value="VU">Vanuatu</option>
+                                <option value="NC">New Caledonia</option>
+                                <option value="PF">French Polynesia</option>
+                                <option value="WS">Samoa</option>
+                                <option value="TO">Tonga</option>
+                                <option value="KI">Kiribati</option>
+                                <option value="TV">Tuvalu</option>
+                                <option value="NR">Nauru</option>
+                                <option value="PW">Palau</option>
+                                <option value="FM">Micronesia</option>
+                                <option value="MH">Marshall Islands</option>
+                                <option value="SA">Saudi Arabia</option>
+                                <option value="AE">United Arab Emirates</option>
+                                <option value="QA">Qatar</option>
+                                <option value="BH">Bahrain</option>
+                                <option value="KW">Kuwait</option>
+                                <option value="OM">Oman</option>
+                                <option value="YE">Yemen</option>
+                                <option value="JO">Jordan</option>
+                                <option value="LB">Lebanon</option>
+                                <option value="SY">Syria</option>
+                                <option value="IQ">Iraq</option>
+                                <option value="IR">Iran</option>
+                                <option value="IL">Israel</option>
+                                <option value="PS">Palestine</option>
+                                <option value="TR">Turkey</option>
+                                <option value="IS">Iceland</option>
+                                <option value="AD">Andorra</option>
+                                <option value="MC">Monaco</option>
+                                <option value="SM">San Marino</option>
+                                <option value="VA">Vatican City</option>
+                                <option value="LI">Liechtenstein</option>
+                                <option value="ME">Montenegro</option>
+                                <option value="RS">Serbia</option>
+                                <option value="MK">North Macedonia</option>
+                                <option value="AL">Albania</option>
+                                <option value="BA">Bosnia and Herzegovina</option>
+                                <option value="XK">Kosovo</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -209,20 +429,15 @@
                     </div>
 
                     <div>
-                        <label for="experience" class="block text-sm font-medium text-gray-700 mb-1">Years of Experience</label>
+                        <label for="experience" class="block text-sm font-medium text-gray-700 mb-1">Years in Business</label>
                         <select id="experience" name="experience" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">Select experience level</option>
+                            <option value="">Select years in business</option>
                             <option value="0-1">0-1 years</option>
                             <option value="2-5">2-5 years</option>
                             <option value="6-10">6-10 years</option>
                             <option value="11-15">11-15 years</option>
                             <option value="15+">15+ years</option>
                         </select>
-                    </div>
-
-                    <div>
-                        <label for="skills" class="block text-sm font-medium text-gray-700 mb-1">Skills & Expertise</label>
-                        <textarea id="skills" name="skills" rows="3" placeholder="List your key skills, separated by commas" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
                     </div>
                 </div>
 
@@ -233,40 +448,16 @@
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                         <label class="flex items-center space-x-2">
-                            <input type="checkbox" name="interests" value="healthcare" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                            <span class="text-sm text-gray-700">Healthcare</span>
+                            <input type="checkbox" name="interests" value="health" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <span class="text-sm text-gray-700">Health</span>
                         </label>
                         <label class="flex items-center space-x-2">
                             <input type="checkbox" name="interests" value="education" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                             <span class="text-sm text-gray-700">Education</span>
                         </label>
                         <label class="flex items-center space-x-2">
-                            <input type="checkbox" name="interests" value="environment" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                            <span class="text-sm text-gray-700">Environment</span>
-                        </label>
-                        <label class="flex items-center space-x-2">
-                            <input type="checkbox" name="interests" value="poverty" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                            <span class="text-sm text-gray-700">Poverty Alleviation</span>
-                        </label>
-                        <label class="flex items-center space-x-2">
-                            <input type="checkbox" name="interests" value="technology" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                            <span class="text-sm text-gray-700">Technology</span>
-                        </label>
-                        <label class="flex items-center space-x-2">
-                            <input type="checkbox" name="interests" value="human-rights" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                            <span class="text-sm text-gray-700">Human Rights</span>
-                        </label>
-                        <label class="flex items-center space-x-2">
-                            <input type="checkbox" name="interests" value="economic-development" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                            <span class="text-sm text-gray-700">Economic Development</span>
-                        </label>
-                        <label class="flex items-center space-x-2">
-                            <input type="checkbox" name="interests" value="disaster-relief" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                            <span class="text-sm text-gray-700">Disaster Relief</span>
-                        </label>
-                        <label class="flex items-center space-x-2">
-                            <input type="checkbox" name="interests" value="community-development" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                            <span class="text-sm text-gray-700">Community Development</span>
+                            <input type="checkbox" name="interests" value="social-services" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <span class="text-sm text-gray-700">Social Services</span>
                         </label>
                     </div>
                 </div>
@@ -276,13 +467,14 @@
                     <h2 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Additional Information</h2>
                     
                     <div>
-                        <label for="languages" class="block text-sm font-medium text-gray-700 mb-1">Languages Spoken</label>
-                        <input type="text" id="languages" name="languages" placeholder="English, French, Spanish, etc." class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <label for="note" class="block text-sm font-medium text-gray-700 mb-1">Note</label>
+                        <textarea id="note" name="note" rows="3" placeholder="Tell us about the opportunity" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
                     </div>
 
                     <div>
-                        <label for="bio" class="block text-sm font-medium text-gray-700 mb-1">Brief Bio</label>
-                        <textarea id="bio" name="bio" rows="3" placeholder="Tell us a bit about yourself and your interests..." class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                        <label for="attachment" class="block text-sm font-medium text-gray-700 mb-1">Attachment (Optional)</label>
+                        <input type="file" id="attachment" name="attachment" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png" class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                        <p class="text-xs text-gray-500 mt-1">Accepted formats: PDF, DOC, DOCX, TXT, JPG, JPEG, PNG (Max 10MB)</p>
                     </div>
                 </div>
 
@@ -325,11 +517,11 @@
     </main>
 
     <!-- JavaScript Modules -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/supabase-config.js"></script>
-    <script src="js/data-manager.js"></script>
-    <script src="js/form-validation.js"></script>
-    <script src="js/auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3"></script>
+    <script src="js/supabase-config.js?v=4"></script>
+    <script src="js/unified-auth.js?v=4"></script>
+    <script src="js/data-manager.js?v=4"></script>
+    <script src="js/form-validation.js?v=4"></script>
     
     <script>
         // Initialize components (using global instances)
@@ -338,9 +530,192 @@
         // formValidator is available globally
         
         document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication state and update navigation
+            checkUserAuth();
             setupFormValidation();
             setupEventListeners();
         });
+
+        // Check user authentication and update navigation
+        function checkUserAuth() {
+            console.log('Checking user authentication on registration page...');
+            
+            // Check for current authentication system (kajopo_session)
+            const sessionData = localStorage.getItem('kajopo_session');
+            let userIsAuthenticated = false;
+            let currentUser = null;
+            
+            console.log('Session data:', sessionData);
+            
+            if (sessionData) {
+                try {
+                    const parsed = JSON.parse(sessionData);
+                    console.log('Parsed session:', parsed);
+                    
+                    // Check for different session structures
+                    if (parsed.user && parsed.user.id) {
+                        // New structure: {user: {id: ..., email: ...}}
+                        userIsAuthenticated = true;
+                        currentUser = parsed.user;
+                    } else if (parsed.userId && parsed.email) {
+                        // Alternative structure: {userId: ..., email: ..., firstName: ...}
+                        userIsAuthenticated = true;
+                        currentUser = {
+                            id: parsed.userId,
+                            email: parsed.email,
+                            firstName: parsed.firstName,
+                            lastName: parsed.LastName || parsed.lastName,
+                            displayName: parsed.displayName,
+                            accountType: parsed.accountType,
+                            role: parsed.role
+                        };
+                    }
+                    
+                    console.log('User authenticated via session:', userIsAuthenticated);
+                    console.log('Current user from session:', currentUser);
+                } catch (error) {
+                    console.error('Error parsing session data:', error);
+                }
+            }
+            
+            // Fallback to old system for compatibility
+            if (!userIsAuthenticated) {
+                const userData = localStorage.getItem('kajopo_current_user') || localStorage.getItem('kajopo_user');
+                console.log('Fallback user data:', userData);
+                if (userData) {
+                    try {
+                        currentUser = JSON.parse(userData);
+                        userIsAuthenticated = true;
+                        console.log('User authenticated via fallback:', userIsAuthenticated);
+                    } catch (error) {
+                        console.error('Error parsing user data:', error);
+                    }
+                }
+            }
+            
+            console.log('Final user:', currentUser);
+            console.log('Final authenticated:', userIsAuthenticated);
+            
+            // Update navigation based on authentication state
+            if (currentUser) {
+                console.log('Showing authenticated menu on registration page');
+                document.getElementById('guestMenu').classList.add('hidden');
+                document.getElementById('authenticatedMenu').classList.remove('hidden');
+                
+                // Handle both old and new user data structures
+                let firstName = currentUser.firstName || '';
+                let lastName = currentUser.lastName || '';
+                let fullName = '';
+                
+                console.log('Processing user data:', currentUser);
+                console.log('firstName:', firstName, 'lastName:', lastName);
+                
+                if (firstName && lastName) {
+                    fullName = `${firstName} ${lastName}`;
+                } else if (currentUser.displayName) {
+                    fullName = currentUser.displayName;
+                    const names = currentUser.displayName.split(' ');
+                    firstName = names[0] || '';
+                    lastName = names[1] || '';
+                } else if (currentUser.name) {
+                    fullName = currentUser.name;
+                    const names = currentUser.name.split(' ');
+                    firstName = names[0] || '';
+                    lastName = names[1] || '';
+                } else if (currentUser.email) {
+                    fullName = currentUser.email;
+                    firstName = currentUser.email.split('@')[0];
+                }
+                
+                console.log('Processed names - firstName:', firstName, 'lastName:', lastName, 'fullName:', fullName);
+                
+                // Show user's name in greeting
+                const greeting = document.getElementById('userGreeting');
+                if (greeting && firstName) {
+                    greeting.textContent = `Welcome, ${firstName}!`;
+                }
+                
+                // Set user full name in menu button
+                const userNameSpan = document.getElementById('userName');
+                if (userNameSpan && fullName) {
+                    userNameSpan.textContent = fullName;
+                }
+                
+                // Setup user menu listeners
+                setupUserMenuListeners();
+            } else {
+                console.log('Showing guest menu on registration page');
+                document.getElementById('guestMenu').classList.remove('hidden');
+                document.getElementById('authenticatedMenu').classList.add('hidden');
+            }
+        }
+
+        // Setup user menu listeners
+        function setupUserMenuListeners() {
+            const userMenuBtn = document.getElementById('userMenuBtn');
+            const userDropdown = document.getElementById('userDropdown');
+            const signOutBtn = document.getElementById('signOutBtn');
+
+            console.log('Setting up user menu listeners on registration page...');
+            console.log('User menu button:', userMenuBtn);
+            console.log('User dropdown:', userDropdown);
+
+            if (userMenuBtn && userDropdown) {
+                userMenuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    userDropdown.classList.toggle('hidden');
+                });
+
+                document.addEventListener('click', function() {
+                    userDropdown.classList.add('hidden');
+                });
+
+                userDropdown.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
+
+            function handleSignOut() {
+                // Clear all session data
+                localStorage.removeItem('kajopo_session');
+                localStorage.removeItem('kajopo_current_user');
+                localStorage.removeItem('kajopo_user');
+                localStorage.removeItem('kajopo_user_session');
+                localStorage.removeItem('userAuthenticated');
+                localStorage.removeItem('userInfo');
+                
+                // Also clear Supabase session if available
+                if (window.supabaseAuth && typeof window.supabaseAuth.signOut === 'function') {
+                    window.supabaseAuth.signOut();
+                }
+                
+                // Redirect to home page
+                window.location.href = 'index.html';
+            }
+
+            if (signOutBtn) {
+                signOutBtn.addEventListener('click', handleSignOut);
+            }
+        }
+
+        function goToProfile() {
+            // Use the same authentication check as the rest of the page
+            const currentUser = checkUserAuth();
+            if (currentUser) {
+                const isSeeker = currentUser.accountType === 'seeker' || currentUser.role === 'I Need Help';
+                
+                if (isSeeker) {
+                    // Redirect to seeker profile
+                    window.location.href = 'seeker-profile.html';
+                } else {
+                    // Redirect to provider profile
+                    window.location.href = 'provider-profile.html';
+                }
+            } else {
+                // Fallback to seeker profile if no user data
+                window.location.href = 'seeker-profile.html';
+            }
+        }
 
         function setupFormValidation() {
             const form = document.getElementById('registrationForm');
@@ -349,7 +724,7 @@
             formValidator.setupRealTimeValidation(form, ValidationRules.registration);
             
             // Add real-time validation for all form fields
-            const fields = ['firstName', 'lastName', 'email', 'password', 'confirmPassword', 'location'];
+            const fields = ['firstName', 'lastName', 'email', 'password', 'confirmPassword', 'address', 'country'];
             fields.forEach(fieldId => {
                 const field = document.getElementById(fieldId);
                 if (field) {
@@ -382,18 +757,25 @@
             
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
-                handleRegistration();
+                e.stopPropagation();
+                handleRegistration(e);
             });
         }
 
-        async function handleRegistration() {
+        async function handleRegistration(e) {
             const form = document.getElementById('registrationForm');
             const submitBtn = form.querySelector('button[type="submit"]');
             
+            // Prevent any scrolling behavior
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
             try {
-                // Check if userAuth is available
-                if (typeof userAuth === 'undefined' || !userAuth) {
-                    console.error('UserAuth not available. Please ensure auth.js is loaded properly.');
+                // Check if unified auth is available
+                if (typeof window.unifiedAuth === 'undefined' || !window.unifiedAuth) {
+                    console.error('UnifiedAuth not available. Please ensure unified-auth.js is loaded properly.');
                     formValidator.showErrorMessage('Authentication system not ready. Please refresh the page.');
                     return;
                 }
@@ -421,24 +803,77 @@
                     }
                 }
                 
-                // Use enhanced auth system for registration
-                const registrationResult = await userAuth.register(userData);
+                // Combine address and country into location for the database
+                if (userData.address && userData.country) {
+                    userData.location = `${userData.address}, ${userData.country}`;
+                }
+                
+                
+                // Check for required fields
+                const requiredFields = ['firstName', 'lastName', 'email', 'password', 'accountType', 'address', 'country'];
+                const missingFields = requiredFields.filter(field => !userData[field] || userData[field].trim() === '');
+                
+                if (missingFields.length > 0) {
+                    formValidator.showErrorMessage(`Missing required fields: ${missingFields.join(', ')}`);
+                    return;
+                }
+                
+                // Validate password confirmation
+                if (userData.password !== userData.confirmPassword) {
+                    formValidator.showErrorMessage('Passwords do not match');
+                    return;
+                }
+                
+                // Use unified auth system for registration
+                const registrationResult = await window.unifiedAuth.register(userData);
+                
+                console.log('Registration result:', registrationResult);
                 
                 if (registrationResult.success) {
+                    // Get account type from registration result
+                    const accountType = registrationResult.accountType || userData.accountType;
+                    let redirectUrl = 'seeker-profile.html'; // Default to seeker profile
+                    
+                    // Redirect to appropriate profile page based on account type
+                    if (accountType === 'provider') {
+                        redirectUrl = 'provider-profile.html';
+                    } else if (accountType === 'seeker') {
+                        redirectUrl = 'seeker-profile.html';
+                    } else {
+                        // Default to seeker profile for unknown account types
+                        redirectUrl = 'seeker-profile.html';
+                    }
+                    
+                    console.log('Registration successful, redirecting to:', redirectUrl, 'for account type:', accountType);
+                    
                     // Show success message
-                    formValidator.showSuccessMessage('Account created successfully! Welcome to Kájọpọ̀!');
+                    formValidator.showSuccessMessage(registrationResult.message || 'Account created successfully! Welcome to Kájọpọ̀!');
+                    
+                    // Clear the form
+                    form.reset();
                     
                     // Redirect after a short delay
                     setTimeout(() => {
                         const returnUrl = new URLSearchParams(window.location.search).get('returnUrl');
-                        if (returnUrl && returnUrl.startsWith('/')) {
+                        // Only use returnUrl if it's not a profile page redirect
+                        if (returnUrl && returnUrl.startsWith('/') && 
+                            !returnUrl.includes('profile') && 
+                            !returnUrl.includes('dashboard')) {
                             window.location.href = returnUrl;
                         } else {
-                            window.location.href = 'dashboard.html';
+                            window.location.href = redirectUrl;
                         }
                     }, 2000);
+                } else {
+                    // Handle registration errors
+                    if (registrationResult.isRateLimited) {
+                        formValidator.showErrorMessage(registrationResult.error);
+                    } else if (registrationResult.userExists) {
+                        formValidator.showErrorMessage(registrationResult.error + ' <a href="signin-form.html" class="text-blue-400 hover:underline">Sign in here</a>');
+                    } else {
+                        formValidator.showErrorMessage(registrationResult.error || 'Registration failed. Please try again.');
+                    }
                 }
-                // Error handling is done in the auth.js file
             } catch (error) {
                 console.error('Registration error:', error);
                 errorHandler.handleError(error, 'Registration');
@@ -472,11 +907,6 @@
             document.body.appendChild(overlay);
         }
 
-        // Demo function to clear registration (for testing)
-        function clearRegistration() {
-            localStorage.removeItem('kajopo_user');
-            alert('Registration cleared. You can now test the registration flow again.');
-        }
     </script>
     
     <!-- Theme Toggle Script -->

@@ -444,25 +444,108 @@ function updateResultsCount(count) {
     }
 }
 
+// Check user authentication
+function checkUserAuth() {
+    console.log('=== APPLY NOW AUTH CHECK START ===');
+    console.log('Checking user authentication for Apply Now button...');
+    
+    // Check for current authentication system (kajopo_session)
+    const sessionData = localStorage.getItem('kajopo_session');
+    let userIsAuthenticated = false;
+    let currentUser = null;
+    
+    console.log('Raw session data from localStorage:', sessionData);
+    
+    if (sessionData) {
+        try {
+            const parsed = JSON.parse(sessionData);
+            console.log('Parsed session object:', parsed);
+            console.log('Session keys:', Object.keys(parsed));
+            
+            // Check for different session structures
+            if (parsed.user && parsed.user.id) {
+                console.log('Found user object in session:', parsed.user);
+                userIsAuthenticated = true;
+                currentUser = parsed.user;
+            } else if (parsed.userId && parsed.email) {
+                console.log('Found userId/email structure in session');
+                userIsAuthenticated = true;
+                currentUser = {
+                    id: parsed.userId,
+                    email: parsed.email,
+                    firstName: parsed.firstName,
+                    lastName: parsed.LastName || parsed.lastName,
+                    displayName: parsed.displayName,
+                    accountType: parsed.accountType,
+                    role: parsed.role
+                };
+            } else {
+                console.log('Session data found but no recognized user structure');
+                console.log('Available fields:', Object.keys(parsed));
+            }
+            
+            console.log('User authenticated via session:', userIsAuthenticated);
+            console.log('Current user from session:', currentUser);
+        } catch (error) {
+            console.error('Error parsing session data:', error);
+        }
+    } else {
+        console.log('No session data found in localStorage');
+    }
+    
+    // Fallback to old system for compatibility
+    if (!userIsAuthenticated) {
+        console.log('Trying fallback authentication methods...');
+        const userData = localStorage.getItem('kajopo_current_user') || localStorage.getItem('kajopo_user');
+        console.log('Fallback user data:', userData);
+        if (userData) {
+            try {
+                currentUser = JSON.parse(userData);
+                userIsAuthenticated = true;
+                console.log('User authenticated via fallback:', userIsAuthenticated);
+            } catch (error) {
+                console.error('Error parsing fallback user data:', error);
+            }
+        } else {
+            console.log('No fallback user data found');
+        }
+    }
+    
+    console.log('=== FINAL AUTH RESULT ===');
+    console.log('Final user for Apply Now:', currentUser);
+    console.log('Final authenticated for Apply Now:', userIsAuthenticated);
+    console.log('=== APPLY NOW AUTH CHECK END ===');
+    return currentUser;
+}
+
 function setupApplyNowButtons() {
+    console.log('Setting up Apply Now button listeners...');
     document.addEventListener('click', function(e) {
         if (e.target.classList.contains('apply-now-btn')) {
             e.preventDefault();
             const opportunityId = e.target.getAttribute('data-opportunity-id');
             
+            console.log('Apply Now button clicked for opportunity:', opportunityId);
+            
             // Check if user is authenticated
             const user = checkUserAuth();
             if (!user) {
+                console.log('User not authenticated, redirecting to sign in');
                 alert('Please sign in to apply for opportunities.');
                 window.location.href = 'signin-form.html';
                 return;
             }
             
+            console.log('User is authenticated, redirecting to application form');
             // Redirect to application form
-            window.location.href = `application-form.html?opportunity=${opportunityId}`;
+            window.location.href = `application-form.html?opportunity_id=${opportunityId}`;
         }
     });
+    console.log('Apply Now button listeners set up successfully');
 }
+
+// Make function available globally
+window.setupApplyNowButtons = setupApplyNowButtons;
 
 // Export for use in other files
 if (typeof module !== 'undefined' && module.exports) {

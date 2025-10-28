@@ -6,7 +6,9 @@
     <title>Opportunity Seeker Profile - Kájọpọ̀ Succeed Together</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/unified-auth.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <!-- Theme System -->
     <link rel="stylesheet" href="css/themes.css">
@@ -299,21 +301,6 @@
             margin-bottom: 1rem;
         }
 
-        /* Skills */
-        .skills-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        .skill-tag {
-            background: #e0e7ff;
-            color: #3730a3;
-            padding: 0.5rem 1rem;
-            border-radius: 2rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
 
         /* Experience */
         .experience-item {
@@ -574,27 +561,6 @@
                     <p>My mission is to help others succeed by sharing knowledge, providing mentorship, and contributing to projects that create lasting social change. I'm particularly interested in educational technology, digital literacy programs, and community development initiatives.</p>
                 </div>
 
-                <!-- Skills Section -->
-                <div class="card">
-                    <h2>
-                        <svg class="contact-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-                        </svg>
-                        Skills & Expertise
-                    </h2>
-                    <div class="skills-list">
-                        <span class="skill-tag">JavaScript</span>
-                        <span class="skill-tag">Python</span>
-                        <span class="skill-tag">Teaching</span>
-                        <span class="skill-tag">Project Management</span>
-                        <span class="skill-tag">Curriculum Development</span>
-                        <span class="skill-tag">Digital Literacy</span>
-                        <span class="skill-tag">Community Outreach</span>
-                        <span class="skill-tag">Mentoring</span>
-                        <span class="skill-tag">Grant Writing</span>
-                        <span class="skill-tag">Public Speaking</span>
-                    </div>
-                </div>
 
                 <!-- Experience Section -->
                 <div class="card">
@@ -748,16 +714,104 @@
             }
         });
 
+        // Authentication check
+        function checkUserAuth() {
+            console.log('=== SEEKER PROFILE AUTH CHECK START ===');
+            console.log('Checking user authentication for seeker profile...');
+            
+            // Use session data instead of unified auth
+            const sessionData = localStorage.getItem('kajopo_session');
+            let userIsAuthenticated = false;
+            let currentUser = null;
+            
+            console.log('Raw session data for seeker profile:', sessionData);
+            
+            if (sessionData) {
+                try {
+                    const parsed = JSON.parse(sessionData);
+                    console.log('Parsed session for seeker profile:', parsed);
+                    
+                    // Check for different session structures
+                    if (parsed.user && parsed.user.id) {
+                        console.log('Found user object in session for seeker profile');
+                        userIsAuthenticated = true;
+                        currentUser = parsed.user;
+                    } else if (parsed.userId && parsed.email) {
+                        console.log('Found userId/email structure in session for seeker profile');
+                        userIsAuthenticated = true;
+                        currentUser = {
+                            id: parsed.userId,
+                            email: parsed.email,
+                            firstName: parsed.firstName,
+                            lastName: parsed.LastName || parsed.lastName,
+                            displayName: parsed.displayName,
+                            accountType: parsed.accountType,
+                            role: parsed.role
+                        };
+                    }
+                    
+                    console.log('User authenticated for seeker profile:', userIsAuthenticated);
+                    console.log('Current user for seeker profile:', currentUser);
+                } catch (error) {
+                    console.error('Error parsing session data for seeker profile:', error);
+                }
+            }
+            
+            // Fallback to old system for compatibility
+            if (!userIsAuthenticated) {
+                console.log('Trying fallback authentication for seeker profile...');
+                const userData = localStorage.getItem('kajopo_current_user') || localStorage.getItem('kajopo_user');
+                if (userData) {
+                    try {
+                        currentUser = JSON.parse(userData);
+                        userIsAuthenticated = true;
+                        console.log('User authenticated via fallback for seeker profile:', currentUser);
+                    } catch (error) {
+                        console.error('Error parsing fallback user data for seeker profile:', error);
+                    }
+                }
+            }
+            
+            console.log('=== FINAL SEEKER PROFILE AUTH RESULT ===');
+            console.log('Final user for seeker profile:', currentUser);
+            console.log('Final authenticated for seeker profile:', userIsAuthenticated);
+            console.log('=== SEEKER PROFILE AUTH CHECK END ===');
+            
+            // Check if user is authenticated
+            if (!userIsAuthenticated || !currentUser) {
+                console.log('No user found, redirecting to sign in');
+                window.location.href = 'signin-form.html';
+                return false;
+            }
+            
+            // Check if user is a seeker
+            const accountType = currentUser.accountType || currentUser.role;
+            const isSeeker = accountType === 'seeker' || accountType === 'I Need Help';
+            
+            console.log('Account type for seeker profile:', accountType);
+            console.log('Is seeker:', isSeeker);
+            
+            if (!isSeeker) {
+                console.log('User is not a seeker, redirecting to appropriate profile');
+                if (accountType === 'provider' || accountType === 'I Can Help') {
+                    window.location.href = 'provider-profile.html';
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
+                return false;
+            }
+            
+            // Store current user globally for use in updateUserInfo
+            window.currentUser = currentUser;
+            
+            return true;
+        }
+
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             // Check authentication
-            let userData = localStorage.getItem('kajopo_current_user');
-            if (!userData) {
-                userData = localStorage.getItem('kajopo_user');
-            }
-            if (!userData) {
-                window.location.href = 'signin-form.html';
-                return;
+            if (!checkUserAuth()) {
+                return; // Stop execution if not authenticated
             }
             
             // Initialize theme
@@ -786,43 +840,156 @@
         });
         
         function updateUserInfo() {
-            let user = localStorage.getItem('kajopo_current_user');
-            if (!user) {
-                user = localStorage.getItem('kajopo_user');
+            console.log('=== UPDATE USER INFO START ===');
+            console.log('Updating user info for seeker profile...');
+            
+            // Use the current user from the authentication check
+            let currentUser = window.currentUser;
+            
+            if (!currentUser) {
+                console.log('No current user found, trying to get from session...');
+                // Fallback to session data
+                const sessionData = localStorage.getItem('kajopo_session');
+                if (sessionData) {
+                    try {
+                        const parsed = JSON.parse(sessionData);
+                        if (parsed.user && parsed.user.id) {
+                            currentUser = parsed.user;
+                        } else if (parsed.userId && parsed.email) {
+                            currentUser = {
+                                id: parsed.userId,
+                                email: parsed.email,
+                                firstName: parsed.firstName,
+                                lastName: parsed.LastName || parsed.lastName,
+                                displayName: parsed.displayName,
+                                accountType: parsed.accountType,
+                                role: parsed.role
+                            };
+                        }
+                    } catch (error) {
+                        console.error('Error parsing session data for updateUserInfo:', error);
+                    }
+                }
             }
-            if (user) {
-                const userData = JSON.parse(user);
-                const firstName = userData.firstName || 'User';
-                const lastName = userData.lastName || '';
+            
+            if (currentUser) {
+                console.log('Current user for updateUserInfo:', currentUser);
+                
+                // Get user name information
+                let firstName = currentUser.firstName || '';
+                let lastName = currentUser.lastName || '';
+                let fullName = '';
+                
+                // Build full name from available data
+                if (firstName && lastName) {
+                    fullName = `${firstName} ${lastName}`;
+                } else if (currentUser.displayName) {
+                    fullName = currentUser.displayName;
+                    // Try to split display name into first and last
+                    const nameParts = currentUser.displayName.split(' ');
+                    firstName = nameParts[0] || '';
+                    lastName = nameParts.slice(1).join(' ') || '';
+                } else if (currentUser.email) {
+                    fullName = currentUser.email.split('@')[0];
+                    firstName = fullName;
+                } else {
+                    fullName = 'User';
+                    firstName = 'User';
+                }
+                
+                // Generate initials
                 const initials = (firstName.charAt(0) + (lastName.charAt(0) || '')).toUpperCase();
                 
-                document.getElementById('userName').textContent = firstName + (lastName ? ' ' + lastName : '');
-                document.getElementById('userInitials').textContent = initials;
-                document.getElementById('profileFullName').textContent = firstName + (lastName ? ' ' + lastName : '');
+                console.log('Processed user info:', { firstName, lastName, fullName, initials });
+                
+                // Update navigation elements
+                const userNameElement = document.getElementById('userName');
+                const userInitialsElement = document.getElementById('userInitials');
+                const profileFullNameElement = document.getElementById('profileFullName');
+                
+                if (userNameElement) {
+                    userNameElement.textContent = fullName;
+                    console.log('Updated userName:', fullName);
+                }
+                
+                if (userInitialsElement) {
+                    userInitialsElement.textContent = initials;
+                    console.log('Updated userInitials:', initials);
+                }
+                
+                if (profileFullNameElement) {
+                    profileFullNameElement.textContent = fullName;
+                    console.log('Updated profileFullName:', fullName);
+                }
                 
                 // Update profile avatar
                 const profileAvatar = document.querySelector('.profile-avatar');
                 if (profileAvatar) {
                     profileAvatar.textContent = initials;
+                    console.log('Updated profile avatar:', initials);
                 }
+                
+                console.log('User info updated successfully');
+            } else {
+                console.log('No user data found for updateUserInfo');
             }
+            
+            console.log('=== UPDATE USER INFO END ===');
         }
         
         function goToProfile() {
-            const currentUser = JSON.parse(localStorage.getItem('kajopo_current_user') || localStorage.getItem('kajopo_user'));
+            console.log('goToProfile called from seeker profile - checking session data...');
+            
+            // Use session data instead of localStorage
+            const sessionData = localStorage.getItem('kajopo_session');
+            let currentUser = null;
+            
+            if (sessionData) {
+                try {
+                    const parsed = JSON.parse(sessionData);
+                    console.log('Session data for goToProfile from seeker profile:', parsed);
+                    
+                    // Check for different session structures
+                    if (parsed.user && parsed.user.id) {
+                        currentUser = parsed.user;
+                    } else if (parsed.userId && parsed.email) {
+                        currentUser = {
+                            id: parsed.userId,
+                            email: parsed.email,
+                            firstName: parsed.firstName,
+                            lastName: parsed.LastName || parsed.lastName,
+                            displayName: parsed.displayName,
+                            accountType: parsed.accountType,
+                            role: parsed.role
+                        };
+                    }
+                    
+                    console.log('Current user for goToProfile from seeker profile:', currentUser);
+                } catch (error) {
+                    console.error('Error parsing session data for goToProfile from seeker profile:', error);
+                }
+            }
+            
             if (currentUser) {
-                const isSeeker = currentUser.accountType === 'seeker' || currentUser.role === 'I Need Help';
+                const accountType = currentUser.accountType || currentUser.role;
+                console.log('Account type for goToProfile from seeker profile:', accountType);
                 
-                if (isSeeker) {
-                    // Redirect to seeker profile
-                    window.location.href = 'seeker-profile.html';
-                } else {
-                    // Redirect to provider profile
+                if (accountType === 'seeker' || accountType === 'I Need Help') {
+                    console.log('Already on seeker profile, staying here');
+                    // Already on seeker profile, no need to redirect
+                    return;
+                } else if (accountType === 'provider' || accountType === 'I Can Help') {
+                    console.log('Redirecting to provider profile');
                     window.location.href = 'provider-profile.html';
+                } else {
+                    console.log('Unknown account type, staying on seeker profile');
+                    // Stay on seeker profile for unknown types
+                    return;
                 }
             } else {
-                // Fallback to seeker profile if no user data
-                window.location.href = 'seeker-profile.html';
+                console.log('No user data found, staying on seeker profile');
+                // Stay on seeker profile if no user data
+                return;
             }
         }
         

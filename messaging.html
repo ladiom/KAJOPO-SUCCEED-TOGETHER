@@ -1019,24 +1019,72 @@
 
         // User Menu Functionality
         function checkUserAuth() {
-            // Check if user is authenticated (in a real app, this would check session/token)
-            const isAuthenticated = localStorage.getItem('userAuthenticated') === 'true';
-            const userMenu = document.getElementById('userMenu');
+            // Check for current authentication system (kajopo_session)
+            const sessionData = localStorage.getItem('kajopo_session');
+            let userIsAuthenticated = false;
+            let currentUser = null;
             
-            if (isAuthenticated) {
-                userMenu.style.display = 'block';
-                updateUserInfo();
-            } else {
-                // Redirect to sign in if not authenticated
-                window.location.href = 'signin-form.html';
+            if (sessionData) {
+                try {
+                    const parsed = JSON.parse(sessionData);
+                    userIsAuthenticated = parsed.user && parsed.user.id;
+                    currentUser = parsed.user;
+                } catch (error) {
+                    console.error('Error parsing session data:', error);
+                }
             }
+            
+            // Fallback to old system for compatibility
+            if (!userIsAuthenticated) {
+                const userData = localStorage.getItem('kajopo_current_user') || localStorage.getItem('kajopo_user');
+                if (userData) {
+                    try {
+                        currentUser = JSON.parse(userData);
+                        userIsAuthenticated = true;
+                    } catch (error) {
+                        console.error('Error parsing user data:', error);
+                    }
+                }
+            }
+            
+            // Check if user is authenticated
+            if (!userIsAuthenticated || !currentUser) {
+                console.log('No user found, redirecting to sign in');
+                window.location.href = 'signin-form.html';
+                return false;
+            }
+            
+            const userMenu = document.getElementById('userMenu');
+            if (userMenu) {
+                userMenu.style.display = 'block';
+                updateUserInfo(currentUser);
+            }
+            
+            return true;
         }
 
-        function updateUserInfo() {
-            // Get user info from localStorage (in a real app, this would come from API)
-            const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
-            const userName = userInfo.name || 'User';
-            const userInitials = userName.split(' ').map(n => n[0]).join('').toUpperCase();
+        function updateUserInfo(user) {
+            // Handle both old and new user data structures
+            let userName = 'User';
+            let userInitials = 'U';
+            
+            if (user) {
+                if (user.firstName && user.lastName) {
+                    userName = `${user.firstName} ${user.lastName}`;
+                    userInitials = `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+                } else if (user.name) {
+                    userName = user.name;
+                    userInitials = user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+                } else if (user.email) {
+                    userName = user.email;
+                    userInitials = user.email[0].toUpperCase();
+                }
+            } else {
+                // Fallback to old system
+                const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+                userName = userInfo.name || 'User';
+                userInitials = userName.split(' ').map(n => n[0]).join('').toUpperCase();
+            }
             
             document.getElementById('userName').textContent = userName;
             document.getElementById('userInitials').textContent = userInitials;
@@ -1073,7 +1121,10 @@
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', () => {
-            checkUserAuth();
+            if (!checkUserAuth()) {
+                return; // Stop execution if not authenticated
+            }
+            
             setupUserMenuListeners();
             loadConversation('sarah-chen');
         });

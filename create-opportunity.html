@@ -250,14 +250,16 @@
     <script>
         // Authentication check
         function checkUserAuth() {
-            const userData = localStorage.getItem('kajopo_current_user') || localStorage.getItem('kajopo_user');
+            let userData = localStorage.getItem('kajopo_session') || localStorage.getItem('kajopo_current_user') || localStorage.getItem('kajopo_user');
             if (!userData) {
                 alert('Please sign in to create opportunities.');
                 window.location.href = 'signin-form.html?returnUrl=' + encodeURIComponent(window.location.href);
                 return false;
             }
             
-            const user = JSON.parse(userData);
+            // Parse session data and extract user object
+            const sessionData = JSON.parse(userData);
+            const user = sessionData.user || sessionData;
             
             // Check if user is a provider
             if (user.accountType !== 'provider' && user.role !== 'I Can Help') {

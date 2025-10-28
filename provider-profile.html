@@ -351,14 +351,14 @@
         }
 
         /* Skills and Experience Styling */
-        .skills-list {
+        .services-list {
             display: flex;
             flex-wrap: wrap;
             gap: 0.5rem;
             margin-top: 1rem;
         }
 
-        .skill-tag {
+        .service-tag {
             background: var(--bg-tertiary);
             color: var(--text-primary);
             padding: 0.5rem 1rem;
@@ -617,6 +617,9 @@
             }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/unified-auth.js"></script>
 </head>
 <body>
     <!-- Navigation Header -->
@@ -753,17 +756,17 @@
                         </svg>
                         Services & Opportunities We Provide
                     </h2>
-                    <div class="skills-list">
-                        <span class="skill-tag">Technology Training</span>
-                        <span class="skill-tag">Mentorship Programs</span>
-                        <span class="skill-tag">Grant Funding</span>
-                        <span class="skill-tag">Career Development</span>
-                        <span class="skill-tag">Digital Literacy</span>
-                        <span class="skill-tag">Community Outreach</span>
-                        <span class="skill-tag">Educational Resources</span>
-                        <span class="skill-tag">Networking Events</span>
-                        <span class="skill-tag">Skill Workshops</span>
-                        <span class="skill-tag">Project Collaboration</span>
+                    <div class="services-list">
+                        <span class="service-tag">Technology Training</span>
+                        <span class="service-tag">Mentorship Programs</span>
+                        <span class="service-tag">Grant Funding</span>
+                        <span class="service-tag">Career Development</span>
+                        <span class="service-tag">Digital Literacy</span>
+                        <span class="service-tag">Community Outreach</span>
+                        <span class="service-tag">Educational Resources</span>
+                        <span class="service-tag">Networking Events</span>
+                        <span class="service-tag">Skill Workshops</span>
+                        <span class="service-tag">Project Collaboration</span>
                     </div>
                 </div>
 
@@ -850,41 +853,89 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            checkUserAuth();
+            if (!checkUserAuth()) {
+                return; // Stop execution if not authenticated
+            }
+            
             updateUserInfo();
-
             loadProviderOpportunities();
         });
 
         function checkUserAuth() {
-            let user = localStorage.getItem('kajopo_current_user');
-            if (!user) {
-                user = localStorage.getItem('kajopo_user');
+            // Wait for unified auth to initialize
+            if (typeof window.unifiedAuth === 'undefined') {
+                console.log('Unified auth not loaded, waiting...');
+                setTimeout(() => {
+                    checkUserAuth();
+                }, 500);
+                return false;
             }
-            if (!user) {
-                console.log('No user found, redirecting to signin');
+            
+            // Check if Supabase is ready
+            if (!window.unifiedAuth.isSupabaseReady()) {
+                console.log('Supabase not ready, waiting...');
+                setTimeout(() => {
+                    checkUserAuth();
+                }, 500);
+                return false;
+            }
+            
+            // Use unified auth system
+            const currentUser = window.unifiedAuth.getCurrentUser();
+            const userIsAuthenticated = window.unifiedAuth.isAuthenticated();
+            
+            console.log('Authentication check:', { currentUser, userIsAuthenticated });
+            
+            // Fallback to old system for compatibility
+            if (!userIsAuthenticated) {
+                const userData = localStorage.getItem('kajopo_current_user') || localStorage.getItem('kajopo_user');
+                if (userData) {
+                    try {
+                        currentUser = JSON.parse(userData);
+                        userIsAuthenticated = true;
+                    } catch (error) {
+                        console.error('Error parsing user data:', error);
+                    }
+                }
+            }
+            
+            // Check if user is authenticated
+            if (!userIsAuthenticated || !currentUser) {
+                console.log('No user found, redirecting to sign in');
                 window.location.href = 'signin-form.html';
-                return;
+                return false;
             }
             
             // Check if user is a provider
-            const userData = JSON.parse(user);
-            if (userData.accountType !== 'provider') {
-                alert('Access denied. This page is only accessible to opportunity providers.');
-                window.location.href = 'dashboard.html';
-                return;
+            const isProvider = currentUser.accountType === 'provider' || currentUser.role === 'I Can Help';
+            if (!isProvider) {
+                console.log('User is not a provider, redirecting to appropriate profile');
+                if (currentUser.accountType === 'seeker' || currentUser.role === 'I Need Help') {
+                    window.location.href = 'seeker-profile.html';
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
+                return false;
             }
+            
+            return true;
         }
 
         function updateUserInfo() {
-            let user = localStorage.getItem('kajopo_current_user');
-            if (!user) {
-                user = localStorage.getItem('kajopo_user');
+            let userData = localStorage.getItem('kajopo_session') || localStorage.getItem('kajopo_current_user') || localStorage.getItem('kajopo_user');
+            if (!userData) return;
+            
+            const sessionData = JSON.parse(userData);
+            let user = sessionData.user || sessionData;
+            
+            // If user is a string, parse it; if it's already an object, use it directly
+            if (typeof user === 'string') {
+                user = JSON.parse(user);
             }
+            
             if (user) {
-                const userData = JSON.parse(user);
-                const firstName = userData.firstName || 'Provider';
-                const lastName = userData.lastName || 'User';
+                const firstName = user.firstName || 'Provider';
+                const lastName = user.lastName || 'User';
                 const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
                 
                 document.getElementById('userName').textContent = firstName + ' ' + lastName;
@@ -904,11 +955,17 @@
 
         
         function loadProviderOpportunities() {
-            let userData = localStorage.getItem('kajopo_current_user');
-            if (!userData) {
-                userData = localStorage.getItem('kajopo_user');
+            let userData = localStorage.getItem('kajopo_session') || localStorage.getItem('kajopo_current_user') || localStorage.getItem('kajopo_user');
+            if (!userData) return;
+            
+            const sessionData = JSON.parse(userData);
+            let user = sessionData.user || sessionData;
+            
+            // If user is a string, parse it; if it's already an object, use it directly
+            if (typeof user === 'string') {
+                user = JSON.parse(user);
             }
-            const user = JSON.parse(userData);
+            
             const opportunities = JSON.parse(localStorage.getItem('kajopo_opportunities') || '[]');
             const providerOpportunities = opportunities.filter(opp => 
                 opp.providerId === (user.id || user.email)
