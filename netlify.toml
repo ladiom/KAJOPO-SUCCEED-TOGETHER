@@ -1,7 +1,10 @@
 # Netlify configuration for Kájọpọ̀ Connect
 [build]
-  # No build command needed for static site
   publish = "."
+  command = "echo 'No build step required for static site'"
+
+[build.environment]
+  NODE_VERSION = "18"
 
 # Redirect rules for SPA-like behavior
 [[redirects]]
@@ -78,13 +81,7 @@
 [context.deploy-preview]
   command = "echo 'Deploy preview'"
 
-[build]
-  publish = "."
-  command = "echo 'No build step required for static site'"
-
-[build.environment]
-  NODE_VERSION = "18"
-
+# Catch-all redirect for SPA behavior (must be last)
 [[redirects]]
   from = "/*"
   to = "/index.html"
